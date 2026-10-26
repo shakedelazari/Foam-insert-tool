@@ -473,7 +473,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.0 · 27 Oct 2026&#10;&#10;• Lid support: Base/Lid per part, layout, Close/Open lid animation&#10;• Arrangement options: Puzzle, Centered, Straight&#10;• Grid with 5 mm snap + red too-close highlight&#10;• Save project (copy panel) + Open project dropdown&#10;• No-fit cards show parts without wall gap&#10;• Shell-Case 2-page drawing with title block&#10;• Minimum cavity depth 5 mm rule&#10;• Base + lid together in Layout top view" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.0</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V2.1 · 27 Oct 2026&#10;&#10;V2.1: Fixed downloads on GitHub Pages&#10;&#10;V2.0: Lid, grid, Puzzle/Centered/Straight layouts,&#10;Save/Open project, no-fit preview, Shell-Case&#10;drawing template, 5 mm min cavity depth" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.1</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10365,36 +10365,23 @@ function openFinger(){const p=S.parts.find(q=>q.id===S.sel);if(!p){toast('Click 
   ${p.fingers.length?`<div>${p.fingers.map((f,i)=>`<div class="row"><span>${f.side}, ${f.w} mm</span><button class="btn sm" data-fp="del" data-i="${i}">Remove</button></div>`).join('')}</div>`:''}</div>`;}
 /* ---- exports ---- */
 function dl(name,data,type){
-  /* Claude artifact sandboxes block direct downloads. Strategy:
-     1. Try window.open() to open the blob in a new tab (user presses Ctrl+S or browser auto-saves)
-     2. Show a link the user can right-click → Save As, or open in a new tab
-     3. Show the raw text in a <textarea> as last resort for STEP/DXF/JSON */
   const b=new Blob([data],{type}),url=URL.createObjectURL(b);
-  /* try new tab first */
-  let opened=null;
-  try{opened=window.open(url,'_blank');}catch(e){}
-  const msg=$('#exMsg');
-  if(!msg)return;
+  const inSandbox=window.location.origin==='null'||window.location.href.startsWith('blob:')||window.location.hostname.endsWith('claude.ai');
+  const a=document.createElement('a');a.href=url;a.download=name;
+  if(!inSandbox){
+    /* GitHub Pages or any real host: direct download works fine */
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    const msg=$('#exMsg');if(msg){msg.querySelectorAll('.dlfall').forEach(x=>x.remove());
+      const note=document.createElement('div');note.className='dlfall';note.style.cssText='margin-top:8px;font-size:13px;color:#555;';
+      note.textContent=name+' downloaded.';msg.appendChild(note);}
+    setTimeout(()=>URL.revokeObjectURL(url),60000);return;}
+  /* Inside Claude artifact sandbox: direct download is blocked — show copy panel */
+  const msg=$('#exMsg');if(!msg)return;
   msg.querySelectorAll('.dlfall').forEach(x=>x.remove());
   const wrap=document.createElement('div');wrap.className='dlfall';
   wrap.style.cssText='margin-top:10px;padding:10px 14px;background:#fdf6f2;border:1px solid #e8c9b8;border-radius:10px;';
-  if(opened){
-    wrap.innerHTML=`<b>File opened in a new tab.</b> In the new tab press <b>Ctrl + S</b> (Windows) or <b>Cmd + S</b> (Mac) to save it as <b>${name}</b>.`;
-  } else {
-    /* new tab blocked - show right-click link */
-    const ln=document.createElement('a');ln.href=url;ln.target='_blank';ln.rel='noopener';
-    ln.textContent='Open file in new tab (then press Ctrl+S / Cmd+S to save as '+name+')';
-    ln.style.cssText='display:block;font-weight:600;color:#c05832;margin-bottom:6px;';
-    wrap.appendChild(ln);
-    /* for text formats also offer copy-to-clipboard */
-    if(type.includes('text')||type.includes('step')||type.includes('json')||type.includes('dxf')){
-      const cb=document.createElement('button');cb.className='btn sm';cb.textContent='Copy to clipboard';cb.style.marginTop='4px';
-      cb.onclick=()=>{navigator.clipboard.writeText(data).then(()=>{cb.textContent='Copied!';setTimeout(()=>cb.textContent='Copy to clipboard',2500);});};
-      wrap.appendChild(cb);
-    }
-  }
-  msg.appendChild(wrap);
-  setTimeout(()=>{URL.revokeObjectURL(url);},300000);}
+  wrap.innerHTML='<b>Downloads are blocked inside the Claude preview.</b> Open the tool from the <a href="https://shakedelazari.github.io/Foam-insert-tool/" target="_blank" style="color:#c05832;font-weight:600">GitHub link</a> to download files directly.';
+  msg.appendChild(wrap);setTimeout(()=>URL.revokeObjectURL(url),300000);}
 const projName=()=>($('#projName').value||'foam').replace(/[^\w\-]+/g,'_');
 function ensureVec(){if(!S.vec||S.vecWant)S.vec=composeVec(S.L);S.vecWant=false;return S.vec;}
 function canExport(){const bad=S.flags.some(x=>x.lv==='bad'),tc=S.vec&&S.vec.tc&&S.vec.tc.length;if(bad&&!$('#accBad')?.checked){toast('Please tick “I accept these problems” first, or go back and fix them.');return false;}if(tc&&!$('#accTC')?.checked){toast('Please confirm the tool change warning first.');return false;}return true;}
