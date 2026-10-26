@@ -473,7 +473,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.1 · 27 Oct 2026&#10;&#10;V2.1: Fixed downloads on GitHub Pages&#10;&#10;V2.0: Lid, grid, Puzzle/Centered/Straight layouts,&#10;Save/Open project, no-fit preview, Shell-Case&#10;drawing template, 5 mm min cavity depth" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.1</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V2.2 · 27 Oct 2026&#10;&#10;V2.2: True multibody STEP — foam + parts as separate&#10;solid bodies at their cavity depth, one file&#10;&#10;V2.1: Fixed downloads on GitHub Pages&#10;&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.2</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10389,79 +10389,79 @@ function outlinePrims(){const f=S.foam;return f.mode==='sta'?(f.side==='lid'?LID
 async function exportFoamWithParts(forceSide){
   const v=ensureVec();if(S.flags.some(x=>x.lv==='bad')){toast('Fix problems in the layout first.');return;}if(!canExport())return;
   const side=forceSide||S.side,foamName=projName()+(side==='lid'?'_lid':'_base');
-  /* foam solid */
   let fr;try{fr=stepSolidArcs(foamName,v.outer,v.levels,S.Hf,outlinePrims(),S.foam.mode==='sta'&&side!=='lid'?FOAM_SHELL[S.foam.caseId]:null);}catch(e){fr=stepSolid(foamName,v.outer,v.levels,S.Hf);}
-  const L=S.L;
-  /* use the downsampled sample mesh (capped ~6000 tris per part) */
-  const foamBase=fr.text.split('\nENDSEC;\nEND-ISO-10303-21;')[0];
-  const allLines=[foamBase];
-  let nextId=foamBase.split('\n').reduce((m,l)=>{const mm=l.match(/^#(\d+)=/);return mm?Math.max(m,+mm[1]):m;},0)+1;
-  const f3=(v)=>v.toFixed(3),f5=(v)=>v.toFixed(5);
-  const sbsmIds=[];
+  const L=S.L,lines=[],f3=(v2)=>v2.toFixed(3);
+  /* ── start from the foam STEP, strip the footer, track the max ID ── */
+  const foamLines=fr.text.split('\n');
+  let nid=0;
+  for(const l of foamLines){const m=l.match(/^#(\d+)=/);if(m&&+m[1]>nid)nid=+m[1];}
+  /* remove the last two lines (ENDSEC + END-ISO-10303-21) */
+  const bodyLines=foamLines.filter(l=>l!=='ENDSEC;'&&l!=='END-ISO-10303-21;');
+  lines.push(...bodyLines);
+  nid++;
+  /* ── write each part as a CLOSED_SHELL (triangulated solid body) ── */
+  const solidIds=[];
+  /* first get the foam solid id */
+  const foamSolidMatch=fr.text.match(/#(\d+)=MANIFOLD_SOLID_BREP/);
+  if(foamSolidMatch)solidIds.push(+foamSolidMatch[1]);
   for(const q of L.per){
-    const p=q.p,c=q.c;
-    const spos=p.sample;/* downsampled Float32Array, same orientation space as c.o.pos */
-    /* Re-orient: c.o.pos is the FULL mesh already oriented. sample was built from the same pos[]
-       but we need to apply the same R+scale. Re-use orientPos on sample. */
-    const opos=orientPos(spos,q.R,p.scale).pos;
+    const p=q.p;
+    const spos=orientPos(p.sample,q.R,p.scale).pos;
     const ox=q.x+PAD,oy=q.y+PAD,oz=S.Hf+q.s-q.H;
-    const n=opos.length/9;
-    const afIds=[];
+    const n=spos.length/9;
+    /* deduplicate vertices */
+    const vpMap=new Map(),vp=[];
+    const vid=(x,y,z)=>{const k=Math.round(x*100)+','+Math.round(y*100)+','+Math.round(z*100);let idx=vpMap.get(k);if(idx===undefined){idx=vp.length;vpMap.set(k,idx);vp.push([x,y,z]);}return idx;};
+    const tris=[];
     for(let ti=0;ti<n;ti++){
-      const o2=ti*9,
-        ax=+(opos[o2]+ox).toFixed(3),ay=+(opos[o2+1]+oy).toFixed(3),az=+(opos[o2+2]+oz).toFixed(3),
-        bx=+(opos[o2+3]+ox).toFixed(3),by=+(opos[o2+4]+oy).toFixed(3),bz=+(opos[o2+5]+oz).toFixed(3),
-        cx=+(opos[o2+6]+ox).toFixed(3),cy=+(opos[o2+7]+oy).toFixed(3),cz=+(opos[o2+8]+oz).toFixed(3);
-      const ux=bx-ax,uy=by-ay,uz=bz-az,vx=cx-ax,vy=cy-ay,vz=cz-az;
-      const nl=Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
+      const o2=ti*9,ax=+(spos[o2]+ox).toFixed(3),ay=+(spos[o2+1]+oy).toFixed(3),az=+(spos[o2+2]+oz).toFixed(3),bx=+(spos[o2+3]+ox).toFixed(3),by=+(spos[o2+4]+oy).toFixed(3),bz=+(spos[o2+5]+oz).toFixed(3),cx=+(spos[o2+6]+ox).toFixed(3),cy=+(spos[o2+7]+oy).toFixed(3),cz=+(spos[o2+8]+oz).toFixed(3);
+      const ux=bx-ax,uy=by-ay,uz=bz-az,vx=cx-ax,vy=cy-ay,vz=cz-az,nl=Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
       if(nl<1e-8)continue;
-      const nvx=+((uy*vz-uz*vy)/nl).toFixed(5),nvy=+((uz*vx-ux*vz)/nl).toFixed(5),nvz=+((ux*vy-uy*vx)/nl).toFixed(5);
-      const pa=nextId++,pb=nextId++,pc=nextId++,pn=nextId++,ax1=nextId++,pl=nextId++,va=nextId++,vb=nextId++,vc=nextId++,ce1=nextId++,ce2=nextId++,ce3=nextId++,oe1=nextId++,oe2=nextId++,oe3=nextId++,loop=nextId++,fob=nextId++,af=nextId++;
-      allLines.push(
-        `#${pa}=CARTESIAN_POINT('',(${ax},${ay},${az}));`,`#${pb}=CARTESIAN_POINT('',(${bx},${by},${bz}));`,`#${pc}=CARTESIAN_POINT('',(${cx},${cy},${cz}));`,
-        `#${pn}=DIRECTION('',(${nvx},${nvy},${nvz}));`,`#${ax1}=AXIS2_PLACEMENT_3D('',#${pa},#${pn},$);`,`#${pl}=PLANE('',#${ax1});`,
-        `#${va}=VERTEX_POINT('',#${pa});`,`#${vb}=VERTEX_POINT('',#${pb});`,`#${vc}=VERTEX_POINT('',#${pc});`,
-        `#${ce1}=EDGE_CURVE('',#${va},#${vb},LINE('',#${pa},VECTOR('',DIRECTION('',(${+(bx-ax).toFixed(3)},${+(by-ay).toFixed(3)},${+(bz-az).toFixed(3)})),1.)),.T.);`,
-        `#${ce2}=EDGE_CURVE('',#${vb},#${vc},LINE('',#${pb},VECTOR('',DIRECTION('',(${+(cx-bx).toFixed(3)},${+(cy-by).toFixed(3)},${+(cz-bz).toFixed(3)})),1.)),.T.);`,
-        `#${ce3}=EDGE_CURVE('',#${vc},#${va},LINE('',#${pc},VECTOR('',DIRECTION('',(${+(ax-cx).toFixed(3)},${+(ay-cy).toFixed(3)},${+(az-cz).toFixed(3)})),1.)),.T.);`,
-        `#${oe1}=ORIENTED_EDGE('',*,*,#${ce1},.T.);`,`#${oe2}=ORIENTED_EDGE('',*,*,#${ce2},.T.);`,`#${oe3}=ORIENTED_EDGE('',*,*,#${ce3},.T.);`,
-        `#${loop}=EDGE_LOOP('',(#${oe1},#${oe2},#${oe3}));`,`#${fob}=FACE_OUTER_BOUND('',#${loop},.T.);`,
-        `#${af}=ADVANCED_FACE('',(#${fob}),#${pl},.T.);`
-      );
-      afIds.push(af);
+      const ia=vid(ax,ay,az),ib=vid(bx,by,bz),ic=vid(cx,cy,cz);
+      if(ia===ib||ib===ic||ic===ia)continue;
+      tris.push({ia,ib,ic,nx:(uy*vz-uz*vy)/nl,ny:(uz*vx-ux*vz)/nl,nz:(ux*vy-uy*vx)/nl,ax,ay,az,bx,by,bz,cx,cy,cz});
     }
-    if(!afIds.length)continue;
-    const osh=nextId++;allLines.push(`#${osh}=OPEN_SHELL('${p.name}',(${afIds.map(i=>`#${i}`).join(',')}));`);
-    const sbsm=nextId++;allLines.push(`#${sbsm}=SHELL_BASED_SURFACE_MODEL('${p.name}',(#${osh}));`);
-    sbsmIds.push({id:sbsm,name:p.name});
+    if(!tris.length)continue;
+    /* write vertex CARTESIAN_POINTs */
+    const vpIds=vp.map(([x,y,z])=>{const id=nid++;lines.push(`#${id}=CARTESIAN_POINT('',(${x},${y},${z}));`);return id;});
+    /* write VERTEX_POINTs */
+    const vvIds=vpIds.map(pid=>{const id=nid++;lines.push(`#${id}=VERTEX_POINT('',#${pid});`);return id;});
+    /* write faces */
+    const faceIds=[];
+    for(const tri of tris){
+      const pn=nid++;lines.push(`#${pn}=DIRECTION('',(${tri.nx.toFixed(5)},${tri.ny.toFixed(5)},${tri.nz.toFixed(5)}));`);
+      const pa=nid++;lines.push(`#${pa}=CARTESIAN_POINT('',(${tri.ax},${tri.ay},${tri.az}));`);
+      const ax1=nid++;lines.push(`#${ax1}=AXIS2_PLACEMENT_3D('',#${pa},#${pn},$);`);
+      const pl=nid++;lines.push(`#${pl}=PLANE('',#${ax1});`);
+      const va=vvIds[tri.ia],vb=vvIds[tri.ib],vc=vvIds[tri.ic];
+      const dab=nid++;lines.push(`#${dab}=DIRECTION('',(${f3(tri.bx-tri.ax)},${f3(tri.by-tri.ay)},${f3(tri.bz-tri.az)}));`);
+      const dbc=nid++;lines.push(`#${dbc}=DIRECTION('',(${f3(tri.cx-tri.bx)},${f3(tri.cy-tri.by)},${f3(tri.cz-tri.bz)}));`);
+      const dca=nid++;lines.push(`#${dca}=DIRECTION('',(${f3(tri.ax-tri.cx)},${f3(tri.ay-tri.cy)},${f3(tri.az-tri.cz)}));`);
+      const lab=nid++;lines.push(`#${lab}=LINE('',#${vpIds[tri.ia]},VECTOR('',#${dab},1.));`);
+      const lbc=nid++;lines.push(`#${lbc}=LINE('',#${vpIds[tri.ib]},VECTOR('',#${dbc},1.));`);
+      const lca=nid++;lines.push(`#${lca}=LINE('',#${vpIds[tri.ic]},VECTOR('',#${dca},1.));`);
+      const ce1=nid++;lines.push(`#${ce1}=EDGE_CURVE('',#${va},#${vb},#${lab},.T.);`);
+      const ce2=nid++;lines.push(`#${ce2}=EDGE_CURVE('',#${vb},#${vc},#${lbc},.T.);`);
+      const ce3=nid++;lines.push(`#${ce3}=EDGE_CURVE('',#${vc},#${va},#${lca},.T.);`);
+      const oe1=nid++;lines.push(`#${oe1}=ORIENTED_EDGE('',*,*,#${ce1},.T.);`);
+      const oe2=nid++;lines.push(`#${oe2}=ORIENTED_EDGE('',*,*,#${ce2},.T.);`);
+      const oe3=nid++;lines.push(`#${oe3}=ORIENTED_EDGE('',*,*,#${ce3},.T.);`);
+      const loop=nid++;lines.push(`#${loop}=EDGE_LOOP('',(#${oe1},#${oe2},#${oe3}));`);
+      const fob=nid++;lines.push(`#${fob}=FACE_OUTER_BOUND('',#${loop},.T.);`);
+      const af=nid++;lines.push(`#${af}=ADVANCED_FACE('',(#${fob}),#${pl},.T.);`);
+      faceIds.push(af);
+    }
+    /* closed shell → manifold solid brep */
+    const csh=nid++;lines.push(`#${csh}=CLOSED_SHELL('${p.name}',(${faceIds.map(id=>`#${id}`).join(',')}));`);
+    const msb=nid++;lines.push(`#${msb}=MANIFOLD_SOLID_BREP('${p.name}',#${csh});`);
+    solidIds.push(msb);
   }
-  /* the foam solid and all part shells share one SHAPE_REPRESENTATION */
-  const foamSolid=foamBase.match(/#(\d+)=MANIFOLD_SOLID_BREP/);
-  if(foamSolid){const fc2=nextId++;allLines.push(`#${fc2}=APPLICATION_CONTEXT('automotive_design');`);
-    const rep2=nextId++;allLines.push(`#${rep2}=SHAPE_REPRESENTATION('${foamName}_assembly',(#${foamSolid[1]}${sbsmIds.map(s=>`,#${s.id}`).join('')}),#${fc2});`);}
-  allLines.push('ENDSEC;','END-ISO-10303-21;');
-  /* write a zip: foam.step + part_N.stl (each positioned in its cavity) */
-  let zipParts=[];
-  for(const q of L.per){
-    const p=q.p,spos=p.sample;
-    const opos=orientPos(spos,q.R,p.scale).pos;
-    const ox=q.x+PAD,oy=q.y+PAD,oz=S.Hf+q.s-q.H;
-    const n=opos.length/9;const stlLines=[`solid ${p.name}`];
-    for(let ti=0;ti<n;ti++){
-      const o2=ti*9,ax=opos[o2]+ox,ay=opos[o2+1]+oy,az=opos[o2+2]+oz,bx=opos[o2+3]+ox,by=opos[o2+4]+oy,bz=opos[o2+5]+oz,cx=opos[o2+6]+ox,cy=opos[o2+7]+oy,cz=opos[o2+8]+oz;
-      const ux=bx-ax,uy=by-ay,uz=bz-az,vx=cx-ax,vy=cy-ay,vz=cz-az;
-      const nl=Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
-      if(nl<1e-8)continue;
-      const nvx=+(uy*vz-uz*vy)/nl,nvy=(uz*vx-ux*vz)/nl,nvz=(ux*vy-uy*vx)/nl;
-      stlLines.push(`facet normal ${nvx.toFixed(5)} ${nvy.toFixed(5)} ${nvz.toFixed(5)}\nouter loop\nvertex ${ax.toFixed(3)} ${ay.toFixed(3)} ${az.toFixed(3)}\nvertex ${bx.toFixed(3)} ${by.toFixed(3)} ${bz.toFixed(3)}\nvertex ${cx.toFixed(3)} ${cy.toFixed(3)} ${cz.toFixed(3)}\nendloop\nendfacet`);}
-    stlLines.push(`endsolid ${p.name}`);
-    zipParts.push({name:p.name.replace(/[^a-zA-Z0-9_-]/g,'_')+'.stl',text:stlLines.join('\n')});}
-  const allLines2=foamBase.split('\n');allLines2.push('ENDSEC;','END-ISO-10303-21;');
-  const foamStepText=allLines2.join('\n');
-  /* download foam STEP + one STL per part */
-  dl(foamName+'_foam.step',foamStepText,'application/step');
-  for(const f2 of zipParts){dl(f2.name,f2.text,'text/plain');}
-  $('#exMsg').textContent=`Downloaded foam STEP + ${zipParts.length} part STL(s), each in its cavity position. Import them together in your CAD tool.`;
+  /* ── one shared SHAPE_REPRESENTATION containing all bodies ── */
+  const appCtx=nid++;lines.push(`#${appCtx}=APPLICATION_CONTEXT('automotive_design');`);
+  const sr=nid++;lines.push(`#${sr}=SHAPE_REPRESENTATION('${foamName}_multibody',(${solidIds.map(id=>`#${id}`).join(',')}),#${appCtx});`);
+  lines.push('ENDSEC;','END-ISO-10303-21;');
+  dl(foamName+'_with_parts.step',lines.join('\n'),'application/step');
+  $('#exMsg').textContent=`Multibody STEP: foam (${fr.faces} faces) + ${L.per.length} part body(s) at cavity depth.`;
 }
 
 function exportStep(){const v=ensureVec();if(S.flags.some(x=>x.lv==='bad')){toast('The STEP can only be made when there are no problems. Please go back to the layout and fix the red items.');return;}if(!canExport())return;let r;try{r=stepSolidArcs(projName(),v.outer,v.levels,S.Hf,outlinePrims(),S.foam.mode==='sta'&&S.side!=='lid'?FOAM_SHELL[S.foam.caseId]:null);if(r.badEdges)throw new Error('open edges');}catch(e){console.error(e);r=stepSolid(projName(),v.outer,v.levels,S.Hf);r.fallback=true;}dl(projName()+'_foam.step',r.text,'application/step');$('#exMsg').textContent=r.fallback?`STEP created with many short straight pieces (${r.faces} faces). The version with true arcs could not be built.`:`STEP created: ${r.faces} faces with ${r.arcEdges} true arcs. Straight edges are true lines, curved edges are true arcs.`;}
