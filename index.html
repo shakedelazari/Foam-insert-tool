@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V2.7 — Shell-Case</title>
+<title>Foam Insert Tool V2.8 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -473,7 +473,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.7 · 30 Oct 2026&#10;&#10;V2.7: Photo outline appears by itself when the page opens.&#10;Shadow is cut away automatically (switch in the panel),&#10;new tool Remove shadow (tap the shadow).&#10;Clear message and Find outline button.&#10;&#10;V2.6: Outline page as a drawing tool, undo, zoom&#10;V2.5: photo part scaled per direction&#10;V2.4: Add from a photo&#10;V2.3: Foam STEP + one STL per part&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.7</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V2.8 · 30 Oct 2026&#10;&#10;V2.8: Photo outline tools: Paint mask (paint the part green and the&#10;shadow red), Dimension lines A-A (X) and B-B (Y) placed by hand with&#10;the caliper size on the line, Round corner tool (radius), Part zoom.&#10;&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.6: outline page as a drawing tool, undo, zoom&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.8</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10719,6 +10719,7 @@ const $q=(s,r)=>(r||root).querySelector(s);
 /* ---------- styles ---------- */
 function css(){ if(document.getElementById('ppCss'))return;
   const s=document.createElement('style');s.id='ppCss';s.textContent=`
+  .pptoolrow{display:flex;flex-wrap:wrap;gap:6px}.ppsw{display:inline-flex;width:28px;height:28px;border-radius:8px;border:3px solid #2f8f5b;color:#fff;font-size:14px;align-items:center;justify-content:center;cursor:pointer;margin:2px;text-shadow:0 0 3px #000}.ppsw.rem{border-color:#d84c55}
   .ppov{position:fixed;inset:0;background:rgba(20,18,16,.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:10px}
   .ppbox{background:var(--surface,#fff);color:var(--ink,#222);border-radius:16px;width:min(780px,100%);max-height:96vh;overflow:auto;padding:16px 20px 14px;box-shadow:0 10px 50px rgba(0,0,0,.35);font-family:inherit}
   .pphd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
@@ -10885,7 +10886,7 @@ function wire2(){
   cv.onpointerup=e=>{if(drag<0)return;drag=-1;drawPrev();};
   st._drawCorner=draw;draw();drawPrev();}
 function drawPrev(){const c=$q('#ppPrev');if(!c)return;const w=warp(1.1);c.width=w.w;c.height=w.h;c.getContext('2d').drawImage(w.cv,0,0);}
-function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.autoTried=false;st.autoBusy=false;}
+function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.autoTried=false;st.autoBusy=false;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.lab=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.stroke=null;}
 
 /* ---------- edges + segmentation ---------- */
 function computeEdges(id,w,h){const d=id.data,n=w*h,ch=[new Float32Array(n),new Float32Array(n),new Float32Array(n)];
@@ -10950,46 +10951,53 @@ function dpLine(p,eps){if(p.length<3)return p;const a=p[0],b=p[p.length-1];let m
 function dpClosed(p,eps){let i0=0,i1=0,bd=0;for(let i=1;i<p.length;i++){const d=(p[i][0]-p[0][0])**2+(p[i][1]-p[0][1])**2;if(d>bd){bd=d;i1=i;}}
   const A=p.slice(i0,i1+1),B=p.slice(i1).concat([p[0]]);return dpLine(A,eps).slice(0,-1).concat(dpLine(B,eps).slice(0,-1));}
 function buildPoly(){if(!st.loop)return;const s=st.line/100,r=Math.round(8-6.5*s),eps=(1.6-1.4*s)*PPM;
-  const sm=smoothClosed(st.loop,r),d=dpClosed(sm,eps);st.polyPx=d;
-  st.poly=d.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM]);st.meas=measure(st.poly);}
-function measure(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.cos(a*Math.PI/180),s=Math.sin(a*Math.PI/180);let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9,iu0,iu1,iv0,iv1;
+  const sm=smoothClosed(st.loop,r),d=dpClosed(sm,eps);st.polyPx=d;if(!st.dimMoved)st.dim=null;
+  st.poly=d.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM,p[2]||0]);st.meas=measure(st.poly);}
+function measureRect(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.cos(a*Math.PI/180),s=Math.sin(a*Math.PI/180);let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9,iu0,iu1,iv0,iv1;
     poly.forEach((p,i)=>{const u=p[0]*c+p[1]*s,v=-p[0]*s+p[1]*c;if(u<u0){u0=u;iu0=i;}if(u>u1){u1=u;iu1=i;}if(v<v0){v0=v;iv0=i;}if(v>v1){v1=v;iv1=i;}});
     const A=(u1-u0)*(v1-v0);if(!best||A<best.A)best={A,du:u1-u0,dv:v1-v0,iu0,iu1,iv0,iv1,c,s};}
   const long=best.du>=best.dv,U=[best.c,best.s],V=[-best.s,best.c];return {dirAB:long?U:V,dirCD:long?V:U,ab:long?best.du:best.dv,cd:long?best.dv:best.du,A:poly[long?best.iu0:best.iv0],B:poly[long?best.iu1:best.iv1],C:poly[long?best.iv0:best.iu0],D:poly[long?best.iv1:best.iu1]};}
 
 /* ---------- SCREEN 3: outline (drawing-tool style) ---------- */
-const TOOLS=[['detect','Find part'],['shadow','Remove shadow'],['move','Move'],['add','Add point'],['del','Delete point']];
-const HINTS={detect:'Tap on the part.',shadow:'Tap on the shadow next to the part. It is cut away from the outline.',move:'Drag a point to fix the line. Drag empty space to move the picture.',add:'Tap the line to add a point. Drag it to place it.',del:'Tap a point to delete it.'};
+const TOOLS=[['detect','Find part'],['color','Paint mask'],['shadow','Remove shadow'],['move','Move'],['add','Add point'],['del','Delete point'],['round','Round corner'],['dim','Dimension lines']];
+const HINTS={color:'Paint over the part (green). Paint over the shadow (red) if it is included.',round:'Tap a corner point to round it. Change the radius on the right.',dim:'Drag the A and B points to where you measured with the caliper. The lines can be anywhere.',detect:'Tap on the part.',shadow:'Tap on the shadow next to the part. It is cut away from the outline.',move:'Drag a point to fix the line. Drag empty space to move the picture.',add:'Tap the line to add a point. Drag it to place it.',del:'Tap a point to delete it.'};
 function scr3(){return shell(`
   <div class="ppcol3"><div>
-   <div class="pptb"><button class="btn primary sm" id="ppAuto" title="Find the outline of the part by itself">Find outline</button><span class="ppgap"></span><div class="seg" id="ppTools">${TOOLS.map(([k,l])=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&!st.polyPx?'disabled':''}>${l}</button>`).join('')}</div>
+   <div class="pptb"><button class="btn primary sm" id="ppAuto" title="Find the outline of the part by itself">Find outline</button><span class="ppgap"></span><div class="pptoolrow">${[TOOLS.slice(0,3),TOOLS.slice(3)].map(grp=>`<div class="seg pptools">${grp.map(([k,l])=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&k!=='color'&&!st.polyPx?'disabled':''}>${l}</button>`).join('')}</div>`).join('')}</div>
     <span class="ppgap"></span><button class="btn sm" id="ppUndo" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" id="ppRedo" title="Redo (Ctrl+Y)">↷ Redo</button>
-    <span class="ppgap"></span><button class="btn sm" id="ppZm" title="Zoom out">−</button><button class="btn sm" id="ppZf" title="Fit to screen">Fit</button><button class="btn sm" id="ppZp" title="Zoom in">+</button></div>
+    <span class="ppgap"></span><button class="btn sm" id="ppZm" title="Zoom out">−</button><button class="btn sm" id="ppZf" title="Show the whole sheet">Fit</button><button class="btn sm" id="ppZpart" title="Zoom to the part">Part</button><button class="btn sm" id="ppZp" title="Zoom in">+</button></div>
    <div class="ppwrap"><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
    <div class="ppnote" id="ppHint"></div></div>
   <div>
    <div class="ppflex"><b>Show</b><div class="seg" id="ppView">${['photo','outline','both'].map(v=>`<button data-v="${v}" aria-pressed="${st.view===v}">${v==='photo'?'Photo':v==='outline'?'Outline':'Both'}</button>`).join('')}</div></div>
    <div class="ppfield"><span>Line: Smooth ⟷ Exact</span><input type="range" id="ppLine" min="0" max="100" value="${st.line}"></div>
    <div class="ppfield"><span>Not found well? Detection</span><div class="seg" id="ppSens">${[['Less',1.6],['Normal',1],['More',0.65]].map(([l,v])=>`<button data-s="${v}" aria-pressed="${st.sens===v}">${l}</button>`).join('')}</div></div>
+   ${colorPanel()}${roundPanel()}
    <label class="ppchk" style="margin:6px 0"><input type="checkbox" id="ppTrim" ${st.trim===true?'checked':''}> Cut shadow automatically (beta)</label>
    <hr style="border:none;border-top:1px solid #e4ddd0;margin:10px 0">
-   <div class="ppnote"><b>Caliper size</b> of the real part. A, B, C, D are on the picture.</div>
+   <div class="ppnote"><b>Dimensions.</b> Type the caliper sizes of the real part. Place A and B on the picture with the tool <b>Dimension lines</b>.</div>
    <div id="ppSize" class="ppnote"></div>
-   <div class="ppfield"><span><b>A to B</b> (mm) required</span><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading"></div>
-   <div class="ppfield"><span>C to D (mm) optional, better</span><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading"></div>
+   <div class="ppfield"><span><b>A–A</b> (X direction, mm) required</span><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading"></div>
+   <div class="ppfield"><span><b>B–B</b> (Y direction, mm) optional, better</span><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading"></div>
    <div id="ppDiff"></div>
    <button class="btn sm" id="ppReset">Start again</button></div></div>`,
   `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext" disabled>Next: height</button>`,true);}
 function wire3(){
   $q('#ppBack').onclick=()=>go(2);$q('#ppNext').onclick=()=>{if(!$q('#ppNext').disabled)go(4);};
   $q('#ppView').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.view=b.dataset.v;render();};
-  $q('#ppTools').onclick=e=>{const b=e.target.closest('[data-t]');if(!b||b.disabled)return;st.tool=b.dataset.t;st.selV=-1;render();};
-  $q('#ppUndo').onclick=undo;$q('#ppRedo').onclick=redo;$q('#ppAuto').onclick=()=>autoOutline(true);
+  root.querySelectorAll('.pptools').forEach(el=>{el.onclick=e=>{const b=e.target.closest('[data-t]');if(!b||b.disabled)return;st.tool=b.dataset.t;st.selV=-1;render();};});
+  $q('#ppUndo').onclick=undo;$q('#ppRedo').onclick=redo;$q('#ppZpart').onclick=()=>zoomToPart();$q('#ppAuto').onclick=()=>autoOutline(true);
   $q('#ppTrim').onchange=e=>{st.trim=e.target.checked;if(st.tap)doTap(st.tap[0],st.tap[1]);};
+  const pm=$q('#ppPMode');if(pm)pm.onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;st.pmode=b.dataset.m;pm.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));};
+  const bs=$q('#ppBrush');if(bs)bs.oninput=e=>{st.brushMm=+e.target.value;};
+  const pc=$q('#ppPClear');if(pc)pc.onclick=()=>{snap();st.strokes=[];rebuildScrib();draw3();};
+  const rd=$q('#ppRad');if(rd){rd.oninput=e=>{const v=Math.max(0,+e.target.value||0);st.radDef=v||st.radDef||3;if(st.selV>=0&&st.polyPx&&st.polyPx[st.selV]){if(!st.radOn){snap();st.radOn=true;}st.polyPx[st.selV][2]=v;syncPoly();draw3();live();}};rd.onchange=()=>{st.radOn=false;};}
+  const ra=$q('#ppRadAll');if(ra)ra.onclick=()=>{if(!st.polyPx)return;snap();const P=st.polyPx,n=P.length;for(let i=0;i<n;i++){const a=P[(i-1+n)%n],p=P[i],b=P[(i+1)%n],ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1],c2=(ux*vx+uy*vy)/((Math.hypot(ux,uy)*Math.hypot(vx,vy))||1);p[2]=c2>-0.9?(st.radDef||3):0;}syncPoly();draw3();live();};
+  const rs=$q('#ppRadSharp');if(rs)rs.onclick=()=>{if(!st.polyPx)return;snap();st.polyPx.forEach(p=>{p[2]=0;});syncPoly();draw3();live();};
   $q('#ppZm').onclick=()=>zoomAt(null,null,1/1.4);$q('#ppZp').onclick=()=>zoomAt(null,null,1.4);$q('#ppZf').onclick=()=>{st.vw={k:1,cx:st.ww/2,cy:st.wh/2};draw3();};
   const sl=$q('#ppLine');sl.oninput=e=>{if(!st.sliderOn){snap();st.sliderOn=true;}st.line=+e.target.value;st.selV=-1;if(st.loop){buildPoly();draw3();live();}};sl.onchange=()=>{st.sliderOn=false;};
   $q('#ppSens').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;st.sens=+b.dataset.s;if(st.tap)doTap(st.tap[0],st.tap[1]);else render();};
-  $q('#ppReset').onclick=()=>{snap();st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw={k:1,cx:st.ww/2,cy:st.wh/2};render();};
+  $q('#ppReset').onclick=()=>{snap();st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.tool='detect';st.vw={k:1,cx:st.ww/2,cy:st.wh/2};render();};
   const ab=$q('#ppAB'),cd=$q('#ppCD');ab.oninput=()=>{st.cal.ab=ab.value;live();};cd.oninput=()=>{st.cal.cd=cd.value;live();};
   const cv=$q('#ppWarp'),dpr=Math.min(2,window.devicePixelRatio||1),cssW=cv.parentElement.clientWidth||520,cssH=Math.round(Math.min(window.innerHeight*0.62,cssW*1.3));
   cv.style.height=cssH+'px';cv.width=Math.round(cssW*dpr);cv.height=Math.round(cssH*dpr);cv.style.cursor=st.tool==='detect'?'crosshair':st.tool==='move'?'default':'cell';
@@ -11001,9 +11009,9 @@ function G(){const cv=$q('#ppWarp'),W=cv.width,H=cv.height,f=Math.min(W/st.ww,H/
   return {cv,W,H,s,k:W/rect.width,toS:(u,v)=>[W/2+(u-st.vw.cx)*s,H/2+(v-st.vw.cy)*s],toU:(X,Y)=>[(X-W/2)/s+st.vw.cx,(Y-H/2)/s+st.vw.cy],pos:e=>[(e.clientX-rect.left)*W/rect.width,(e.clientY-rect.top)*H/rect.height]};}
 function clampView(){const v=st.vw;v.k=Math.max(1,Math.min(14,v.k));v.cx=Math.max(0,Math.min(st.ww,v.cx));v.cy=Math.max(0,Math.min(st.wh,v.cy));}
 function zoomAt(X,Y,fac){const g=G();if(X==null){X=g.W/2;Y=g.H/2;}const [u,v]=g.toU(X,Y);st.vw.k*=fac;clampView();const g2=G();st.vw.cx=u-(X-g2.W/2)/g2.s;st.vw.cy=v-(Y-g2.H/2)/g2.s;clampView();draw3();}
-function snapOf(){return {poly:st.polyPx?st.polyPx.map(p=>p.slice()):null,line:st.line,loop:st.loop,tap:st.tap,seg:st.seg,tool:st.tool};}
+function snapOf(){return {strokes:(st.strokes||[]).slice(),dim:st.dim?JSON.parse(JSON.stringify(st.dim)):null,colors:(st.colors||[]).map(c=>({...c})),poly:st.polyPx?st.polyPx.map(p=>p.slice()):null,line:st.line,loop:st.loop,tap:st.tap,seg:st.seg,tool:st.tool};}
 function snap(){st.undo.push(snapOf());if(st.undo.length>150)st.undo.shift();st.redo=[];}
-function restore(sn){st.polyPx=sn.poly?sn.poly.map(p=>p.slice()):null;st.line=sn.line;st.loop=sn.loop;st.tap=sn.tap;st.seg=sn.seg;st.selV=-1;
+function restore(sn){st.strokes=(sn.strokes||[]).slice();rebuildScrib();st.dim=sn.dim?JSON.parse(JSON.stringify(sn.dim)):null;st.colors=(sn.colors||[]).map(c=>({...c}));st.polyPx=sn.poly?sn.poly.map(p=>p.slice()):null;st.line=sn.line;st.loop=sn.loop;st.tap=sn.tap;st.seg=sn.seg;st.selV=-1;
   if(st.polyPx)syncPoly();else{st.poly=null;st.meas=null;}const sl=$q('#ppLine');if(sl)sl.value=st.line;if(!st.polyPx)st.tool='detect';draw3();live();}
 function undo(){if(!st||st.step!==3||!st.undo.length)return;st.redo.push(snapOf());restore(st.undo.pop());}
 function redo(){if(!st||st.step!==3||!st.redo.length)return;st.undo.push(snapOf());restore(st.redo.pop());}
@@ -11019,14 +11027,21 @@ function bindCanvas(cv){
     if(st.polyPx&&st.tool==='move'){const i=nearV(X,Y,g);if(i>=0){snap();st.selV=i;mode='drag';draw3();return;}}
     if(st.polyPx&&st.tool==='add'){const r=nearSeg(X,Y,g);if(r){snap();st.polyPx.splice(r.i+1,0,r.pt);st.selV=r.i+1;syncPoly();mode='drag';draw3();live();return;}}
     if(st.polyPx&&st.tool==='del'){const i=nearV(X,Y,g);if(i>=0&&st.polyPx.length>3){snap();st.polyPx.splice(i,1);st.selV=-1;syncPoly();draw3();live();mode=null;return;}}
+    if(st.tool==='color'){snap();ensureScrib();st.stroke={mode:st.pmode||'fg',pts:[],last:null};const u0=g.toU(X,Y);paintTo(u0[0],u0[1]);mode='paint';draw3();return;}
+    if(st.polyPx&&st.tool==='round'){const i=nearV(X,Y,g);if(i>=0){const P=st.polyPx[i];if(!(P[2]>0)){snap();P[2]=st.radDef||3;}st.selV=i;syncPoly();const el=$q('#ppRad');if(el)el.value=f1(P[2]);draw3();live();mode=null;return;}}
+    if(st.polyPx&&st.dim&&st.tool==='dim'){let best=null,bd=(26*g.k)**2;['A','B'].forEach(k=>st.dim[k].forEach((p,j)=>{const q=g.toS(p[0],p[1]),d2=(q[0]-X)**2+(q[1]-Y)**2;if(d2<bd){bd=d2;best=[k,j];}}));if(best){snap();st.dimSel=best;st.dimMoved=true;mode='dimdrag';draw3();return;}}
     mode='pan';};
   cv.onpointermove=e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
     if(mode==='pinch'&&ptrs.size>=2){const [p1,p2]=[...ptrs.values()],d=Math.hypot(p1[0]-p2[0],p1[1]-p2[1]),mx=(p1[0]+p2[0])/2,my=(p1[1]+p2[1])/2,r=cv.getBoundingClientRect(),X=(mx-r.left)*g.W/r.width,Y=(my-r.top)*g.H/r.height;
       zoomAt(X,Y,d/pinch.d);const g2=G();st.vw.cx-=(mx-pinch.mx)*(g2.W/r.width)/g2.s;st.vw.cy-=(my-pinch.my)*(g2.H/r.height)/g2.s;clampView();pinch={d,mx,my};draw3();return;}
     const [X,Y]=g.pos(e);
+    if(mode==='paint'&&st.stroke){const u=g.toU(X,Y);paintTo(u[0],u[1]);draw3();return;}
+    if(mode==='dimdrag'&&st.dimSel){const u=g.toU(X,Y);st.dim[st.dimSel[0]][st.dimSel[1]]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];st.meas=measure(st.poly);draw3();live();return;}
     if(mode==='drag'&&st.selV>=0){const u=g.toU(X,Y);st.polyPx[st.selV]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];syncPoly();draw3();live();}
     else if(mode==='pan'&&down){if(Math.hypot(X-down.X,Y-down.Y)>6*g.k)down.moved=true;if(down.moved){st.vw.cx=down.cx-(X-down.X)/g.s;st.vw.cy=down.cy-(Y-down.Y)/g.s;clampView();draw3();}}};
   cv.onpointerup=e=>{const g=G();ptrs.delete(e.pointerId);
+    if(mode==='dimdrag'){mode=null;st.dimSel=null;live();return;}
+    if(mode==='paint'){mode=null;const s=st.stroke;st.stroke=null;if(s&&s.pts.length){(st.strokes=st.strokes||[]).push({mode:s.mode,r:brushPx(),pts:s.pts});runPaintMask();}return;}
     if(mode==='pan'&&down&&!down.moved&&st.tool==='shadow'&&st.polyPx){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;removeShadow(u[0],u[1]);return;}
     if(mode==='pan'&&down&&!down.moved&&st.tool==='detect'){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;doTap(u[0],u[1]);return;}
     if(ptrs.size<2&&mode==='pinch')mode=null;if(mode==='drag'||mode==='pan')mode=null;};
@@ -11086,29 +11101,114 @@ function removeShadow(x,y){if(!st.polyPx)return;const w=st.ww,h=st.wh,n=w*h,d=st
   const k=keepLargest(morph(morph(nm,w,h,2,true),w,h,2,false),w,h);if(k.area<n*0.002){if(hint)hint.textContent='That would remove the whole part. Tap on the shadow only.';return;}
   snap();st.seg={mask:k.mask,area:k.area,sol:1,T:(st.seg&&st.seg.T)||0,trimmed:cut/9};st.loop=outerLoop(k.mask,w,h);buildPoly();st.selV=-1;draw3();live();
   if(hint)hint.textContent='Shadow cut away ('+f1(cut/9)+' mm²). Undo (Ctrl+Z) brings it back. Tap more shadow if needed.';}
+function zoomToPart(){if(!st||!st.polyPx||!$q('#ppWarp'))return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;st.polyPx.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+  const g=G(),bw=Math.max(40,x1-x0),bh=Math.max(40,y1-y0);st.vw.k=Math.min(g.W/(bw*1.9),g.H/(bh*1.9))/Math.min(g.W/st.ww,g.H/st.wh);clampView();st.vw.cx=(x0+x1)/2;st.vw.cy=(y0+y1)/2;clampView();draw3();}
 function autoOutline(force){if(!st||st.autoBusy)return;st.autoTried=true;st.autoBusy=true;draw3();const id=st.warpId;
   setTimeout(()=>{if(!st||!root||st.warpId!==id||st.step!==3)return;const seed=autoSeed();st.autoBusy=false;
     if(!seed){draw3();const hh=$q('#ppHint');if(hh)hh.textContent='I could not find the part by myself. Tap on your part.';return;}
-    if(force&&st.polyPx)snap();doTap(seed[0],seed[1],true);},40);}
+    if(force&&st.polyPx)snap();doTap(seed[0],seed[1],true);if(!force)zoomToPart();},40);}
+
+/* ---------- V2.8: color mask, dimension lines A-A / B-B, rounded corners ---------- */
+/* rounded corners: P = [[x,y,r],...] with r in the same unit as x,y. Returns a plain polygon with the arcs written as points */
+function filletPoints(P){const n=P.length;if(n<3||!P.some(p=>p[2]>0))return P.map(p=>[p[0],p[1]]);const out=[];
+  for(let i=0;i<n;i++){const p=P[i],r=p[2]||0;if(!(r>0)){out.push([p[0],p[1]]);continue;}
+    const a=P[(i-1+n)%n],b=P[(i+1)%n];let ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1];const lu=Math.hypot(ux,uy),lv=Math.hypot(vx,vy);
+    if(lu<1e-6||lv<1e-6){out.push([p[0],p[1]]);continue;}ux/=lu;uy/=lu;vx/=lv;vy/=lv;
+    const th=Math.acos(Math.max(-1,Math.min(1,ux*vx+uy*vy)));if(th<0.05||th>Math.PI-0.05){out.push([p[0],p[1]]);continue;}
+    let t=r/Math.tan(th/2);const tmax=0.5*Math.min(lu,lv);if(t>tmax)t=tmax;const rr=t*Math.tan(th/2);
+    const t1=[p[0]+ux*t,p[1]+uy*t];let bx=ux+vx,by=uy+vy;const bl=Math.hypot(bx,by)||1;bx/=bl;by/=bl;const dc=rr/Math.sin(th/2),cx=p[0]+bx*dc,cy=p[1]+by*dc,t2=[p[0]+vx*t,p[1]+vy*t];
+    const a1=Math.atan2(t1[1]-cy,t1[0]-cx),a2=Math.atan2(t2[1]-cy,t2[0]-cx);let da=a2-a1;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;
+    const N=Math.max(2,Math.ceil(Math.abs(da)/(Math.PI/18)));for(let k=0;k<=N;k++){const ang=a1+da*k/N;out.push([cx+rr*Math.cos(ang),cy+rr*Math.sin(ang)]);}}
+  return out;}
+const roundedPx=()=>filletPoints(st.polyPx.map(p=>[p[0],p[1],(p[2]||0)*PPM]));
+/* dimension lines A-A (X direction) and B-B (Y direction): start next to the part, the user drags them */
+function initDims(){if(!st.polyPx||st.dim)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;st.polyPx.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+  const ya=y0-24>8?y0-24:Math.min(st.wh-8,y1+24),xb=x1+24<st.ww-8?x1+24:Math.max(8,x0-24);
+  st.dim={A:[[x0,ya],[x1,ya]],B:[[xb,y0],[xb,y1]]};}
+function drawDims(c,g,d){if(!st.dim||!st.polyPx)return;const m=st.meas;
+  const defs=[['A',st.dim.A,'#1d4ed8',+st.cal.ab>0?f1(+st.cal.ab)+' mm':(m?f1(m.ab)+' mm (photo)':'')],['B',st.dim.B,'#7c3aed',+st.cal.cd>0?f1(+st.cal.cd)+' mm':(m?f1(m.cd)+' mm (photo)':'')]];
+  defs.forEach(([L,pts,col,txt])=>{const p1=g.toS(pts[0][0],pts[0][1]),p2=g.toS(pts[1][0],pts[1][1]),dx=p2[0]-p1[0],dy=p2[1]-p1[1],len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
+    c.save();c.strokeStyle=col;c.lineWidth=2*d;c.setLineDash([8*d,5*d]);c.beginPath();c.moveTo(p1[0],p1[1]);c.lineTo(p2[0],p2[1]);c.stroke();c.setLineDash([]);
+    for(const p of [p1,p2]){c.beginPath();c.moveTo(p[0]-nx*10*d,p[1]-ny*10*d);c.lineTo(p[0]+nx*10*d,p[1]+ny*10*d);c.stroke();}
+    for(const p of [p1,p2]){c.beginPath();c.arc(p[0],p[1],(st.tool==='dim'?12:9)*d,0,7);c.fillStyle=col;c.fill();c.fillStyle='#fff';c.font='bold '+(12*d)+'px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(L,p[0],p[1]+d);}
+    const label=L+'–'+L+'   '+txt;c.font='bold '+(13*d)+'px sans-serif';const mx=(p1[0]+p2[0])/2+nx*18*d,my=(p1[1]+p2[1])/2+ny*18*d,tw=c.measureText(label).width+14*d;
+    c.fillStyle='rgba(255,255,255,.93)';c.fillRect(mx-tw/2,my-11*d,tw,22*d);c.fillStyle=col;c.textAlign='center';c.fillText(label,mx,my);c.restore();});}
+/* sizes now come from the two dimension lines (A-A along X, B-B along Y); without lines the old automatic rectangle is used */
+function measure(poly){const r=measureRect(poly);if(!st||!st.polyPx)return r;if(!st.dim)initDims();if(!st.dim)return r;
+  const to=p=>[p[0]/PPM,(st.wh-p[1])/PPM],a1=to(st.dim.A[0]),a2=to(st.dim.A[1]),b1=to(st.dim.B[0]),b2=to(st.dim.B[1]),ax=a2[0]-a1[0],ay=a2[1]-a1[1],al=Math.max(0.5,Math.hypot(ax,ay)),
+    ua=[ax/al,ay/al],uc=[-ua[1],ua[0]],bl=Math.abs((b2[0]-b1[0])*uc[0]+(b2[1]-b1[1])*uc[1]);
+  return {dirAB:ua,dirCD:uc,ab:al,cd:Math.max(0.5,bl),A:a1,B:a2,C:b1,D:b2};}
+/* color mask */
+function ensureLab(){if(st.lab)return st.lab;const d=st.wid.data,n=st.ww*st.wh,L=new Float32Array(n*3),lin=new Float32Array(256);
+  for(let v=0;v<256;v++){const x=v/255;lin[v]=x<=0.04045?x/12.92:Math.pow((x+0.055)/1.055,2.4);}
+  const f=t=>t>0.008856?Math.cbrt(t):7.787*t+16/116;
+  for(let i=0;i<n;i++){const r=lin[d[i*4]],g=lin[d[i*4+1]],b=lin[d[i*4+2]],X=(0.4124*r+0.3576*g+0.1805*b)/0.95047,Y=0.2126*r+0.7152*g+0.0722*b,Z=(0.0193*r+0.1192*g+0.9505*b)/1.08883,fx=f(X),fy=f(Y),fz=f(Z);
+    L[i*3]=116*fy-16;L[i*3+1]=500*(fx-fy);L[i*3+2]=200*(fy-fz);}
+  st.lab=L;return L;}
+/* paint mask: paint over the part (green) and over what is NOT the part (red). The tool learns the colors and builds the mask */
+const brushPx=()=>Math.max(4,Math.round((st.brushMm||5)*PPM));
+function ensureScrib(){if(!st.sfg){st.sfg=new Uint8Array(st.ww*st.wh);st.sbg=new Uint8Array(st.ww*st.wh);st.scCv=document.createElement('canvas');st.scCv.width=st.ww;st.scCv.height=st.wh;}}
+function stamp(x,y,r,mode){const w=st.ww,h=st.wh,A=mode==='fg'?st.sfg:st.sbg,B=mode==='fg'?st.sbg:st.sfg,r2=r*r;
+  for(let yy=Math.max(0,Math.floor(y-r));yy<=Math.min(h-1,Math.ceil(y+r));yy++)for(let xx=Math.max(0,Math.floor(x-r));xx<=Math.min(w-1,Math.ceil(x+r));xx++)if((xx-x)*(xx-x)+(yy-y)*(yy-y)<=r2){A[yy*w+xx]=1;B[yy*w+xx]=0;}
+  const g=st.scCv.getContext('2d');g.globalCompositeOperation='destination-out';g.beginPath();g.arc(x,y,r,0,7);g.fill();g.globalCompositeOperation='source-over';
+  g.fillStyle=mode==='fg'?'rgba(47,143,91,.7)':'rgba(216,76,85,.7)';g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function paintTo(x,y){const s=st.stroke,r=brushPx();if(s.last){const dx=x-s.last[0],dy=y-s.last[1],d=Math.hypot(dx,dy),step=Math.max(2,r/3);for(let t=step;t<d;t+=step)stamp(s.last[0]+dx*t/d,s.last[1]+dy*t/d,r,s.mode);}stamp(x,y,r,s.mode);s.last=[x,y];s.pts.push([x,y]);}
+function rebuildScrib(){st.sfg=null;st.sbg=null;st.scCv=null;if(!(st.strokes&&st.strokes.length))return;ensureScrib();
+  for(const s of st.strokes){let last=null;for(const p of s.pts){if(last){const dx=p[0]-last[0],dy=p[1]-last[1],d=Math.hypot(dx,dy),step=Math.max(2,s.r/3);for(let t=step;t<d;t+=step)stamp(last[0]+dx*t/d,last[1]+dy*t/d,s.r,s.mode);}stamp(p[0],p[1],s.r,s.mode);last=p;}}}
+function kmeans(S,k){if(S.length<=k)return S.map(p=>p.slice());let C=[];for(let i=0;i<k;i++)C.push(S[Math.floor(i*S.length/k)].slice());
+  for(let it=0;it<6;it++){const sum=C.map(()=>[0,0,0,0]);for(const p of S){let bi=0,bd=1e18;C.forEach((c,i)=>{const d=(p[0]-c[0])**2+(p[1]-c[1])**2+(p[2]-c[2])**2;if(d<bd){bd=d;bi=i;}});const s=sum[bi];s[0]+=p[0];s[1]+=p[1];s[2]+=p[2];s[3]++;}
+    C=C.map((c,i)=>sum[i][3]?[sum[i][0]/sum[i][3],sum[i][1]/sum[i][3],sum[i][2]/sum[i][3]]:c);}return C;}
+function runPaintMask(){if(!st.sfg)return;const w=st.ww,h=st.wh,n=w*h,L=ensureLab(),hint=$q('#ppHint');let fgN=0;for(let i=0;i<n;i++)fgN+=st.sfg[i];if(!fgN)return;
+  const sampleFrom=(mask,max)=>{const idx=[];for(let i=0;i<n;i++)if(mask[i])idx.push(i);const step=Math.max(1,Math.floor(idx.length/max)),S=[];for(let k=0;k<idx.length;k+=step){const i=idx[k];S.push([L[i*3],L[i*3+1],L[i*3+2]]);}return S;};
+  const fgC=kmeans(sampleFrom(st.sfg,700),6),near=morph(st.sfg,w,h,60,false),far=morph(st.sfg,w,h,160,false),ring=new Uint8Array(n);for(let i=0;i<n;i++)ring[i]=far[i]&&!near[i]?1:0;
+  const bgC=kmeans(sampleFrom(ring,500).concat(sampleFrom(st.sbg,600)),6),roi=morph(st.sfg,w,h,36,false),m0=new Uint8Array(n);
+  for(let i=0;i<n;i++){if(st.sfg[i]){m0[i]=1;continue;}if(st.sbg[i]||!roi[i])continue;const l=L[i*3],a=L[i*3+1],b=L[i*3+2];let df=1e18,db=1e18;
+    for(const c of fgC){const d=(l-c[0])**2+(a-c[1])**2+(b-c[2])**2;if(d<df)df=d;}for(const c of bgC){const d=(l-c[0])**2+(a-c[1])**2+(b-c[2])**2;if(d<db)db=d;}if(df<=db)m0[i]=1;}
+  let m=morph(morph(m0,w,h,3,false),w,h,3,true,0);const fill=mk=>{const bg=new Uint8Array(n),q=new Int32Array(n);let hh=0,tt=0;const push=i=>{if(!mk[i]&&!bg[i]){bg[i]=1;q[tt++]=i;}};
+    for(let x=0;x<w;x++){push(x);push((h-1)*w+x);}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1);}
+    while(hh<tt){const i=q[hh++],x=i%w,y=(i/w)|0;if(x>0)push(i-1);if(x<w-1)push(i+1);if(y>0)push(i-w);if(y<h-1)push(i+w);}const o=new Uint8Array(n);for(let i=0;i<n;i++)o[i]=bg[i]?0:1;return o;};
+  m=fill(m);m=morph(morph(m,w,h,3,true),w,h,3,false);
+  /* keep the pieces you painted on, join them, fill holes */
+  const lab=new Int32Array(n),q2=new Int32Array(n),keep=new Uint8Array(n);let id=0;
+  for(let s0=0;s0<n;s0++){if(!m[s0]||lab[s0])continue;id++;let hh=0,tt=0,hit=false;q2[tt++]=s0;lab[s0]=id;
+    while(hh<tt){const i=q2[hh++];if(st.sfg[i])hit=true;const x=i%w,y=(i/w)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const j=Y*w+X;if(m[j]&&!lab[j]){lab[j]=id;q2[tt++]=j;}}}
+    if(hit)for(let k=0;k<tt;k++)keep[q2[k]]=1;}
+  let mm=fill(morph(morph(keep,w,h,4,false),w,h,4,true,0));const res=keepLargest(mm,w,h);
+  if(!res||res.area<n*0.0015){if(hint)hint.textContent='Could not make a mask. Paint more of the part.';draw3();return;}
+  st.seg={mask:res.mask,area:res.area,sol:1,T:0};st.tap=null;st.loop=outerLoop(res.mask,w,h);buildPoly();st.selV=-1;draw3();live();
+  if(hint)hint.textContent='Mask made. Paint more of the part (green) or over the shadow (red) to improve it. Undo (Ctrl+Z) removes the last stroke.';}
+function colorPanel(){if(st.tool!=='color')return '';
+  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Paint mask</b><div class="ppnote">Paint over the part with <b>Part</b> (green). Paint over the shadow or anything that is not the part with <b>Not part</b> (red). The outline follows the colors.</div>
+   <div class="seg" id="ppPMode"><button data-m="fg" aria-pressed="${(st.pmode||'fg')==='fg'}">Part</button><button data-m="bg" aria-pressed="${st.pmode==='bg'}">Not part</button></div>
+   <div class="ppfield"><span>Brush size</span><input type="range" id="ppBrush" min="2" max="14" value="${st.brushMm||5}"></div>
+   <button class="btn sm" id="ppPClear">Clear paint</button></div>`;}
+
+function roundPanel(){if(st.tool!=='round')return '';const v=st.selV>=0&&st.polyPx&&st.polyPx[st.selV]?(st.polyPx[st.selV][2]||0):(st.radDef||3);
+  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Round corner</b><div class="ppnote">Tap a corner point to round it. Then set the radius here, or use the buttons.</div>
+   <div class="ppfield"><span>Radius (mm)</span><input id="ppRad" type="number" min="0" step="0.5" value="${f1(v)}"></div>
+   <button class="btn sm" id="ppRadAll">Round all corners</button> <button class="btn sm" id="ppRadSharp">Make all sharp</button></div>`;}
+/* part used by Add as 3D part: turned so A-A runs along X and B-B along Y, each scaled to its caliper size, corners rounded */
+function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2,a=m.dirAB,c=m.dirCD,ka=st.k||1,kc=(st.kcd&&st.kcd>0)?st.kcd:ka,kr=(ka+kc)/2;
+  return filletPoints(st.poly.map(p=>{const x=p[0]-cx,y=p[1]-cy;return [(x*a[0]+y*a[1])*ka,(x*c[0]+y*c[1])*kc,(p[2]||0)*kr];}));}
 
 function doTap(x,y,noSnap){if(!noSnap)snap();st.tap=[x,y];const r=segment(x,y);if(r&&st.trim===true){const t=trimShadow(r.mask);if(t){r.mask=t.mask;r.trimmed=t.removedArea;}}
   if(!r){st.seg=null;st.loop=null;st.polyPx=null;st.poly=null;st.meas=null;st.tool='detect';render();const m=$q('#ppHint');if(m)m.textContent='Could not find the part there. Tap the middle of the part, or set Detection to More.';return;}
   st.seg=r;st.loop=outerLoop(r.mask,st.ww,st.wh);buildPoly();st.tool='move';st.selV=-1;render();}
-function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM]);st.meas=measure(st.poly);}
+function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM,p[2]||0]);st.meas=measure(st.poly);}
 /* shared size check: caliper readings against the photo */
 function calcScale(){const m=st.meas;let k=1,kc=0,html='',okAB=false;if(!m)return {k,kc,html,okAB};
   const A=+st.cal.ab,Cd=+st.cal.cd;
   if(A>0){okAB=true;k=A/m.ab;const diff=Math.abs(A-m.ab),pct=diff/A,good=diff<=LIM_MM||pct<=LIM_PCT;
-    html+=`<div class="ppmsg ${good?'ok':'warn'}">A to B: photo ${f1(m.ab)}, caliper ${f1(A)}. Difference <b>${f1(diff)} mm</b> (${f1(pct*100)}%)</div>`;
+    html+=`<div class="ppmsg ${good?'ok':'warn'}">A–A: photo ${f1(m.ab)}, caliper ${f1(A)}. Difference <b>${f1(diff)} mm</b> (${f1(pct*100)}%)</div>`;
     if(Cd>0){kc=Cd/m.cd;const d2=Math.abs(Cd-m.cd),p2=d2/Cd,good2=d2<=LIM_MM||p2<=LIM_PCT;
-      html+=`<div class="ppmsg ${good2?'ok':'warn'}">C to D: photo ${f1(m.cd)}, caliper ${f1(Cd)}. Difference <b>${f1(d2)} mm</b> (${f1(p2*100)}%)</div>`;
+      html+=`<div class="ppmsg ${good2?'ok':'warn'}">B–B: photo ${f1(m.cd)}, caliper ${f1(Cd)}. Difference <b>${f1(d2)} mm</b> (${f1(p2*100)}%)</div>`;
       const same=Math.abs(kc/k-1)<=0.03;
       html+=`<div class="ppnote">${same?(k<1&&kc<1?'Both a little too big. Normal: the top of a tall part looks bigger from above. The caliper sizes fix it.':'Both directions match. Each direction is scaled to the caliper size.'):'The two directions differ by '+f1(Math.abs(kc/k-1)*100)+'%. Each direction is scaled to the caliper size. Check the outline for bumps or shadow, or retake the photo.'}</div>`;}
-    else html+=`<div class="ppnote">The whole part is scaled to the A to B size. Add C to D for a better result.</div>`;
+    else html+=`<div class="ppnote">The whole part is scaled to A–A. Add B–B for a better result.</div>`;
     if(!good)html+=`<div class="ppnote">Large difference. Fix bumps or shadow with the Move, Add and Delete tools.</div>`;}
   return {k,kc,html,okAB};}
 function live(){if(!root||!st||st.step!==3)return;const m=st.meas,sz=$q('#ppSize');
-  if(sz)sz.innerHTML=m?`Photo: A to B <b>${f1(m.ab)}</b> mm · C to D <b>${f1(m.cd)}</b> mm`:'Tap the part first.';
+  if(sz)sz.innerHTML=m?`Photo: A–A <b>${f1(m.ab)}</b> mm · B–B <b>${f1(m.cd)}</b> mm`:'Tap the part first.';
   const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;const df=$q('#ppDiff');if(df)df.innerHTML=cs.html;
   const nb=$q('#ppNext');if(nb)nb.disabled=!(m&&cs.okAB);
   const u=$q('#ppUndo'),r=$q('#ppRedo');if(u)u.disabled=!st.undo.length;if(r)r.disabled=!st.redo.length;
@@ -11117,17 +11217,18 @@ function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.g
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#e8e3d8';c.fillRect(0,0,g.W,g.H);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const o=g.toS(0,0);
   if(st.view==='outline'){c.fillStyle='#f6f3ec';c.fillRect(o[0],o[1],st.ww*g.s,st.wh*g.s);}else c.drawImage(img,o[0],o[1],st.ww*g.s,st.wh*g.s);
-  if(st.polyPx&&st.view!=='photo'){c.beginPath();st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});c.closePath();
+  if(st.tool==='color'&&st.scCv){c.drawImage(st.scCv,o[0],o[1],st.ww*g.s,st.wh*g.s);}
+  if(st.polyPx&&st.view!=='photo'){c.beginPath();roundedPx().forEach((p,i)=>{const q=g.toS(p[0],p[1]);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});c.closePath();
     if(st.view==='both'){c.fillStyle='rgba(240,83,37,.16)';c.fill();}c.lineWidth=2.5*d;c.strokeStyle='#f05325';c.stroke();}
-  if(st.polyPx&&st.tool!=='detect'&&st.tool!=='shadow'){st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);c.beginPath();c.arc(q[0],q[1],(i===st.selV?7:5)*d,0,7);c.fillStyle=i===st.selV?'#f05325':(st.tool==='del'?'#fbe3e5':'#fff');c.fill();c.lineWidth=1.6*d;c.strokeStyle=st.tool==='del'?'#d84c55':'#f05325';c.stroke();});}
-  const m=st.meas;if(m&&st.polyPx){[['A',m.A],['B',m.B],['C',m.C],['D',m.D]].forEach(([l,p])=>{const q=g.toS(p[0]*PPM,st.wh-p[1]*PPM);c.beginPath();c.arc(q[0],q[1],12*d,0,7);c.fillStyle='#1d2a44';c.fill();c.fillStyle='#fff';c.font='bold '+(13*d)+'px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(l,q[0],q[1]+d);});}
+  if(st.polyPx&&st.tool!=='detect'&&st.tool!=='shadow'&&st.tool!=='color'&&st.tool!=='dim'){st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);c.beginPath();c.arc(q[0],q[1],(i===st.selV?7:5)*d,0,7);c.fillStyle=i===st.selV?'#f05325':(st.tool==='del'?'#fbe3e5':'#fff');c.fill();c.lineWidth=1.6*d;c.strokeStyle=st.tool==='del'?'#d84c55':'#f05325';c.stroke();});}
+  drawDims(c,g,d);
   if(st.tap&&st.tool==='detect'){const q=g.toS(st.tap[0],st.tap[1]);c.strokeStyle='#2f8f5b';c.lineWidth=3*d;c.beginPath();c.arc(q[0],q[1],9*d,0,7);c.stroke();}
   if(!st.polyPx){const msg=st.autoBusy?'Finding the outline…':'Tap on your part to find its outline';c.font='bold '+(18*d)+'px sans-serif';const tw=c.measureText(msg).width+40*d,th=44*d,x0=(g.W-tw)/2,y0=g.H*0.05;c.fillStyle='rgba(29,42,68,.9)';c.beginPath();if(c.roundRect)c.roundRect(x0,y0,tw,th,12*d);else c.rect(x0,y0,tw,th);c.fill();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(msg,g.W/2,y0+th/2);}}
 
 /* ---------- SCREEN 4: height, name, 3D block ---------- */
 function scr4(){const cs=calcScale(),m=st.meas;return shell(`
   <div class="ppcol"><div>
-   <div class="ppnote">Caliper size used: A to B <b>${f1(+st.cal.ab)}</b> mm${+st.cal.cd>0?' · C to D <b>'+f1(+st.cal.cd)+'</b> mm':''}. The part is turned so A to B runs along Y and C to D along X.</div>
+   <div class="ppnote">Caliper size used: A–A <b>${f1(+st.cal.ab)}</b> mm${+st.cal.cd>0?' · B–B <b>'+f1(+st.cal.cd)+'</b> mm':''}. The part is turned so A–A runs along X and B–B along Y.</div>
    <div class="ppfield"><span><b>Height</b> (mm)</span><input id="ppH" type="number" step="0.1" value="${st.cal.h}" placeholder="required"></div>
    <div class="ppfield"><span>Part name</span><input id="ppName" type="text" value="${st.cal.name}"></div>
    <div class="ppnote">Added as one-depth 3D part, tagged <b>From photo: estimate</b>.</div></div>
@@ -11140,10 +11241,6 @@ function wire4(){
   const upd=()=>{st.cal.h=h.value;st.cal.name=nm.value;const H=+h.value;add.disabled=!(H>0&&H<400&&cs.okAB);draw3d(H>0?H:20);};
   [h,nm].forEach(i=>i.oninput=upd);upd();
   add.onclick=()=>{upd();if(!add.disabled)addToTool();};}
-function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2,a=m.dirAB,c=m.dirCD,
-    sg=(a[0]*c[1]-a[1]*c[0])>0?-1:1,ka=st.k||1,kc=(st.kcd&&st.kcd>0)?st.kcd:ka;
-  /* the part is turned so that A to B runs along Y and C to D along X */
-  return st.poly.map(p=>{const x=p[0]-cx,y=p[1]-cy;return [sg*(x*c[0]+y*c[1])*kc,(x*a[0]+y*a[1])*ka];});}
 function draw3d(H){const cv=$q('#pp3d');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);const poly=scaledPoly(),c=0.8660254,s=0.5;
   const P=(x,y,z)=>[(y-x)*c,-(x+y)*s-z];let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;poly.forEach(p=>{[0,H].forEach(z=>{const q=P(p[0],p[1],z);mnx=Math.min(mnx,q[0]);mxx=Math.max(mxx,q[0]);mny=Math.min(mny,q[1]);mxy=Math.max(mxy,q[1]);});});
   const sc=Math.min((cv.width-30)/(mxx-mnx||1),(cv.height-30)/(mxy-mny||1)),ox=(cv.width-(mxx-mnx)*sc)/2-mnx*sc,oy=(cv.height-(mxy-mny)*sc)/2-mny*sc,X=(x,y,z)=>{const q=P(x,y,z);return [q[0]*sc+ox,q[1]*sc+oy];};
@@ -11170,8 +11267,9 @@ function addToTool(){const H=+st.cal.h,poly=scaledPoly(),pos=extrude(poly,H),stt
   close();renderAll();toast('Photo part added. It is an estimate. Please check it with a real sample.');}
 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a="photo"]');if(b){e.stopPropagation();e.preventDefault();open();}},true);
-window.PP={_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
+window.PP={_paint:(pts,mo,r)=>{ensureScrib();st.brushMm=r||5;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;(st.strokes=st.strokes||[]).push({mode:s.mode,r:brushPx(),pts:s.pts});runPaintMask();},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
 })();
+
 
 
 </script>
