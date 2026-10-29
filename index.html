@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V2.5 — Shell-Case</title>
+<title>Foam Insert Tool V2.6 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -473,7 +473,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.5 · 29 Oct 2026&#10;&#10;V2.5: Photo part: when both caliper sizes are typed, each&#10;direction is scaled separately (fixes a wrong angle warning).&#10;Clearer messages, hint to edit points.&#10;&#10;V2.4: Add from a photo&#10;V2.3: Foam STEP + one STL per part&#10;V2.1: downloads fixed on GitHub Pages&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.5</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V2.6 · 30 Oct 2026&#10;&#10;V2.6: Photo outline page works like a drawing tool:&#10;caliper A to B and C to D on the same page, zoom and pan&#10;(wheel, pinch, + / Fit), Move / Add / Delete point tools,&#10;Undo and Redo (Ctrl+Z, Ctrl+Y).&#10;&#10;V2.5: photo part scaled per direction, A to B along Y&#10;V2.4: Add from a photo&#10;V2.3: Foam STEP + one STL per part&#10;V2.1: downloads fixed on GitHub Pages&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.6</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10730,7 +10730,12 @@ function css(){ if(document.getElementById('ppCss'))return;
   .pptips{background:#f6f2ea;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:14px}
   .pptips ul{margin:6px 0 0 18px;padding:0}.pptips li{margin:3px 0}
   .ppcv{display:block;max-width:100%;border-radius:10px;touch-action:none;background:#eee}
+  .ppbox.wide{width:min(1020px,100%)}
+  .ppcol3{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px}
+  .pptb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}.ppgap{width:6px}
+  .ppwrap{background:#e8e3d8;border-radius:10px;overflow:hidden}
   .ppcol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:700px){.ppcol3{grid-template-columns:1fr}}
   @media(max-width:640px){.ppcol{grid-template-columns:1fr}}
   .ppchk{display:flex;gap:8px;align-items:center;font-size:14px;margin:4px 0}
   .ppchk b{display:inline-flex;min-width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:13px}
@@ -10748,17 +10753,19 @@ function css(){ if(document.getElementById('ppCss'))return;
 /* ---------- state ---------- */
 function fresh(){return {step:1,cv:null,iw:0,ih:0,sheet:'A4',cw:210,ch:297,corners:null,checks:null,
   wc:null,ww:0,wh:0,wid:null,E:null,tap:null,seg:null,loop:null,line:30,view:'both',points:false,sens:1,
-  poly:null,polyPx:null,meas:null,cal:{ab:'',cd:'',h:'',name:'Photo part'},k:1};}
+  poly:null,polyPx:null,meas:null,cal:{ab:'',cd:'',h:'',name:'Photo part'},k:1,kcd:0,tool:'detect',vw:null,undo:[],redo:[],selV:-1,wcHi:null};}
 
 /* ---------- open / close ---------- */
 function open(){css();st=fresh();if(root)root.remove();
   root=document.createElement('div');root.className='ppov';root.addEventListener('mousedown',e=>{if(e.target===root&&false)close();});
-  document.body.appendChild(root);render();}
-function close(){if(root){root.remove();root=null;}st=null;}
+  document.body.appendChild(root);document.addEventListener('keydown',kd,true);render();}
+function kd(e){if(!st||!root||st.step!==3)return;const mod=e.ctrlKey||e.metaKey;if(!mod)return;const t=e.target,tag=t&&t.tagName;if((tag==='INPUT'&&t.type!=='range')||tag==='TEXTAREA')return;
+  const k=(e.key||'').toLowerCase();if(k==='z'){e.preventDefault();e.stopPropagation();e.shiftKey?redo():undo();}else if(k==='y'){e.preventDefault();e.stopPropagation();redo();}}
+function close(){if(root){root.remove();root=null;}document.removeEventListener('keydown',kd,true);st=null;}
 
 const STEPS=['Photo','Corners','Outline','Size'];
-function shell(inner,footer){
-  return `<div class="ppbox"><div class="pphd"><h3>Add from a photo</h3><button class="btn sm" id="ppX">Close</button></div>
+function shell(inner,footer,wide){
+  return `<div class="ppbox${wide?' wide':''}"><div class="pphd"><h3>Add from a photo</h3><button class="btn sm" id="ppX">Close</button></div>
    <div class="ppsteps">${STEPS.map((s,i)=>`<span class="ppchip ${st.step===i+1?'on':st.step>i+1?'done':''}"><i>${st.step>i+1?'✓':i+1}</i>${s}</span>`).join('')}</div>
    ${inner}<div class="ppft">${footer}</div></div>`;}
 function render(){
@@ -10878,7 +10885,7 @@ function wire2(){
   cv.onpointerup=e=>{if(drag<0)return;drag=-1;drawPrev();};
   st._drawCorner=draw;draw();drawPrev();}
 function drawPrev(){const c=$q('#ppPrev');if(!c)return;const w=warp(1.1);c.width=w.w;c.height=w.h;c.getContext('2d').drawImage(w.cv,0,0);}
-function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;}
+function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;}
 
 /* ---------- edges + segmentation ---------- */
 function computeEdges(id,w,h){const d=id.data,n=w*h,ch=[new Float32Array(n),new Float32Array(n),new Float32Array(n)];
@@ -10950,77 +10957,125 @@ function measure(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.cos(
     const A=(u1-u0)*(v1-v0);if(!best||A<best.A)best={A,du:u1-u0,dv:v1-v0,iu0,iu1,iv0,iv1,c,s};}
   const long=best.du>=best.dv,U=[best.c,best.s],V=[-best.s,best.c];return {dirAB:long?U:V,dirCD:long?V:U,ab:long?best.du:best.dv,cd:long?best.dv:best.du,A:poly[long?best.iu0:best.iv0],B:poly[long?best.iu1:best.iv1],C:poly[long?best.iv0:best.iu0],D:poly[long?best.iv1:best.iu1]};}
 
-/* ---------- SCREEN 3: outline ---------- */
+/* ---------- SCREEN 3: outline (drawing-tool style) ---------- */
+const TOOLS=[['detect','Detect'],['move','Move'],['add','Add point'],['del','Delete point']];
+const HINTS={detect:'Tap on the part.',move:'Drag a point to fix the line. Drag empty space to move the picture.',add:'Tap the line to add a point. Drag it to place it.',del:'Tap a point to delete it.'};
 function scr3(){return shell(`
-  <div class="ppnote">${st.seg?'Is this the part? If not, tap another spot on the part.':'Tap on the part.'}</div>
-  <div class="ppcol"><div><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
-  <div><div class="ppflex"><b>Show</b><div class="seg" id="ppView">${['photo','outline','both'].map(v=>`<button data-v="${v}" aria-pressed="${st.view===v}">${v==='photo'?'Photo':v==='outline'?'Outline':'Both'}</button>`).join('')}</div></div>
-   <label class="ppchk"><input type="checkbox" id="ppPts" ${st.points?'checked':''}> Show points (edit)</label>
-   <div id="ppEdit" class="ppnote" style="display:${st.points?'block':'none'}">Drag a point to fix the line. Tap on the line to add a point. <button class="btn sm" id="ppDel">Remove point</button></div>
+  <div class="ppcol3"><div>
+   <div class="pptb"><div class="seg" id="ppTools">${TOOLS.map(([k,l])=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&!st.polyPx?'disabled':''}>${l}</button>`).join('')}</div>
+    <span class="ppgap"></span><button class="btn sm" id="ppUndo" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" id="ppRedo" title="Redo (Ctrl+Y)">↷ Redo</button>
+    <span class="ppgap"></span><button class="btn sm" id="ppZm" title="Zoom out">−</button><button class="btn sm" id="ppZf" title="Fit to screen">Fit</button><button class="btn sm" id="ppZp" title="Zoom in">+</button></div>
+   <div class="ppwrap"><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
+   <div class="ppnote" id="ppHint"></div></div>
+  <div>
+   <div class="ppflex"><b>Show</b><div class="seg" id="ppView">${['photo','outline','both'].map(v=>`<button data-v="${v}" aria-pressed="${st.view===v}">${v==='photo'?'Photo':v==='outline'?'Outline':'Both'}</button>`).join('')}</div></div>
    <div class="ppfield"><span>Line: Smooth ⟷ Exact</span><input type="range" id="ppLine" min="0" max="100" value="${st.line}"></div>
    <div class="ppfield"><span>Not found well? Detection</span><div class="seg" id="ppSens">${[['Less',1.6],['Normal',1],['More',0.65]].map(([l,v])=>`<button data-s="${v}" aria-pressed="${st.sens===v}">${l}</button>`).join('')}</div></div>
-   <div id="ppSize" class="ppmsg ok" style="display:${st.poly?'block':'none'}"></div>
-   <button class="btn sm" id="ppReset">Start again</button></div></div>`,
-  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext" ${st.poly?'':'disabled'}>Next: size</button>`);}
-function wire3(){
-  $q('#ppBack').onclick=()=>go(2);$q('#ppNext').onclick=()=>{if(st.poly)go(4);};
-  $q('#ppView').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.view=b.dataset.v;render();};
-  $q('#ppPts').onchange=e=>{st.points=e.target.checked;st.selV=-1;$q('#ppEdit').style.display=st.points?'block':'none';draw3();};
-  $q('#ppDel').onclick=()=>{if(st.selV>=0&&st.polyPx&&st.polyPx.length>3){st.polyPx.splice(st.selV,1);st.selV=-1;syncPoly();draw3();sizeMsg();}};
-  $q('#ppLine').oninput=e=>{st.line=+e.target.value;st.selV=-1;buildPoly();draw3();sizeMsg();};
-  $q('#ppSens').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;st.sens=+b.dataset.s;if(st.tap)doTap(st.tap[0],st.tap[1],true);else render();};
-  $q('#ppReset').onclick=()=>{st.tap=null;st.seg=null;st.loop=null;st.poly=null;render();};
-  const cv=$q('#ppWarp');cv.width=st.ww;cv.height=st.wh;cv.style.maxHeight='62vh';cv.style.width='auto';cv.style.maxWidth='100%';cv.style.cursor='crosshair';
-  const cp=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height,cv.width/r.width];};
-  let dragV=false;
-  cv.onpointerdown=e=>{const [x,y,k]=cp(e);
-    if(st.points&&st.polyPx){let bi=-1,bd=(16*k)**2;st.polyPx.forEach((p,i)=>{const d=(p[0]-x)**2+(p[1]-y)**2;if(d<bd){bd=d;bi=i;}});
-      if(bi<0){let bs=-1,bsd=(11*k)**2,bt=0;const n=st.polyPx.length;for(let i=0;i<n;i++){const a=st.polyPx[i],b2=st.polyPx[(i+1)%n],dx=b2[0]-a[0],dy=b2[1]-a[1],L2=dx*dx+dy*dy||1e-9;let t=((x-a[0])*dx+(y-a[1])*dy)/L2;t=Math.max(0,Math.min(1,t));const px=a[0]+t*dx,py=a[1]+t*dy,d=(px-x)**2+(py-y)**2;if(d<bsd){bsd=d;bs=i;bt=[px,py];}}
-        if(bs>=0){st.polyPx.splice(bs+1,0,bt);bi=bs+1;}}
-      if(bi>=0){st.selV=bi;dragV=true;cv.setPointerCapture(e.pointerId);syncPoly();draw3();sizeMsg();}return;}
-    doTap(x,y);};
-  cv.onpointermove=e=>{if(!dragV||st.selV<0)return;const [x,y]=cp(e);st.polyPx[st.selV]=[Math.max(0,Math.min(cv.width,x)),Math.max(0,Math.min(cv.height,y))];syncPoly();draw3();sizeMsg();};
-  cv.onpointerup=()=>{dragV=false;};
-  draw3();sizeMsg();}
-function doTap(x,y,keep){st.tap=[x,y];const r=segment(x,y);if(!r){st.seg=null;st.loop=null;st.poly=null;if(root){render();const m=$q('.ppnote');if(m)m.textContent='Could not find the part there. Tap on the middle of the part, or set Detection to More.';}return;}
-  st.seg=r;st.loop=outerLoop(r.mask,st.ww,st.wh);buildPoly();render();}
-function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM]);st.meas=measure(st.poly);}
-function sizeMsg(){const b=$q('#ppSize');if(!b||!st.meas)return;const m=st.meas;b.style.display='block';b.innerHTML=`Size from photo: <b>${f1(m.ab)} × ${f1(m.cd)} mm</b><br><span style="font-size:12px">Bumps or shadow on the line? Turn on Show points and drag them.</span>`;}
-function draw3(){const cv=$q('#ppWarp');if(!cv)return;const g=cv.getContext('2d');
-  if(st.view==='outline'){g.fillStyle='#f4f1ea';g.fillRect(0,0,cv.width,cv.height);}else g.drawImage(st.wc,0,0);
-  if(st.polyPx&&st.view!=='photo'){g.beginPath();st.polyPx.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();
-    if(st.view==='both'){g.fillStyle='rgba(240,83,37,.18)';g.fill();}g.lineWidth=3;g.strokeStyle='#f05325';g.stroke();
-    if(st.points){g.fillStyle='#fff';g.strokeStyle='#f05325';g.lineWidth=1.5;st.polyPx.forEach((p,i)=>{g.beginPath();g.arc(p[0],p[1],i===st.selV?6:3.6,0,7);g.fillStyle=i===st.selV?'#f05325':'#fff';g.fill();g.stroke();});}
-    const m=st.meas;if(m){[['A',m.A],['B',m.B],['C',m.C],['D',m.D]].forEach(([l,p])=>{const x=p[0]*PPM,y=st.wh-p[1]*PPM;g.beginPath();g.arc(x,y,13,0,7);g.fillStyle='#1d2a44';g.fill();g.fillStyle='#fff';g.font='bold 14px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(l,x,y+1);});}}
-  if(st.tap){g.strokeStyle='#2f8f5b';g.lineWidth=3;g.beginPath();g.arc(st.tap[0],st.tap[1],9,0,7);g.stroke();}}
-
-/* ---------- SCREEN 4: size and height ---------- */
-function scr4(){const m=st.meas;return shell(`
-  <div class="ppcol"><div>
-   <div class="ppnote">Measure the part with a caliper. Points A, B, C, D are on the outline picture.</div>
-   <div class="ppfield"><span><b>A to B</b> (caliper, mm). Photo says <b>${f1(m.ab)}</b> mm</span><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="required"></div>
-   <div class="ppfield"><span>C to D (caliper, mm). Photo says <b>${f1(m.cd)}</b> mm. Optional, but better</span><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="optional"></div>
+   <hr style="border:none;border-top:1px solid #e4ddd0;margin:10px 0">
+   <div class="ppnote"><b>Caliper size</b> of the real part. A, B, C, D are on the picture.</div>
+   <div id="ppSize" class="ppnote"></div>
+   <div class="ppfield"><span><b>A to B</b> (mm) required</span><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading"></div>
+   <div class="ppfield"><span>C to D (mm) optional, better</span><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading"></div>
    <div id="ppDiff"></div>
+   <button class="btn sm" id="ppReset">Start again</button></div></div>`,
+  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext" disabled>Next: height</button>`,true);}
+function wire3(){
+  $q('#ppBack').onclick=()=>go(2);$q('#ppNext').onclick=()=>{if(!$q('#ppNext').disabled)go(4);};
+  $q('#ppView').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.view=b.dataset.v;render();};
+  $q('#ppTools').onclick=e=>{const b=e.target.closest('[data-t]');if(!b||b.disabled)return;st.tool=b.dataset.t;st.selV=-1;render();};
+  $q('#ppUndo').onclick=undo;$q('#ppRedo').onclick=redo;
+  $q('#ppZm').onclick=()=>zoomAt(null,null,1/1.4);$q('#ppZp').onclick=()=>zoomAt(null,null,1.4);$q('#ppZf').onclick=()=>{st.vw={k:1,cx:st.ww/2,cy:st.wh/2};draw3();};
+  const sl=$q('#ppLine');sl.oninput=e=>{if(!st.sliderOn){snap();st.sliderOn=true;}st.line=+e.target.value;st.selV=-1;if(st.loop){buildPoly();draw3();live();}};sl.onchange=()=>{st.sliderOn=false;};
+  $q('#ppSens').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;st.sens=+b.dataset.s;if(st.tap)doTap(st.tap[0],st.tap[1]);else render();};
+  $q('#ppReset').onclick=()=>{snap();st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw={k:1,cx:st.ww/2,cy:st.wh/2};render();};
+  const ab=$q('#ppAB'),cd=$q('#ppCD');ab.oninput=()=>{st.cal.ab=ab.value;live();};cd.oninput=()=>{st.cal.cd=cd.value;live();};
+  const cv=$q('#ppWarp'),dpr=Math.min(2,window.devicePixelRatio||1),cssW=cv.parentElement.clientWidth||520,cssH=Math.round(Math.min(window.innerHeight*0.62,cssW*1.3));
+  cv.style.height=cssH+'px';cv.width=Math.round(cssW*dpr);cv.height=Math.round(cssH*dpr);cv.style.cursor=st.tool==='detect'?'crosshair':st.tool==='move'?'default':'cell';
+  if(!st.vw)st.vw={k:1,cx:st.ww/2,cy:st.wh/2};
+  bindCanvas(cv);
+  if(!st.wcHi&&!st.hiBusy){st.hiBusy=true;const id=st.warpId;setTimeout(()=>{if(!st||st.warpId!==id)return;const w=warp(7);if(!st||st.warpId!==id)return;st.wcHi=w.cv;st.hiBusy=false;if(root&&st.step===3)draw3();},60);}
+  draw3();live();}
+function G(){const cv=$q('#ppWarp'),W=cv.width,H=cv.height,f=Math.min(W/st.ww,H/st.wh),s=f*st.vw.k,rect=cv.getBoundingClientRect();
+  return {cv,W,H,s,k:W/rect.width,toS:(u,v)=>[W/2+(u-st.vw.cx)*s,H/2+(v-st.vw.cy)*s],toU:(X,Y)=>[(X-W/2)/s+st.vw.cx,(Y-H/2)/s+st.vw.cy],pos:e=>[(e.clientX-rect.left)*W/rect.width,(e.clientY-rect.top)*H/rect.height]};}
+function clampView(){const v=st.vw;v.k=Math.max(1,Math.min(14,v.k));v.cx=Math.max(0,Math.min(st.ww,v.cx));v.cy=Math.max(0,Math.min(st.wh,v.cy));}
+function zoomAt(X,Y,fac){const g=G();if(X==null){X=g.W/2;Y=g.H/2;}const [u,v]=g.toU(X,Y);st.vw.k*=fac;clampView();const g2=G();st.vw.cx=u-(X-g2.W/2)/g2.s;st.vw.cy=v-(Y-g2.H/2)/g2.s;clampView();draw3();}
+function snapOf(){return {poly:st.polyPx?st.polyPx.map(p=>p.slice()):null,line:st.line,loop:st.loop,tap:st.tap,seg:st.seg,tool:st.tool};}
+function snap(){st.undo.push(snapOf());if(st.undo.length>150)st.undo.shift();st.redo=[];}
+function restore(sn){st.polyPx=sn.poly?sn.poly.map(p=>p.slice()):null;st.line=sn.line;st.loop=sn.loop;st.tap=sn.tap;st.seg=sn.seg;st.selV=-1;
+  if(st.polyPx)syncPoly();else{st.poly=null;st.meas=null;}const sl=$q('#ppLine');if(sl)sl.value=st.line;if(!st.polyPx)st.tool='detect';draw3();live();}
+function undo(){if(!st||st.step!==3||!st.undo.length)return;st.redo.push(snapOf());restore(st.undo.pop());}
+function redo(){if(!st||st.step!==3||!st.redo.length)return;st.undo.push(snapOf());restore(st.redo.pop());}
+function bindCanvas(cv){
+  const ptrs=new Map();let mode=null,down=null,pinch=null;
+  const nearV=(X,Y,g)=>{let bi=-1,bd=(18*g.k)**2;(st.polyPx||[]).forEach((p,i)=>{const q=g.toS(p[0],p[1]),d=(q[0]-X)**2+(q[1]-Y)**2;if(d<bd){bd=d;bi=i;}});return bi;};
+  const nearSeg=(X,Y,g)=>{const P=st.polyPx;if(!P)return null;let best=null,bd=(26*g.k)**2;const n=P.length;
+    for(let i=0;i<n;i++){const a=g.toS(P[i][0],P[i][1]),b=g.toS(P[(i+1)%n][0],P[(i+1)%n][1]),dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1e-9;let t=((X-a[0])*dx+(Y-a[1])*dy)/L2;t=Math.max(0.02,Math.min(0.98,t));
+      const px=a[0]+t*dx,py=a[1]+t*dy,d=(px-X)**2+(py-Y)**2;if(d<bd){bd=d;const u=g.toU(px,py);best={i,pt:u};}}return best;};
+  cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
+    if(ptrs.size===2){const [p1,p2]=[...ptrs.values()];pinch={d:Math.hypot(p1[0]-p2[0],p1[1]-p2[1]),mx:(p1[0]+p2[0])/2,my:(p1[1]+p2[1])/2};mode='pinch';return;}
+    const [X,Y]=g.pos(e);down={X,Y,cx:st.vw.cx,cy:st.vw.cy,moved:false};
+    if(st.polyPx&&st.tool==='move'){const i=nearV(X,Y,g);if(i>=0){snap();st.selV=i;mode='drag';draw3();return;}}
+    if(st.polyPx&&st.tool==='add'){const r=nearSeg(X,Y,g);if(r){snap();st.polyPx.splice(r.i+1,0,r.pt);st.selV=r.i+1;syncPoly();mode='drag';draw3();live();return;}}
+    if(st.polyPx&&st.tool==='del'){const i=nearV(X,Y,g);if(i>=0&&st.polyPx.length>3){snap();st.polyPx.splice(i,1);st.selV=-1;syncPoly();draw3();live();mode=null;return;}}
+    mode='pan';};
+  cv.onpointermove=e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
+    if(mode==='pinch'&&ptrs.size>=2){const [p1,p2]=[...ptrs.values()],d=Math.hypot(p1[0]-p2[0],p1[1]-p2[1]),mx=(p1[0]+p2[0])/2,my=(p1[1]+p2[1])/2,r=cv.getBoundingClientRect(),X=(mx-r.left)*g.W/r.width,Y=(my-r.top)*g.H/r.height;
+      zoomAt(X,Y,d/pinch.d);const g2=G();st.vw.cx-=(mx-pinch.mx)*(g2.W/r.width)/g2.s;st.vw.cy-=(my-pinch.my)*(g2.H/r.height)/g2.s;clampView();pinch={d,mx,my};draw3();return;}
+    const [X,Y]=g.pos(e);
+    if(mode==='drag'&&st.selV>=0){const u=g.toU(X,Y);st.polyPx[st.selV]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];syncPoly();draw3();live();}
+    else if(mode==='pan'&&down){if(Math.hypot(X-down.X,Y-down.Y)>6*g.k)down.moved=true;if(down.moved){st.vw.cx=down.cx-(X-down.X)/g.s;st.vw.cy=down.cy-(Y-down.Y)/g.s;clampView();draw3();}}};
+  cv.onpointerup=e=>{const g=G();ptrs.delete(e.pointerId);
+    if(mode==='pan'&&down&&!down.moved&&st.tool==='detect'){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;doTap(u[0],u[1]);return;}
+    if(ptrs.size<2&&mode==='pinch')mode=null;if(mode==='drag'||mode==='pan')mode=null;};
+  cv.onpointercancel=()=>{ptrs.clear();mode=null;};
+  cv.onwheel=e=>{e.preventDefault();const g=G(),[X,Y]=g.pos(e);zoomAt(X,Y,Math.pow(1.0014,-e.deltaY));};}
+function doTap(x,y){snap();st.tap=[x,y];const r=segment(x,y);
+  if(!r){st.seg=null;st.loop=null;st.polyPx=null;st.poly=null;st.meas=null;st.tool='detect';render();const m=$q('#ppHint');if(m)m.textContent='Could not find the part there. Tap the middle of the part, or set Detection to More.';return;}
+  st.seg=r;st.loop=outerLoop(r.mask,st.ww,st.wh);buildPoly();st.tool='move';st.selV=-1;render();}
+function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM]);st.meas=measure(st.poly);}
+/* shared size check: caliper readings against the photo */
+function calcScale(){const m=st.meas;let k=1,kc=0,html='',okAB=false;if(!m)return {k,kc,html,okAB};
+  const A=+st.cal.ab,Cd=+st.cal.cd;
+  if(A>0){okAB=true;k=A/m.ab;const diff=Math.abs(A-m.ab),pct=diff/A,good=diff<=LIM_MM||pct<=LIM_PCT;
+    html+=`<div class="ppmsg ${good?'ok':'warn'}">A to B: photo ${f1(m.ab)}, caliper ${f1(A)}. Difference <b>${f1(diff)} mm</b> (${f1(pct*100)}%)</div>`;
+    if(Cd>0){kc=Cd/m.cd;const d2=Math.abs(Cd-m.cd),p2=d2/Cd,good2=d2<=LIM_MM||p2<=LIM_PCT;
+      html+=`<div class="ppmsg ${good2?'ok':'warn'}">C to D: photo ${f1(m.cd)}, caliper ${f1(Cd)}. Difference <b>${f1(d2)} mm</b> (${f1(p2*100)}%)</div>`;
+      const same=Math.abs(kc/k-1)<=0.03;
+      html+=`<div class="ppnote">${same?(k<1&&kc<1?'Both a little too big. Normal: the top of a tall part looks bigger from above. The caliper sizes fix it.':'Both directions match. Each direction is scaled to the caliper size.'):'The two directions differ by '+f1(Math.abs(kc/k-1)*100)+'%. Each direction is scaled to the caliper size. Check the outline for bumps or shadow, or retake the photo.'}</div>`;}
+    else html+=`<div class="ppnote">The whole part is scaled to the A to B size. Add C to D for a better result.</div>`;
+    if(!good)html+=`<div class="ppnote">Large difference. Fix bumps or shadow with the Move, Add and Delete tools.</div>`;}
+  return {k,kc,html,okAB};}
+function live(){if(!root||!st||st.step!==3)return;const m=st.meas,sz=$q('#ppSize');
+  if(sz)sz.innerHTML=m?`Photo: A to B <b>${f1(m.ab)}</b> mm · C to D <b>${f1(m.cd)}</b> mm`:'Tap the part first.';
+  const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;const df=$q('#ppDiff');if(df)df.innerHTML=cs.html;
+  const nb=$q('#ppNext');if(nb)nb.disabled=!(m&&cs.okAB);
+  const u=$q('#ppUndo'),r=$q('#ppRedo');if(u)u.disabled=!st.undo.length;if(r)r.disabled=!st.redo.length;
+  const h=$q('#ppHint');if(h&&!/Could not/.test(h.textContent))h.textContent=(st.tool==='detect'&&st.polyPx?'Is this the part? If not, tap another spot. ':'')+HINTS[st.tool]+(st.vw&&st.vw.k>1.05?'  Zoom x'+f1(st.vw.k)+'.':'  Scroll or pinch to zoom.');}
+function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.getContext('2d'),d=g.k,img=st.wcHi||st.wc;
+  c.setTransform(1,0,0,1,0,0);c.fillStyle='#e8e3d8';c.fillRect(0,0,g.W,g.H);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  const o=g.toS(0,0);
+  if(st.view==='outline'){c.fillStyle='#f6f3ec';c.fillRect(o[0],o[1],st.ww*g.s,st.wh*g.s);}else c.drawImage(img,o[0],o[1],st.ww*g.s,st.wh*g.s);
+  if(st.polyPx&&st.view!=='photo'){c.beginPath();st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});c.closePath();
+    if(st.view==='both'){c.fillStyle='rgba(240,83,37,.16)';c.fill();}c.lineWidth=2.5*d;c.strokeStyle='#f05325';c.stroke();}
+  if(st.polyPx&&st.tool!=='detect'){st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);c.beginPath();c.arc(q[0],q[1],(i===st.selV?7:5)*d,0,7);c.fillStyle=i===st.selV?'#f05325':(st.tool==='del'?'#fbe3e5':'#fff');c.fill();c.lineWidth=1.6*d;c.strokeStyle=st.tool==='del'?'#d84c55':'#f05325';c.stroke();});}
+  const m=st.meas;if(m&&st.polyPx){[['A',m.A],['B',m.B],['C',m.C],['D',m.D]].forEach(([l,p])=>{const q=g.toS(p[0]*PPM,st.wh-p[1]*PPM);c.beginPath();c.arc(q[0],q[1],12*d,0,7);c.fillStyle='#1d2a44';c.fill();c.fillStyle='#fff';c.font='bold '+(13*d)+'px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(l,q[0],q[1]+d);});}
+  if(st.tap&&st.tool==='detect'){const q=g.toS(st.tap[0],st.tap[1]);c.strokeStyle='#2f8f5b';c.lineWidth=3*d;c.beginPath();c.arc(q[0],q[1],9*d,0,7);c.stroke();}}
+
+/* ---------- SCREEN 4: height, name, 3D block ---------- */
+function scr4(){const cs=calcScale(),m=st.meas;return shell(`
+  <div class="ppcol"><div>
+   <div class="ppnote">Caliper size used: A to B <b>${f1(+st.cal.ab)}</b> mm${+st.cal.cd>0?' · C to D <b>'+f1(+st.cal.cd)+'</b> mm':''}. The part is turned so A to B runs along Y and C to D along X.</div>
    <div class="ppfield"><span><b>Height</b> (mm)</span><input id="ppH" type="number" step="0.1" value="${st.cal.h}" placeholder="required"></div>
-   <div class="ppfield"><span>Part name</span><input id="ppName" type="text" value="${st.cal.name}"></div></div>
+   <div class="ppfield"><span>Part name</span><input id="ppName" type="text" value="${st.cal.name}"></div>
+   <div class="ppnote">Added as one-depth 3D part, tagged <b>From photo: estimate</b>.</div></div>
    <div><canvas class="ppcv" id="pp3d" width="300" height="260" style="width:100%;background:#f4f1ea"></canvas><div class="ppnote" id="pp3dt"></div></div></div>`,
   `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppAdd" disabled>Add as 3D part</button>`);}
 function wire4(){
   $q('#ppBack').onclick=()=>go(3);
-  const ab=$q('#ppAB'),cd=$q('#ppCD'),h=$q('#ppH'),nm=$q('#ppName'),add=$q('#ppAdd');
-  const upd=()=>{st.cal.ab=ab.value;st.cal.cd=cd.value;st.cal.h=h.value;st.cal.name=nm.value;
-    const m=st.meas,A=+ab.value,Cd=+cd.value,H=+h.value;let k=1,kc=0,html='',ok=false;
-    if(A>0){k=A/m.ab;const diff=Math.abs(A-m.ab),pct=diff/A,good=diff<=LIM_MM||pct<=LIM_PCT;
-      html+=`<div class="ppmsg ${good?'ok':'warn'}">A to B: photo ${f1(m.ab)} mm, caliper ${f1(A)} mm. Difference <b>${f1(diff)} mm</b> (${f1(pct*100)}%).</div>`;
-      if(Cd>0){kc=Cd/m.cd;const d2=Math.abs(Cd-m.cd),p2=d2/Cd,good2=d2<=LIM_MM||p2<=LIM_PCT;
-        html+=`<div class="ppmsg ${good2?'ok':'warn'}">C to D: photo ${f1(m.cd)} mm, caliper ${f1(Cd)} mm. Difference <b>${f1(d2)} mm</b> (${f1(p2*100)}%).</div>`;
-        const same=Math.abs(kc/k-1)<=0.03;
-        html+=`<div class="ppnote">${same?(k<1&&kc<1?'Both directions are a little too big. This is normal: the top of a tall part looks bigger from above. The caliper sizes fix it.':'Both directions match. The tool scales each direction to the caliper size.'):'The two directions differ by '+f1(Math.abs(kc/k-1)*100)+'%. The tool scales each direction to the caliper size. Please check the outline for bumps (Back, then Show points) or retake the photo.'}</div>`;}
-      else html+=`<div class="ppnote">The tool scales the whole part to the A to B caliper size. Add C to D for a better result.</div>`;
-      if(!good)html+=`<div class="ppnote">Difference is large. Check the outline for bumps or shadow (Back, then Show points).</div>`;
-      ok=H>0&&H<400;}
-    st.k=k;st.kcd=kc;$q('#ppDiff').innerHTML=html;add.disabled=!ok;draw3d(H>0?H:20);};
-  [ab,cd,h,nm].forEach(i=>i.oninput=upd);upd();
+  const h=$q('#ppH'),nm=$q('#ppName'),add=$q('#ppAdd');
+  const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;
+  const upd=()=>{st.cal.h=h.value;st.cal.name=nm.value;const H=+h.value;add.disabled=!(H>0&&H<400&&cs.okAB);draw3d(H>0?H:20);};
+  [h,nm].forEach(i=>i.oninput=upd);upd();
   add.onclick=()=>{upd();if(!add.disabled)addToTool();};}
 function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2,a=m.dirAB,c=m.dirCD,
     sg=(a[0]*c[1]-a[1]*c[0])>0?-1:1,ka=st.k||1,kc=(st.kcd&&st.kcd>0)?st.kcd:ka;
