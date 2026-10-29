@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V2.8 — Shell-Case</title>
+<title>Foam Insert Tool V2.9 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -473,7 +473,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.8 · 30 Oct 2026&#10;&#10;V2.8: Photo outline tools: Paint mask (paint the part green and the&#10;shadow red), Dimension lines A-A (X) and B-B (Y) placed by hand with&#10;the caliper size on the line, Round corner tool (radius), Part zoom.&#10;&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.6: outline page as a drawing tool, undo, zoom&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.8</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V2.9 · 30 Oct 2026&#10;&#10;V2.9: Magnifier on the corners screen: press and hold a dot&#10;to see the exact point on the paper (cross-hair and sheet line).&#10;&#10;V2.8: Paint mask, Dimension lines A-A / B-B, Round corner, Part zoom&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.6: outline page as a drawing tool, undo, zoom&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.9</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10867,7 +10867,7 @@ function warp(ppm){const {W,H}=sheetSize(),Wd=Math.round(W*ppm),Hd=Math.round(H*
 function scr2(){return shell(`
   <div class="ppflex"><b>Sheet</b><div class="seg" id="ppSheet">${Object.keys(SHEETS).map(k=>`<button data-s="${k}" aria-pressed="${st.sheet===k}">${k==='A4'?'A4':k}</button>`).join('')}</div>
    <span id="ppCustom" style="display:${st.sheet==='Custom'?'inline-flex':'none'};gap:6px;align-items:center"><input id="ppCW" type="number" value="${st.cw}" style="width:74px"> × <input id="ppCH" type="number" value="${st.ch}" style="width:74px"> mm</span></div>
-  <div class="ppnote">${st.cornersAuto?'The 4 dots were placed for you. Tap or drag a dot to move it exactly onto a sheet corner.':'Tap or drag each dot onto a sheet corner.'}</div>
+  <div class="ppnote">${st.cornersAuto?'The 4 dots were placed for you. Press and hold a dot: a magnifier shows the exact point. Move it onto the sheet corner.':'Press and hold a dot: a magnifier shows the exact point. Move each dot onto a sheet corner.'}</div>
   <div class="ppcol"><canvas class="ppcv" id="ppCorner"></canvas><div><div class="ppnote"><b>Straightened sheet</b></div><canvas class="ppcv" id="ppPrev"></canvas></div></div>`,
   `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext">Next: outline</button>`);}
 function wire2(){
@@ -10877,13 +10877,24 @@ function wire2(){
   const cw=$q('#ppCW'),ch=$q('#ppCH');if(cw)cw.onchange=()=>{st.cw=+cw.value||210;drawPrev();};if(ch)ch.onchange=()=>{st.ch=+ch.value||297;drawPrev();};
   const cv=$q('#ppCorner'),dw=Math.min(560,st.iw),sc=dw/st.iw;cv.width=dw;cv.height=Math.round(st.ih*sc);
   let drag=-1;
+  /* magnifier: shows the paper around the dot you are holding, with a cross-hair and the sheet line */
+  const LP=176,LR=52,dpr=Math.min(2,window.devicePixelRatio||1),lp=document.createElement('canvas');lp.width=LP*dpr;lp.height=LP*dpr;
+  lp.style.cssText='position:fixed;pointer-events:none;border-radius:50%;border:3px solid #f05325;box-shadow:0 6px 22px rgba(0,0,0,.45);display:none;z-index:10001;background:#222;width:'+LP+'px;height:'+LP+'px';root.appendChild(lp);
+  const loupe=(e,i)=>{const c=st.corners[i],g=lp.getContext('2d'),S=LP*dpr,k=S/LR;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,S,S);g.save();g.beginPath();g.arc(S/2,S/2,S/2,0,7);g.clip();g.imageSmoothingEnabled=true;
+    g.drawImage(st.cv,c[0]-LR/2,c[1]-LR/2,LR,LR,0,0,S,S);
+    g.strokeStyle='#f05325';g.lineWidth=2*dpr;g.beginPath();st.corners.forEach((p,j)=>{const x=(p[0]-c[0])*k+S/2,y=(p[1]-c[1])*k+S/2;j?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.stroke();
+    g.strokeStyle='rgba(255,255,255,.95)';g.lineWidth=1.5*dpr;g.beginPath();g.moveTo(S/2-20*dpr,S/2);g.lineTo(S/2+20*dpr,S/2);g.moveTo(S/2,S/2-20*dpr);g.lineTo(S/2,S/2+20*dpr);g.stroke();
+    g.strokeStyle='#1d2a44';g.lineWidth=1*dpr;g.beginPath();g.arc(S/2,S/2,5*dpr,0,7);g.stroke();g.restore();
+    g.fillStyle='rgba(29,42,68,.88)';g.fillRect(S/2-30*dpr,S-31*dpr,60*dpr,22*dpr);g.fillStyle='#fff';g.font='bold '+(13*dpr)+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('Point '+(i+1),S/2,S-20*dpr);
+    let x=e.clientX-LP/2,y=e.clientY-LP-34;if(y<8)y=e.clientY+44;x=Math.max(8,Math.min(window.innerWidth-LP-8,x));lp.style.left=x+'px';lp.style.top=y+'px';lp.style.display='block';};
   const draw=()=>{const g=cv.getContext('2d');g.drawImage(st.cv,0,0,cv.width,cv.height);g.lineWidth=2;g.strokeStyle='#f05325';g.beginPath();st.corners.forEach((c,i)=>{i?g.lineTo(c[0]*sc,c[1]*sc):g.moveTo(c[0]*sc,c[1]*sc);});g.closePath();g.stroke();
     st.corners.forEach((c,i)=>{g.beginPath();g.arc(c[0]*sc,c[1]*sc,11,0,7);g.fillStyle='rgba(240,83,37,.85)';g.fill();g.fillStyle='#fff';g.font='bold 12px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(i+1,c[0]*sc,c[1]*sc+1);});};
   const pos=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width/sc,(e.clientY-r.top)*cv.height/r.height/sc];};
   const nearest=p=>{let b=0,bd=1e18;st.corners.forEach((c,i)=>{const d=(c[0]-p[0])**2+(c[1]-p[1])**2;if(d<bd){bd=d;b=i;}});return b;};
-  cv.onpointerdown=e=>{const p=pos(e);drag=nearest(p);st.corners[drag]=p;st.cornersAuto=false;cv.setPointerCapture(e.pointerId);draw();};
-  cv.onpointermove=e=>{if(drag<0)return;st.corners[drag]=pos(e);draw();};
-  cv.onpointerup=e=>{if(drag<0)return;drag=-1;drawPrev();};
+  cv.onpointerdown=e=>{const p=pos(e);drag=nearest(p);st.corners[drag]=p;st.cornersAuto=false;cv.setPointerCapture(e.pointerId);draw();loupe(e,drag);};
+  cv.onpointermove=e=>{if(drag<0)return;st.corners[drag]=pos(e);draw();loupe(e,drag);};
+  cv.onpointerup=e=>{lp.style.display='none';if(drag<0)return;drag=-1;drawPrev();};
+  cv.onpointercancel=()=>{lp.style.display='none';drag=-1;};
   st._drawCorner=draw;draw();drawPrev();}
 function drawPrev(){const c=$q('#ppPrev');if(!c)return;const w=warp(1.1);c.width=w.w;c.height=w.h;c.getContext('2d').drawImage(w.cv,0,0);}
 function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.autoTried=false;st.autoBusy=false;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.lab=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.stroke=null;}
@@ -11269,6 +11280,7 @@ function addToTool(){const H=+st.cal.h,poly=scaledPoly(),pos=extrude(poly,H),stt
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a="photo"]');if(b){e.stopPropagation();e.preventDefault();open();}},true);
 window.PP={_paint:(pts,mo,r)=>{ensureScrib();st.brushMm=r||5;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;(st.strokes=st.strokes||[]).push({mode:s.mode,r:brushPx(),pts:s.pts});runPaintMask();},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
 })();
+
 
 
 
