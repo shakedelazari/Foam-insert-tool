@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V2.4 — Shell-Case</title>
+<title>Foam Insert Tool V2.5 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -473,7 +473,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.4 · 29 Oct 2026&#10;&#10;V2.4: Add from a photo (part on A4 sheet: 4 corners,&#10;one outline, caliper check, height, 3D block).&#10;Tagged From photo: estimate.&#10;&#10;V2.3: Foam STEP + one STL per part at cavity depth&#10;V2.2: multibody STEP attempt (removed)&#10;V2.1: downloads fixed on GitHub Pages&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.4</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V2.5 · 29 Oct 2026&#10;&#10;V2.5: Photo part: when both caliper sizes are typed, each&#10;direction is scaled separately (fixes a wrong angle warning).&#10;Clearer messages, hint to edit points.&#10;&#10;V2.4: Add from a photo&#10;V2.3: Foam STEP + one STL per part&#10;V2.1: downloads fixed on GitHub Pages&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.5</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10947,8 +10947,8 @@ function buildPoly(){if(!st.loop)return;const s=st.line/100,r=Math.round(8-6.5*s
   st.poly=d.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM]);st.meas=measure(st.poly);}
 function measure(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.cos(a*Math.PI/180),s=Math.sin(a*Math.PI/180);let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9,iu0,iu1,iv0,iv1;
     poly.forEach((p,i)=>{const u=p[0]*c+p[1]*s,v=-p[0]*s+p[1]*c;if(u<u0){u0=u;iu0=i;}if(u>u1){u1=u;iu1=i;}if(v<v0){v0=v;iv0=i;}if(v>v1){v1=v;iv1=i;}});
-    const A=(u1-u0)*(v1-v0);if(!best||A<best.A)best={A,du:u1-u0,dv:v1-v0,iu0,iu1,iv0,iv1};}
-  const long=best.du>=best.dv;return {ab:long?best.du:best.dv,cd:long?best.dv:best.du,A:poly[long?best.iu0:best.iv0],B:poly[long?best.iu1:best.iv1],C:poly[long?best.iv0:best.iu0],D:poly[long?best.iv1:best.iu1]};}
+    const A=(u1-u0)*(v1-v0);if(!best||A<best.A)best={A,du:u1-u0,dv:v1-v0,iu0,iu1,iv0,iv1,c,s};}
+  const long=best.du>=best.dv,U=[best.c,best.s],V=[-best.s,best.c];return {dirAB:long?U:V,dirCD:long?V:U,ab:long?best.du:best.dv,cd:long?best.dv:best.du,A:poly[long?best.iu0:best.iv0],B:poly[long?best.iu1:best.iv1],C:poly[long?best.iv0:best.iu0],D:poly[long?best.iv1:best.iu1]};}
 
 /* ---------- SCREEN 3: outline ---------- */
 function scr3(){return shell(`
@@ -10985,7 +10985,7 @@ function wire3(){
 function doTap(x,y,keep){st.tap=[x,y];const r=segment(x,y);if(!r){st.seg=null;st.loop=null;st.poly=null;if(root){render();const m=$q('.ppnote');if(m)m.textContent='Could not find the part there. Tap on the middle of the part, or set Detection to More.';}return;}
   st.seg=r;st.loop=outerLoop(r.mask,st.ww,st.wh);buildPoly();render();}
 function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM]);st.meas=measure(st.poly);}
-function sizeMsg(){const b=$q('#ppSize');if(!b||!st.meas)return;const m=st.meas;b.style.display='block';b.innerHTML=`Size from photo: <b>${f1(m.ab)} × ${f1(m.cd)} mm</b>`;}
+function sizeMsg(){const b=$q('#ppSize');if(!b||!st.meas)return;const m=st.meas;b.style.display='block';b.innerHTML=`Size from photo: <b>${f1(m.ab)} × ${f1(m.cd)} mm</b><br><span style="font-size:12px">Bumps or shadow on the line? Turn on Show points and drag them.</span>`;}
 function draw3(){const cv=$q('#ppWarp');if(!cv)return;const g=cv.getContext('2d');
   if(st.view==='outline'){g.fillStyle='#f4f1ea';g.fillRect(0,0,cv.width,cv.height);}else g.drawImage(st.wc,0,0);
   if(st.polyPx&&st.view!=='photo'){g.beginPath();st.polyPx.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();
@@ -11009,15 +11009,23 @@ function wire4(){
   $q('#ppBack').onclick=()=>go(3);
   const ab=$q('#ppAB'),cd=$q('#ppCD'),h=$q('#ppH'),nm=$q('#ppName'),add=$q('#ppAdd');
   const upd=()=>{st.cal.ab=ab.value;st.cal.cd=cd.value;st.cal.h=h.value;st.cal.name=nm.value;
-    const m=st.meas,A=+ab.value,Cd=+cd.value,H=+h.value;let k=1,html='',ok=false;
+    const m=st.meas,A=+ab.value,Cd=+cd.value,H=+h.value;let k=1,kc=0,html='',ok=false;
     if(A>0){k=A/m.ab;const diff=Math.abs(A-m.ab),pct=diff/A,good=diff<=LIM_MM||pct<=LIM_PCT;
-      html+=`<div class="ppmsg ${good?'ok':'warn'}">Photo ${f1(m.ab)} mm, caliper ${f1(A)} mm. Difference <b>${f1(diff)} mm</b> (${f1(pct*100)}%). The tool uses the caliper size.${good?'':'<br>Difference is large. A new photo gives a better result.'}</div>`;
-      if(Cd>0){const k2=Cd/m.cd,rel=Math.abs(k2/k-1);html+=`<div class="ppmsg ${rel<=LIM_PCT?'ok':'warn'}">C to D: photo ${f1(m.cd*k)} mm after the fix, caliper ${f1(Cd)} mm.${rel<=LIM_PCT?' Matches.':'<br>The two directions do not match. The camera angle was probably off. Retake the photo.'}</div>`;}
+      html+=`<div class="ppmsg ${good?'ok':'warn'}">A to B: photo ${f1(m.ab)} mm, caliper ${f1(A)} mm. Difference <b>${f1(diff)} mm</b> (${f1(pct*100)}%).</div>`;
+      if(Cd>0){kc=Cd/m.cd;const d2=Math.abs(Cd-m.cd),p2=d2/Cd,good2=d2<=LIM_MM||p2<=LIM_PCT;
+        html+=`<div class="ppmsg ${good2?'ok':'warn'}">C to D: photo ${f1(m.cd)} mm, caliper ${f1(Cd)} mm. Difference <b>${f1(d2)} mm</b> (${f1(p2*100)}%).</div>`;
+        const same=Math.abs(kc/k-1)<=0.03;
+        html+=`<div class="ppnote">${same?(k<1&&kc<1?'Both directions are a little too big. This is normal: the top of a tall part looks bigger from above. The caliper sizes fix it.':'Both directions match. The tool scales each direction to the caliper size.'):'The two directions differ by '+f1(Math.abs(kc/k-1)*100)+'%. The tool scales each direction to the caliper size. Please check the outline for bumps (Back, then Show points) or retake the photo.'}</div>`;}
+      else html+=`<div class="ppnote">The tool scales the whole part to the A to B caliper size. Add C to D for a better result.</div>`;
+      if(!good)html+=`<div class="ppnote">Difference is large. Check the outline for bumps or shadow (Back, then Show points).</div>`;
       ok=H>0&&H<400;}
-    st.k=k;$q('#ppDiff').innerHTML=html;add.disabled=!ok;draw3d(H>0?H:20);};
+    st.k=k;st.kcd=kc;$q('#ppDiff').innerHTML=html;add.disabled=!ok;draw3d(H>0?H:20);};
   [ab,cd,h,nm].forEach(i=>i.oninput=upd);upd();
   add.onclick=()=>{upd();if(!add.disabled)addToTool();};}
-function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2;return st.poly.map(p=>[(p[0]-cx)*st.k,(p[1]-cy)*st.k]);}
+function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2,a=m.dirAB,c=m.dirCD,
+    sg=(a[0]*c[1]-a[1]*c[0])>0?-1:1,ka=st.k||1,kc=(st.kcd&&st.kcd>0)?st.kcd:ka;
+  /* the part is turned so that A to B runs along Y and C to D along X */
+  return st.poly.map(p=>{const x=p[0]-cx,y=p[1]-cy;return [sg*(x*c[0]+y*c[1])*kc,(x*a[0]+y*a[1])*ka];});}
 function draw3d(H){const cv=$q('#pp3d');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);const poly=scaledPoly(),c=0.8660254,s=0.5;
   const P=(x,y,z)=>[(y-x)*c,-(x+y)*s-z];let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;poly.forEach(p=>{[0,H].forEach(z=>{const q=P(p[0],p[1],z);mnx=Math.min(mnx,q[0]);mxx=Math.max(mxx,q[0]);mny=Math.min(mny,q[1]);mxy=Math.max(mxy,q[1]);});});
   const sc=Math.min((cv.width-30)/(mxx-mnx||1),(cv.height-30)/(mxy-mny||1)),ox=(cv.width-(mxx-mnx)*sc)/2-mnx*sc,oy=(cv.height-(mxy-mny)*sc)/2-mny*sc,X=(x,y,z)=>{const q=P(x,y,z);return [q[0]*sc+ox,q[1]*sc+oy];};
@@ -11039,7 +11047,7 @@ function extrude(poly,H){let a=0;for(let i=0;i<poly.length;i++){const u=poly[i],
 function thumb(){const c=document.createElement('canvas');c.width=200;c.height=Math.round(200*st.wh/st.ww);c.getContext('2d').drawImage(st.wc,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.6);}
 function addToTool(){const H=+st.cal.h,poly=scaledPoly(),pos=extrude(poly,H),stt=meshStats(pos),name=(st.cal.name||'Photo part').trim()||'Photo part';
   const p=newPart({name,pos,st:stt,R0:RI,box:true,simple:true,kind:'photo',sample:pos});
-  p.photo={source:'photo',estimate:true,sheet:st.sheet,diffMm:Math.abs(+st.cal.ab-st.meas.ab),heightMm:H,outline:poly.map(q=>[+q[0].toFixed(2),+q[1].toFixed(2)]),thumb:thumb()};
+  p.photo={source:'photo',estimate:true,sheet:st.sheet,diffMm:Math.abs(+st.cal.ab-st.meas.ab),diffCdMm:st.cal.cd?Math.abs(+st.cal.cd-st.meas.cd):null,heightMm:H,outline:poly.map(q=>[+q[0].toFixed(2),+q[1].toFixed(2)]),thumb:thumb()};
   placeNew(p);S.parts.push(p);S.sel=p.id;S.open=new Set([p.gid]);S.ladder=null;S.custom=null;
   close();renderAll();toast('Photo part added. It is an estimate. Please check it with a real sample.');}
 
