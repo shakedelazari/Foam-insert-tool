@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V2.9 — Shell-Case</title>
+<title>Foam Insert Tool V3.0 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -445,6 +445,23 @@ body{overflow:hidden}
 .pp-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);font-weight:600}
 .dimbar{top:10px}
 @media (max-width:900px){.prow,.orow{grid-template-columns:1fr}.exgrid,.fgrid,.addtiles{grid-template-columns:1fr}}
+
+/* phone layout (V3.0) */
+@media (max-width:760px){
+  header{flex-wrap:wrap!important;gap:6px!important;padding:6px 10px!important}
+  header h1{font-size:15px!important}
+  .projname{min-width:0!important;flex:1 1 150px}
+  .projname input{width:100%!important;min-width:0!important;font-size:16px!important}
+  .hdrbtns{flex-wrap:wrap;margin-left:0!important}
+  .stepbar{justify-content:flex-start!important;overflow-x:auto;flex-wrap:nowrap!important;padding:4px 10px!important}
+  .stp{flex:0 0 auto}
+  main,#screen,.app2{min-width:0}
+  .foot2{padding:8px 12px!important}
+  .ppov{padding:0!important;align-items:stretch!important}
+  .ppbox,.ppbox.wide{width:100%!important;max-height:100%!important;border-radius:0!important;padding:12px 12px 10px!important}
+  .pptoolrow{gap:4px}
+  .pptoolrow .seg button,.pptools button{padding:7px 8px!important;font-size:12.5px!important}
+}
 </style></head>
 <body>
 <div class="app2">
@@ -473,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V2.9 · 30 Oct 2026&#10;&#10;V2.9: Magnifier on the corners screen: press and hold a dot&#10;to see the exact point on the paper (cross-hair and sheet line).&#10;&#10;V2.8: Paint mask, Dimension lines A-A / B-B, Round corner, Part zoom&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.6: outline page as a drawing tool, undo, zoom&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V2.9</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V3.0 · 30 Oct 2026&#10;&#10;V3.0: Phone layout: header wraps, step bar scrolls, the photo window&#10;fills the phone screen. The automatic outline now takes the whole part&#10;more reliably. Includes the photo tools: Paint mask,&#10;Dimension lines A-A / B-B, Round corner, magnifier on the corners.&#10;&#10;V2.9: Magnifier on the corners screen&#10;V2.8: Paint mask, Dimension lines, Round corner, Part zoom&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.6: outline page as a drawing tool, undo, zoom&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.0</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10942,8 +10959,10 @@ function trySeg(tx,ty,T,dil,gap){dil=dil||2;gap=gap==null?5:gap;const w=st.ww,h=
   const pts=[];for(let y=0;y<h;y++){let a=-1,b=-1;for(let x=0;x<w;x++)if(c2.mask[y*w+x]){if(a<0)a=x;b=x;}if(a>=0){pts.push([a,y],[b+1,y],[a,y+1],[b+1,y+1]);}}
   const sol=c2.area/Math.max(1,hullArea(pts));return {mask:c2.mask,area:c2.area,sol,T};}
 function segment(tx,ty){const lad=[6,7,8,10,12,16,22,30].map(v=>Math.max(3,v*st.sens)),n=st.ww*st.wh;let best=null;
-  for(const T of lad){const r=trySeg(tx,ty,T);if(!r||r.area<n*0.003||r.area>n*0.6)continue;if(r.sol>=0.88){best=r;break;}if(!best||r.sol>best.sol)best=r;}
-  return best;}
+  /* look at every detection level and take the biggest result that is still compact (a result that is only a bit of the part is smaller; a result with shadow is not compact) */
+  let bestOk=null;
+  for(const T of lad){const r=trySeg(tx,ty,T);if(!r||r.area<n*0.003||r.area>n*0.6)continue;if(r.sol>=0.85&&(!bestOk||r.area>bestOk.area))bestOk=r;if(!best||r.sol>best.sol)best=r;}
+  return bestOk||best;}
 function outerLoop(mask,w,h){const nxt=new Map(),key=(x,y)=>y*(w+1)+x,add=(x0,y0,x1,y1)=>{const k=key(x0,y0),a=nxt.get(k);if(a)a.push([x1,y1]);else nxt.set(k,[[x1,y1]]);};
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(!mask[y*w+x])continue;
     if(y===0||!mask[(y-1)*w+x])add(x,y,x+1,y);if(x===w-1||!mask[y*w+x+1])add(x+1,y,x+1,y+1);if(y===h-1||!mask[(y+1)*w+x])add(x+1,y+1,x,y+1);if(x===0||!mask[y*w+x-1])add(x,y+1,x,y);}
