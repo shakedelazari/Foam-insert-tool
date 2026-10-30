@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V3.3 — Shell-Case</title>
+<title>Foam Insert Tool V3.4 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V3.3 · 30 Oct 2026&#10;&#10;V3.3: Paint mask edits the outline you already have: green adds,&#10;red removes. A brush circle with its real size (diameter in mm) is&#10;shown before you press. Ctrl switches between green and red.&#10;&#10;V3.2: Edit line gestures, Sizes step before the outline&#10;V3.1: radius per point, min R4&#10;V3.0: Phone layout&#10;V2.8: Paint mask, Dimension lines&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.3</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V3.4 · 30 Oct 2026&#10;&#10;V3.4: Edit the part later: button Edit outline on the part card (saved in the project too).&#10;Simple outline page: Move points, Paint, Mirror. No A-A on this page.&#10;Arc handle (diamond) in the middle of every line. Mirror: fix one half,&#10;the other half follows.&#10;&#10;V3.3: Paint edits the outline you have, brush circle, Ctrl&#10;V3.2: Edit line gestures, Sizes step&#10;V3.1: radius per point, min R4&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.4</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -9707,7 +9707,7 @@ function newPart(o){const id=S.nextId++;const p={id,gid:o.gid||id,name:o.name,po
   p.T=allowedTs(p)[0];return p;}
 const groups=()=>{const m=new Map();for(const p of S.parts){if(!m.has(p.gid))m.set(p.gid,[]);m.get(p.gid).push(p);}return [...m.values()];};
 function setQty(gid,n){n=Math.max(1,Math.min(20,Math.round(n)||1));const g=S.parts.filter(p=>p.gid===gid);if(!g.length)return;
-  while(g.length<n){const b=g[0],c=newPart({...b,gid,name:b.name,pos:b.pos,st:b.st,scale:b.scale,R0:b.R0,faces:b.faces,allow:b.allow,small:b.small,simple:b.simple,box:b.box,sample:b.sample,ang:{...b.ang},kind:b.kind});c.T=b.T;c.color=b.color;c.fingers=b.fingers;c.stickBy=b.stickBy;c.side=b.side;c.c0=b.c0;c.c1=b.c1;c.x=b.x+4*g.length;c.y=b.y+4*g.length;S.parts.push(c);g.push(c);}
+  while(g.length<n){const b=g[0],c=newPart({...b,gid,name:b.name,pos:b.pos,st:b.st,scale:b.scale,R0:b.R0,faces:b.faces,allow:b.allow,small:b.small,simple:b.simple,box:b.box,sample:b.sample,ang:{...b.ang},kind:b.kind});c.T=b.T;c.color=b.color;c.fingers=b.fingers;c.photo=b.photo;c.stickBy=b.stickBy;c.side=b.side;c.c0=b.c0;c.c1=b.c1;c.x=b.x+4*g.length;c.y=b.y+4*g.length;S.parts.push(c);g.push(c);}
   while(g.length>n){const c=g.pop();S.parts=S.parts.filter(p=>p!==c);}S.ladder=null;S.custom=null;}
 function syncGroup(p){for(const q of S.parts)if(q.gid===p.gid&&q!==p){q.faces=p.faces;q.allow=p.allow;q.small=p.small;q.simple=p.simple;q.c0=p.c0;q.c1=p.c1;q.fingers=p.fingers;q.stick=p.stick;q.stickBy=p.stickBy;q.side=p.side;}}
 /* ---- shapes for typed sizes and the library ---- */
@@ -10204,7 +10204,7 @@ function scr1(){const gs=groups();const small=p=>p.cur&&p.cur.cav&&p.cur.cav.nr.
   <div class="addtiles"><button class="addt" data-a="step"><span class="plusic">+</span><span class="tt"><b>Upload a STEP file</b></span></button><button class="addt${S.form==='lib'?' pick':''}" data-a="lib"><span class="plusic">+</span><span class="tt"><b>Add a simple shape</b></span></button><button class="addt" data-a="photo"><span class="plusic">+</span><span class="tt"><b>Add from a photo</b></span></button></div>
   <input type="file" id="fileIn" accept=".step,.stp,.stl" multiple class="vis-hidden">
   ${S.form==='lib'?libPanel():''}
-  <div class="plist">${gs.length?gs.map(g=>{const p=g[0],open=S.open.has(p.gid),nf=allowedTs(p).length;return `<div class="prow2" data-gid="${p.gid}"><div class="phead" data-a="toggle"><img class="pthumb" src="${thumb(p)}" alt="${esc(p.name)}" width="56" height="56"><div class="pname"><b>${esc(p.name)}</b>${p.kind==='photo'?' <span class="badge">From photo: estimate</span>':''}${g.length>1?` <span class="badge">× ${g.length}</span>`:''} <span class="hint">${sizeOf(p)}</span></div><span class="hdrctl"><span class="hc"><span class="hint">Place</span><div class="seg"><button data-place="base" aria-pressed="${(p.side||'base')==='base'}">Base</button><button data-place="lid" aria-pressed="${p.side==='lid'}">Lid</button></div></span><span class="hc"><span class="hint">Copies</span><input type="number" min="1" max="20" step="1" data-qty value="${g.length}" title="How many of this part (1 to 20)"></span></span><button class="btn sm tog${open?' on':''}" data-a="toggle" title="${open?'Close the options':'Set orientation, duplicates and allowances'}">${open?'▲ Hide':'▼ Show details'}</button><button class="btn ghost sm" data-a="del" title="Remove this part">✕</button></div>${open?body(p,g):''}</div>`;}).join(''):'<p class="hint">No parts yet. Use the buttons above to add your first part.</p>'}</div>`;}
+  <div class="plist">${gs.length?gs.map(g=>{const p=g[0],open=S.open.has(p.gid),nf=allowedTs(p).length;return `<div class="prow2" data-gid="${p.gid}"><div class="phead" data-a="toggle"><img class="pthumb" src="${thumb(p)}" alt="${esc(p.name)}" width="56" height="56"><div class="pname"><b>${esc(p.name)}</b>${p.kind==='photo'?' <span class="badge">From photo: estimate</span>'+(p.photo&&p.photo.edit?` <button class="btn sm" data-a="editphoto" data-gid="${p.gid}" title="Open the outline again and fix it">Edit outline</button>`:''):''}${g.length>1?` <span class="badge">× ${g.length}</span>`:''} <span class="hint">${sizeOf(p)}</span></div><span class="hdrctl"><span class="hc"><span class="hint">Place</span><div class="seg"><button data-place="base" aria-pressed="${(p.side||'base')==='base'}">Base</button><button data-place="lid" aria-pressed="${p.side==='lid'}">Lid</button></div></span><span class="hc"><span class="hint">Copies</span><input type="number" min="1" max="20" step="1" data-qty value="${g.length}" title="How many of this part (1 to 20)"></span></span><button class="btn sm tog${open?' on':''}" data-a="toggle" title="${open?'Close the options':'Set orientation, duplicates and allowances'}">${open?'▲ Hide':'▼ Show details'}</button><button class="btn ghost sm" data-a="del" title="Remove this part">✕</button></div>${open?body(p,g):''}</div>`;}).join(''):'<p class="hint">No parts yet. Use the buttons above to add your first part.</p>'}</div>`;}
 function startPrev(p){const T=allowedTs(p)[0],R=mmul(TM[T],p.R0),key='_sp'+rkey(R);if(p[key])return p[key];
   const o=orientPos(p.sample||p.pos,R,1),m=o.pos,ex=o.ext,c=0.8660254,s=0.5,B=[ex[0]+44,ex[1]+44,Math.max(14,ex[2]*0.6)],off=[22,22,B[2]],P=(x,y,z)=>[(y-x)*c,-(x+y)*s-z];
   const faces=[[[[0,0,B[2]],[B[0],0,B[2]],[B[0],B[1],B[2]],[0,B[1],B[2]]],'#8a8380'],[[[0,0,0],[0,B[1],0],[0,B[1],B[2]],[0,0,B[2]]],'#4a4543'],[[[0,0,0],[B[0],0,0],[B[0],0,B[2]],[0,0,B[2]]],'#5f5956']];
@@ -10441,7 +10441,7 @@ function exportDxf(){const v=ensureVec();if(!canExport())return;const f=S.foam,o
 function b64(f32){const u=new Uint8Array(f32.buffer,f32.byteOffset,f32.byteLength);let s='';const ch=0x8000;for(let i=0;i<u.length;i+=ch)s+=String.fromCharCode.apply(null,u.subarray(i,i+ch));return btoa(s);}
 function unb64(s){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Float32Array(u.buffer);}
 function projectJSON(){const ks=S.side;if(ks==='lid'){S.side='base';applySideFoam();}
-  try{const meshes={},parts=S.parts.map(p=>{if(!meshes[p.gid])meshes[p.gid]=b64(p.pos);return {id:p.id,gid:p.gid,name:p.name,kind:p.kind,scale:p.scale,R0:p.R0,T:p.T,ang:p.ang,faces:p.faces,where:p.where,locked:p.locked,hidden:p.hidden,stick:p.stick,stickBy:p.stickBy,side:p.side||'base',simple:p.simple,c0:p.c0,c1:p.c1,x:p.x,y:p.y,color:p.color,box:p.box,allow:p.allow,small:p.small,fingers:p.fingers};});
+  try{const seenPh=new Set(),meshes={},parts=S.parts.map(p=>{if(!meshes[p.gid])meshes[p.gid]=b64(p.pos);return {id:p.id,gid:p.gid,name:p.name,kind:p.kind,scale:p.scale,R0:p.R0,T:p.T,ang:p.ang,faces:p.faces,where:p.where,locked:p.locked,hidden:p.hidden,stick:p.stick,stickBy:p.stickBy,side:p.side||'base',simple:p.simple,c0:p.c0,c1:p.c1,x:p.x,y:p.y,color:p.color,box:p.box,allow:p.allow,small:p.small,fingers:p.fingers,photo:(p.photo&&!seenPh.has(p.gid))?(seenPh.add(p.gid),p.photo):undefined};});
     return JSON.stringify({app:'foam-insert-tool',v:2,saved:new Date().toISOString(),project:$('#projName').value,units:S.units,disp:S.disp,fit:S.fit,foam:S.foam,set:S.set,notes:S.notes||'',dim:S.dim,parts,meshes});}
   finally{if(ks==='lid'){S.side='lid';applySideFoam();}}}
 async function saveProject(){const txt=projectJSON(),name=projName();try{const all=JSON.parse((await idbGet('savedList'))||'[]');const entry={name,saved:new Date().toISOString(),n:S.parts.length};const idx=all.findIndex(x=>x.name===name);if(idx>=0)all.splice(idx,1);all.unshift(entry);if(all.length>10)all.length=10;await idbSet('savedList',JSON.stringify(all));await idbSet('proj:'+name,txt);}catch(e){console.warn('idb save',e);}showCopyPanel(name,txt);}
@@ -10471,6 +10471,7 @@ function openProject(text){const d=JSON.parse(text);if(d.app!=='foam-insert-tool
   const mesh={};for(const [g,b] of Object.entries(d.meshes))mesh[g]=unb64(b);
   for(const q of d.parts){const pos=mesh[q.gid],st=meshStats(pos),n2=pos.length/9,step=Math.max(1,Math.ceil(n2/6000)),sample=new Float32Array(Math.ceil(n2/step)*9);let k=0;for(let t=0;t<n2;t+=step){sample.set(pos.subarray(t*9,t*9+9),k);k+=9;}
     S.parts.push({...q,pos,st,sample:sample.subarray(0,k)});S.nextId=Math.max(S.nextId,q.id+1);}
+  for(const q of S.parts){if(q.kind==='photo'&&!q.photo){const s=S.parts.find(z=>z.gid===q.gid&&z.photo);if(s)q.photo=s.photo;}}
   S.chosen=true;S.open=new Set();for(const q of S.parts)q.lidPlaced=true;S.side='base';S.step=4;applySideFoam();syncWhere();recalc();S.view='top';S.fit3=true;S.dirty3=true;S.vec=null;S.vecWant=true;renderAll();}
 function xoGet(){if(!S.xo)S.xo={units:'both',overall:true,gap:true,edge:true,size:false,parts:true,notes:true};return S.xo;}
 function exportPdf(){const xo=xoGet(),xt=n=>xo.units==='in'?(n/25.4).toFixed(2)+' in':xo.units==='both'?n+' ('+(n/25.4).toFixed(2)+' in)':String(n);const v=ensureVec();if(!canExport())return;if(typeof jspdf==='undefined'){toast('The PDF library did not load.');return;}
@@ -10772,7 +10773,7 @@ function css(){ if(document.getElementById('ppCss'))return;
 /* ---------- state ---------- */
 function fresh(){return {step:1,cv:null,iw:0,ih:0,sheet:'A4',cw:210,ch:297,corners:null,checks:null,
   wc:null,ww:0,wh:0,wid:null,E:null,tap:null,seg:null,loop:null,line:30,view:'both',points:false,sens:1,
-  poly:null,polyPx:null,meas:null,cal:{ab:'',cd:'',h:'',name:'Photo part'},k:1,kcd:0,tool:'detect',vw:null,undo:[],redo:[],selV:-1,wcHi:null,phase:'dims',dimHide:{A:false,B:false}};}
+  poly:null,polyPx:null,meas:null,cal:{ab:'',cd:'',h:'',name:'Photo part'},k:1,kcd:0,tool:'detect',vw:null,undo:[],redo:[],selV:-1,wcHi:null,phase:'dims',dimHide:{A:false,B:false},mir:null,editGid:null};}
 
 /* ---------- open / close ---------- */
 function open(){css();st=fresh();if(root)root.remove();
@@ -10918,7 +10919,7 @@ function wire2(){
   cv.onpointercancel=()=>{lp.style.display='none';drag=-1;};
   st._drawCorner=draw;draw();drawPrev();}
 function drawPrev(){const c=$q('#ppPrev');if(!c)return;const w=warp(1.1);c.width=w.w;c.height=w.h;c.getContext('2d').drawImage(w.cv,0,0);}
-function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.phase='dims';st.dimBusy=false;st.autoTried=false;st.autoBusy=false;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.lab=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.stroke=null;}
+function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.mir=null;st.phase='dims';st.dimBusy=false;st.autoTried=false;st.autoBusy=false;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.lab=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.stroke=null;}
 
 /* ---------- edges + segmentation ---------- */
 function computeEdges(id,w,h){const d=id.data,n=w*h,ch=[new Float32Array(n),new Float32Array(n),new Float32Array(n)];
@@ -10986,43 +10987,22 @@ function dpClosed(p,eps){let i0=0,i1=0,bd=0;for(let i=1;i<p.length;i++){const d=
   const A=p.slice(i0,i1+1),B=p.slice(i1).concat([p[0]]);return dpLine(A,eps).slice(0,-1).concat(dpLine(B,eps).slice(0,-1));}
 function buildPoly(){if(!st.loop)return;const s=st.line/100,r=Math.round(8-6.5*s),eps=(1.6-1.4*s)*PPM;
   const sm=smoothClosed(st.loop,r),d=dpClosed(sm,eps);st.polyPx=d;if(!st.dimMoved)st.dim=null;
-  st.poly=d.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM,p[2]||0]);st.meas=measure(st.poly);}
+  st.poly=d.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM,p[2]||0,-(p[3]||0)]);st.meas=measure(st.poly);}
 function measureRect(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.cos(a*Math.PI/180),s=Math.sin(a*Math.PI/180);let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9,iu0,iu1,iv0,iv1;
     poly.forEach((p,i)=>{const u=p[0]*c+p[1]*s,v=-p[0]*s+p[1]*c;if(u<u0){u0=u;iu0=i;}if(u>u1){u1=u;iu1=i;}if(v<v0){v0=v;iv0=i;}if(v>v1){v1=v;iv1=i;}});
     const A=(u1-u0)*(v1-v0);if(!best||A<best.A)best={A,du:u1-u0,dv:v1-v0,iu0,iu1,iv0,iv1,c,s};}
   const long=best.du>=best.dv,U=[best.c,best.s],V=[-best.s,best.c];return {dirAB:long?U:V,dirCD:long?V:U,ab:long?best.du:best.dv,cd:long?best.dv:best.du,A:poly[long?best.iu0:best.iv0],B:poly[long?best.iu1:best.iv1],C:poly[long?best.iv0:best.iu0],D:poly[long?best.iv1:best.iu1]};}
 
 /* ---------- SCREEN 3: outline (drawing-tool style) ---------- */
-const TOOLS=[['detect','Find part'],['color','Paint mask'],['shadow','Remove shadow'],['move','Edit line'],['dim','Dimension lines']];
-const HINTS={color:'Paint over the part (green). Paint over the shadow (red) if it is included.',move:'Press a point and drag to move it. Press on the line to add a point. Double-click a point for its radius.',dim:'Drag the points A and B to where you measured. Tap the size on the line to type the caliper size at that place.',detect:'Tap on the part.',shadow:'Tap on the shadow next to the part. It is cut away from the outline.'};
-function scr3(){const dp=st.phase==='dims',hid=dp?' style="display:none"':'';return shell(`
-  <div class="ppcol3"><div>
-   <div class="pptb"><button class="btn primary sm" id="ppAuto" title="Find the outline of the part by itself"${hid}>Find outline</button><span class="ppgap"${hid}></span><div class="pptoolrow"${hid}>${[TOOLS.slice(0,3),TOOLS.slice(3)].map(grp=>`<div class="seg pptools">${grp.map(([k,l])=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&k!=='color'&&!st.polyPx?'disabled':''}>${l}</button>`).join('')}</div>`).join('')}</div>
-    <span class="ppgap"${hid}></span><button class="btn sm" id="ppUndo" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" id="ppRedo" title="Redo (Ctrl+Y)">↷ Redo</button><button class="btn sm" id="ppDelSel" title="Delete the selected point (Delete key)" disabled${hid}>Delete point</button>
-    <span class="ppgap"></span><button class="btn sm" id="ppZm" title="Zoom out">−</button><button class="btn sm" id="ppZf" title="Show the whole sheet">Fit</button><button class="btn sm" id="ppZpart" title="${dp?'Zoom to the lines':'Zoom to the part'}">${dp?'Lines':'Part'}</button><button class="btn sm" id="ppZp" title="Zoom in">+</button></div>
-   <div class="ppwrap"><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
-   <div class="ppnote" id="ppHint"></div></div>
-  <div>
-   <div id="ppOutPanel"${hid}>
-   <div class="ppflex"><b>Show</b><div class="seg" id="ppView">${['photo','outline','both'].map(v=>`<button data-v="${v}" aria-pressed="${st.view===v}">${v==='photo'?'Photo':v==='outline'?'Outline':'Both'}</button>`).join('')}</div></div>
-   <div class="ppfield"><span>Line: Smooth ⟷ Exact</span><input type="range" id="ppLine" min="0" max="100" value="${st.line}"></div>
-   <div class="ppfield"><span>Not found well? Detection</span><div class="seg" id="ppSens">${[['Less',1.6],['Normal',1],['More',0.65]].map(([l,v])=>`<button data-s="${v}" aria-pressed="${st.sens===v}">${l}</button>`).join('')}</div></div>
-   ${colorPanel()}${roundPanel()}
-   <label class="ppchk" style="margin:6px 0"><input type="checkbox" id="ppTrim" ${st.trim===true?'checked':''}> Cut shadow automatically (beta)</label>
-   <hr style="border:none;border-top:1px solid #e4ddd0;margin:10px 0"></div>
-   <div class="ppnote">${dp?'<b>Measure first.</b> Measure the real part with a caliper. Drag the points A and A (and B and B) to where you measured. Then type the size you read at that place. The lines can be anywhere on the part.':'<b>Dimensions.</b> The sizes you set in the step before. You can still move the lines with the tool <b>Dimension lines</b>.'}</div>
-   <div id="ppSize" class="ppnote"></div>
-   <div class="ppfield"><span><b>A–A</b> (X direction, mm) required</span><div class="ppflex" style="margin:0"><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line A–A"><input type="checkbox" id="ppShowA" ${st.dimHide.A?'':'checked'}> Show</label></div></div>
-   <div class="ppfield"><span><b>B–B</b> (Y direction, mm) optional, better</span><div class="ppflex" style="margin:0"><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line B–B"><input type="checkbox" id="ppShowB" ${st.dimHide.B?'':'checked'}> Show</label></div></div>
-   <div id="ppDiff"></div>
-   <button class="btn sm" id="ppReset"${hid}>Start again</button></div></div>`,
-  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext" disabled>Next: ${dp?'outline':'height'}</button>`,true);}
-
+const TOOLS=[['detect','Tap to find part'],['color','Paint'],['shadow','Remove shadow'],['move','Move points'],['dim','Dimension lines']];
+const HINTS={color:'Paint over the part with the brush. Green adds to the outline, red removes. Press Ctrl to switch.',move:'Drag a dot to move it. Tap the line to add a dot. Drag a ◆ to bend a line into an arc.',dim:'Drag the points A and B to where you measured. Tap the size on the line to type the caliper size at that place.',detect:'Tap on the part and the tool finds its outline again.',shadow:'Tap on the shadow next to the part. It is cut away from the outline.'};
 function wire3(){
   const dp=st.phase==='dims';if(dp)st.tool='dim';
-  $q('#ppBack').onclick=()=>{closePops();if(dp)go(2);else{st.phase='dims';st.tool='dim';render();}};
+  $q('#ppBack').onclick=()=>{closePops();if(dp){if(!st.editGid)go(2);}else{st.phase='dims';st.tool='dim';render();}};
   $q('#ppNext').onclick=()=>{if($q('#ppNext').disabled)return;closePops();if(dp){st.dimMoved=true;st.phase='outline';st.tool=st.polyPx?'move':'detect';render();}else go(4);};
   $q('#ppDelSel').onclick=delSelected;
+  const mb=$q('#ppMirror');if(mb)mb.onclick=()=>{if(!st.polyPx)return;closePops();snap();if(st.mir){st.mir=null;}else if(!mirrorOn()){st.undo.pop();const hh=$q('#ppHint');if(hh)hh.textContent='Mirror needs a closed outline with at least 4 points.';return;}st.tool='move';render();};
+  const ml=$q('#ppMirL'),mr=$q('#ppMirR'),mo=$q('#ppMirOff');if(ml)ml.onclick=()=>{snap();mirrorOn('L');render();};if(mr)mr.onclick=()=>{snap();mirrorOn('R');render();};if(mo)mo.onclick=()=>{snap();st.mir=null;render();};
   $q('#ppShowA').onchange=e=>{st.dimHide.A=!e.target.checked;draw3();};$q('#ppShowB').onchange=e=>{st.dimHide.B=!e.target.checked;draw3();};
   $q('#ppView').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.view=b.dataset.v;render();};
   root.querySelectorAll('.pptools').forEach(el=>{el.onclick=e=>{const b=e.target.closest('[data-t]');if(!b||b.disabled)return;st.tool=b.dataset.t;st.selV=-1;st.hover=null;render();};});
@@ -11037,7 +11017,7 @@ function wire3(){
   const rp=$q('#ppRadP');if(rp)rp.onclick=()=>{if(st.selV<0)return;const c=st.polyPx[st.selV][2]||0;setR(c>0?c+0.5:Math.max(minR(),st.radDef||minR()));};
   const rsh=$q('#ppRadS');if(rsh)rsh.onclick=()=>{if(st.selV<0)return;setR(0);};
   const pp=$q('#ppPrevPt'),np=$q('#ppNextPt');if(pp)pp.onclick=()=>{const n=st.polyPx.length;st.selV=((st.selV<0?0:st.selV)-1+n)%n;draw3();updRound();};if(np)np.onclick=()=>{const n=st.polyPx.length;st.selV=((st.selV<0?-1:st.selV)+1)%n;draw3();updRound();};
-  const ra=$q('#ppRadAll');if(ra)ra.onclick=()=>{if(!st.polyPx)return;snap();const P=st.polyPx,n=P.length;for(let i=0;i<n;i++){const a=P[(i-1+n)%n],p=P[i],b=P[(i+1)%n],ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1],c2=(ux*vx+uy*vy)/((Math.hypot(ux,uy)*Math.hypot(vx,vy))||1);p[2]=c2>-0.9?Math.max(minR(),st.radDef||minR()):0;}syncPoly();draw3();live();};
+  const ra=$q('#ppRadAll');if(ra)ra.onclick=()=>{if(!st.polyPx)return;snap();const P=st.polyPx,n=P.length;for(let i=0;i<n;i++){const a=P[(i-1+n)%n],p=P[i],b=P[(i+1)%n],ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1],c2=(ux*vx+uy*vy)/((Math.hypot(ux,uy)*Math.hypot(vx,vy))||1);p[2]=c2>-0.9?Math.max(minR(),st.radDef||minR()):0;}if(st.mir)resym();syncPoly();draw3();live();};
   const rs=$q('#ppRadSharp');if(rs)rs.onclick=()=>{if(!st.polyPx)return;snap();st.polyPx.forEach(p=>{p[2]=0;});syncPoly();draw3();live();};
   $q('#ppZm').onclick=()=>zoomAt(null,null,1/1.4);$q('#ppZp').onclick=()=>zoomAt(null,null,1.4);$q('#ppZf').onclick=()=>{st.vw={k:1,cx:st.ww/2,cy:st.wh/2};draw3();};
   const sl=$q('#ppLine');sl.oninput=e=>{if(!st.sliderOn){snap();st.sliderOn=true;}st.line=+e.target.value;st.selV=-1;if(st.loop){buildPoly();draw3();live();}};sl.onchange=()=>{st.sliderOn=false;};
@@ -11048,36 +11028,40 @@ function wire3(){
   cv.style.height=cssH+'px';cv.width=Math.round(cssW*dpr);cv.height=Math.round(cssH*dpr);cv.style.cursor=st.tool==='detect'?'crosshair':st.tool==='move'?'default':'cell';
   if(!st.vw)st.vw={k:1,cx:st.ww/2,cy:st.wh/2};
   bindCanvas(cv);
-  if(!st.wcHi&&!st.hiBusy){st.hiBusy=true;const id=st.warpId;setTimeout(()=>{if(!st||st.warpId!==id)return;const w=warp(7);if(!st||st.warpId!==id)return;st.wcHi=w.cv;st.hiBusy=false;if(root&&st.step===3)draw3();},60);}
+  if(!st.wcHi&&!st.hiBusy&&st.cv){st.hiBusy=true;const id=st.warpId;setTimeout(()=>{if(!st||st.warpId!==id)return;const w=warp(7);if(!st||st.warpId!==id)return;st.wcHi=w.cv;st.hiBusy=false;if(root&&st.step===3)draw3();},60);}
   draw3();live();if(dp){if(!st.dim)autoDims();else zoomToDims();}else if(!st.polyPx&&!st.autoTried)autoOutline(false);}
 function G(){const cv=$q('#ppWarp'),W=cv.width,H=cv.height,f=Math.min(W/st.ww,H/st.wh),s=f*st.vw.k,rect=cv.getBoundingClientRect();
   return {cv,W,H,s,k:W/rect.width,toS:(u,v)=>[W/2+(u-st.vw.cx)*s,H/2+(v-st.vw.cy)*s],toU:(X,Y)=>[(X-W/2)/s+st.vw.cx,(Y-H/2)/s+st.vw.cy],pos:e=>[(e.clientX-rect.left)*W/rect.width,(e.clientY-rect.top)*H/rect.height]};}
 function clampView(){const v=st.vw;v.k=Math.max(1,Math.min(14,v.k));v.cx=Math.max(0,Math.min(st.ww,v.cx));v.cy=Math.max(0,Math.min(st.wh,v.cy));}
 function zoomAt(X,Y,fac){const g=G();if(X==null){X=g.W/2;Y=g.H/2;}const [u,v]=g.toU(X,Y);st.vw.k*=fac;clampView();const g2=G();st.vw.cx=u-(X-g2.W/2)/g2.s;st.vw.cy=v-(Y-g2.H/2)/g2.s;clampView();draw3();}
-function snapOf(){return {strokes:(st.strokes||[]).slice(),dim:st.dim?JSON.parse(JSON.stringify(st.dim)):null,colors:(st.colors||[]).map(c=>({...c})),poly:st.polyPx?st.polyPx.map(p=>p.slice()):null,line:st.line,loop:st.loop,tap:st.tap,seg:st.seg,tool:st.tool};}
+function snapOf(){return {mir:st.mir?JSON.parse(JSON.stringify(st.mir)):null,strokes:(st.strokes||[]).slice(),dim:st.dim?JSON.parse(JSON.stringify(st.dim)):null,colors:(st.colors||[]).map(c=>({...c})),poly:st.polyPx?st.polyPx.map(p=>p.slice()):null,line:st.line,loop:st.loop,tap:st.tap,seg:st.seg,tool:st.tool};}
 function snap(){st.undo.push(snapOf());if(st.undo.length>150)st.undo.shift();st.redo=[];}
-function restore(sn){st.strokes=(sn.strokes||[]).slice();rebuildScrib();st.dim=sn.dim?JSON.parse(JSON.stringify(sn.dim)):null;st.colors=(sn.colors||[]).map(c=>({...c}));st.polyPx=sn.poly?sn.poly.map(p=>p.slice()):null;st.line=sn.line;st.loop=sn.loop;st.tap=sn.tap;st.seg=sn.seg;st.selV=-1;
+function restore(sn){st.mir=sn.mir?JSON.parse(JSON.stringify(sn.mir)):null;st.strokes=(sn.strokes||[]).slice();rebuildScrib();st.dim=sn.dim?JSON.parse(JSON.stringify(sn.dim)):null;st.colors=(sn.colors||[]).map(c=>({...c}));st.polyPx=sn.poly?sn.poly.map(p=>p.slice()):null;st.line=sn.line;st.loop=sn.loop;st.tap=sn.tap;st.seg=sn.seg;st.selV=-1;
   if(st.polyPx)syncPoly();else{st.poly=null;st.meas=null;}const sl=$q('#ppLine');if(sl)sl.value=st.line;if(!st.polyPx)st.tool='detect';draw3();live();}
 function undo(){if(!st||st.step!==3||!st.undo.length)return;st.redo.push(snapOf());restore(st.undo.pop());}
 function redo(){if(!st||st.step!==3||!st.redo.length)return;st.undo.push(snapOf());restore(st.redo.pop());}
 function bindCanvas(cv){
   const ptrs=new Map();let mode=null,down=null,pinch=null;
   const nearV=(X,Y,g)=>{let bi=-1,bd=(18*g.k)**2;(st.polyPx||[]).forEach((p,i)=>{const q=g.toS(p[0],p[1]),d=(q[0]-X)**2+(q[1]-Y)**2;if(d<bd){bd=d;bi=i;}});return bi;};
-  const nearSeg=(X,Y,g)=>{const P=st.polyPx;if(!P)return null;let best=null,bd=(26*g.k)**2;const n=P.length;
-    for(let i=0;i<n;i++){const a=g.toS(P[i][0],P[i][1]),b=g.toS(P[(i+1)%n][0],P[(i+1)%n][1]),dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1e-9;let t=((X-a[0])*dx+(Y-a[1])*dy)/L2;t=Math.max(0.02,Math.min(0.98,t));
-      const px=a[0]+t*dx,py=a[1]+t*dy,d=(px-X)**2+(py-Y)**2;if(d<bd){bd=d;const u=g.toU(px,py);best={i,pt:u};}}return best;};
+  const nearSeg=(X,Y,g)=>{const P=st.polyPx;if(!P)return null;let best=null,bd=(16*g.k)**2;const n=P.length;
+    for(let i=0;i<n;i++){const pts=segPts(P,i);for(let j=0;j<pts.length-1;j++){const a=g.toS(pts[j][0],pts[j][1]),b=g.toS(pts[j+1][0],pts[j+1][1]),dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1e-9;let t=((X-a[0])*dx+(Y-a[1])*dy)/L2;t=Math.max(0,Math.min(1,t));const px=a[0]+t*dx,py=a[1]+t*dy,d=(px-X)**2+(py-Y)**2;if(d<bd){bd=d;best={i,pt:g.toU(px,py)};}}}return best;};
   cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
     if(ptrs.size===2){const [p1,p2]=[...ptrs.values()];pinch={d:Math.hypot(p1[0]-p2[0],p1[1]-p2[1]),mx:(p1[0]+p2[0])/2,my:(p1[1]+p2[1])/2};mode='pinch';return;}
     const [X,Y]=g.pos(e);down={X,Y,cx:st.vw.cx,cy:st.vw.cy,moved:false};
     closePops();
-    if((st.tool==='dim'||st.phase==='dims')&&st.dim){const lb=(st._dimLabels||[]).find(l=>X>=l.x&&X<=l.x+l.w&&Y>=l.y&&Y<=l.y+l.h);if(lb){mode=null;openDimPop(lb.L);return;}}
-    if(st.polyPx&&st.tool==='move'){const i=nearV(X,Y,g);
+    if(st.phase==='dims'&&st.dim){const lb=(st._dimLabels||[]).find(l=>X>=l.x&&X<=l.x+l.w&&Y>=l.y&&Y<=l.y+l.h);if(lb){mode=null;openDimPop(lb.L);return;}}
+    if(st.polyPx&&st.tool==='move'){
+      if(st.mir){const ha=['a','b'].find(k=>{const q=g.toS(st.mir[k][0],st.mir[k][1]);return (q[0]-X)**2+(q[1]-Y)**2<(22*g.k)**2;});if(ha){snap();st.axisK=ha;down.snapped=true;mode='axisdrag';return;}}
+      const i=nearV(X,Y,g);
       if(i>=0){const now=performance.now();if(st.lastTap&&st.lastTap.vi===i&&now-st.lastTap.t<450){st.lastTap=null;st.selV=i;draw3();openRadPop(i);mode=null;return;}
         st.lastTap={t:now,vi:i};st.selV=i;mode='drag';draw3();live();showLoupeAt(e,st.polyPx[i]);return;}
-      const r=nearSeg(X,Y,g);if(r){snap();st.polyPx.splice(r.i+1,0,r.pt);st.selV=r.i+1;syncPoly();down.snapped=true;mode='drag';draw3();live();showLoupeAt(e,r.pt);return;}
+      let bh=-1,bd=(17*g.k)**2;st.polyPx.forEach((p,j)=>{if(!hasHandle(st.polyPx,j,g))return;const mm=segMid(st.polyPx,j),q=g.toS(mm[0],mm[1]),d2=(q[0]-X)**2+(q[1]-Y)**2;if(d2<bd){bd=d2;bh=j;}});
+      if(bh>=0){const now=performance.now();if(st.lastH&&st.lastH.i===bh&&now-st.lastH.t<450){st.lastH=null;snap();st.polyPx[bh][3]=0;if(st.mir)mirrorSync(bh);syncPoly();draw3();live();mode=null;return;}
+        st.lastH={t:now,i:bh};mode='arcdrag';st.arcI=bh;down.snapped=false;return;}
+      const r=nearSeg(X,Y,g);if(r){snap();addVertexOn(r.i,r.pt);syncPoly();down.snapped=true;mode='drag';draw3();live();showLoupeAt(e,r.pt);return;}
       st.selV=-1;draw3();live();}
     if(st.tool==='color'){snap();ensureScrib();clearScrib();st.hover=[X,Y];st.stroke={mode:st.pmode||'fg',pts:[],last:null};const u0=g.toU(X,Y);paintTo(u0[0],u0[1]);mode='paint';draw3();return;}
-    if((st.tool==='dim'||st.phase==='dims')&&st.dim){let best=null,bd=(30*g.k)**2;['A','B'].forEach(k=>{if(st.dimHide[k])return;st.dim[k].forEach((p,j)=>{const q=g.toS(p[0],p[1]),d2=(q[0]-X)**2+(q[1]-Y)**2;if(d2<bd){bd=d2;best=[k,j];}});});if(best){snap();st.dimSel=best;st.dimMoved=true;mode='dimdrag';draw3();showLoupeAt(e,st.dim[best[0]][best[1]]);return;}}
+    if(st.phase==='dims'&&st.dim){let best=null,bd=(30*g.k)**2;['A','B'].forEach(k=>{if(st.dimHide[k])return;st.dim[k].forEach((p,j)=>{const q=g.toS(p[0],p[1]),d2=(q[0]-X)**2+(q[1]-Y)**2;if(d2<bd){bd=d2;best=[k,j];}});});if(best){snap();st.dimSel=best;st.dimMoved=true;mode='dimdrag';draw3();showLoupeAt(e,st.dim[best[0]][best[1]]);return;}}
     mode='pan';};
   cv.onpointermove=e=>{if(!ptrs.has(e.pointerId)){if(st.tool==='color'){const g0=G(),p0=g0.pos(e);st.hover=[p0[0],p0[1]];draw3();}return;}ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
     if(mode==='pinch'&&ptrs.size>=2){const [p1,p2]=[...ptrs.values()],d=Math.hypot(p1[0]-p2[0],p1[1]-p2[1]),mx=(p1[0]+p2[0])/2,my=(p1[1]+p2[1])/2,r=cv.getBoundingClientRect(),X=(mx-r.left)*g.W/r.width,Y=(my-r.top)*g.H/r.height;
@@ -11085,13 +11069,18 @@ function bindCanvas(cv){
     const [X,Y]=g.pos(e);
     if(mode==='paint'&&st.stroke){const u=g.toU(X,Y);paintTo(u[0],u[1]);st.hover=[X,Y];draw3();return;}
     if(mode==='dimdrag'&&st.dimSel){const u=g.toU(X,Y);st.dim[st.dimSel[0]][st.dimSel[1]]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];st.meas=measure(st.poly);draw3();live();showLoupeAt(e,st.dim[st.dimSel[0]][st.dimSel[1]]);return;}
-    if(mode==='drag'&&st.selV>=0){if(!down.snapped){if(Math.hypot(X-down.X,Y-down.Y)<4*g.k)return;snap();down.snapped=true;}const u=g.toU(X,Y),r0=st.polyPx[st.selV][2]||0;st.polyPx[st.selV]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1])),r0];syncPoly();draw3();live();showLoupeAt(e,st.polyPx[st.selV]);}
+    if(mode==='axisdrag'&&st.mir){const u=g.toU(X,Y);st.mir[st.axisK]=[u[0],u[1]];if(st.mir.a[1]>st.mir.b[1]){const t=st.mir.a;st.mir.a=st.mir.b;st.mir.b=t;st.axisK=st.axisK==='a'?'b':'a';}resym();draw3();live();return;}
+    if(mode==='arcdrag'&&st.arcI!=null&&st.polyPx[st.arcI]){const u=g.toU(X,Y),P=st.polyPx,i=st.arcI,p=P[i],q=P[(i+1)%P.length],dx=q[0]-p[0],dy=q[1]-p[1],c=Math.hypot(dx,dy)||1,s=(u[0]-(p[0]+q[0])/2)*(-dy/c)+(u[1]-(p[1]+q[1])/2)*(dx/c);
+      if(!down.snapped){if(Math.hypot(X-down.X,Y-down.Y)<4*g.k)return;snap();down.snapped=true;}
+      p[3]=Math.abs(s)<2?0:Math.max(-1.8,Math.min(1.8,2*s/c));if(st.mir)mirrorSync(i);syncPoly();st.arcLabel=true;draw3();live();return;}
+    if(mode==='drag'&&st.selV>=0){if(!down.snapped){if(Math.hypot(X-down.X,Y-down.Y)<4*g.k)return;snap();down.snapped=true;}const u=g.toU(X,Y),pv=st.polyPx[st.selV];pv[0]=Math.max(0,Math.min(st.ww,u[0]));pv[1]=Math.max(0,Math.min(st.wh,u[1]));if(st.mir)mirrorSync(st.selV);syncPoly();draw3();live();showLoupeAt(e,st.polyPx[st.selV]);}
     else if(mode==='pan'&&down){if(Math.hypot(X-down.X,Y-down.Y)>6*g.k)down.moved=true;if(down.moved){st.vw.cx=down.cx-(X-down.X)/g.s;st.vw.cy=down.cy-(Y-down.Y)/g.s;clampView();draw3();}}};
   cv.onpointerup=e=>{const g=G();ptrs.delete(e.pointerId);
     if(mode==='dimdrag'){const L=st.dimSel&&st.dimSel[0];mode=null;st.dimSel=null;hideLoupe();live();if(L)openDimPop(L);return;}
     if(mode==='paint'){mode=null;const s=st.stroke;st.stroke=null;if(s&&s.pts.length)applyStroke(s.mode);return;}
     if(mode==='pan'&&down&&!down.moved&&st.tool==='shadow'&&st.polyPx){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;removeShadow(u[0],u[1]);return;}
     if(mode==='pan'&&down&&!down.moved&&st.tool==='detect'){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;doTap(u[0],u[1]);return;}
+    if(mode==='axisdrag'||mode==='arcdrag'){mode=null;st.arcI=null;st.arcLabel=false;draw3();return;}
     hideLoupe();if(ptrs.size<2&&mode==='pinch')mode=null;if(mode==='drag'||mode==='pan')mode=null;};
   cv.onpointercancel=()=>{ptrs.clear();mode=null;hideLoupe();};
   cv.onpointerleave=()=>{if(st.hover&&!ptrs.size){st.hover=null;draw3();}};
@@ -11169,7 +11158,7 @@ function filletPoints(P){const n=P.length;if(n<3||!P.some(p=>p[2]>0))return P.ma
     const a1=Math.atan2(t1[1]-cy,t1[0]-cx),a2=Math.atan2(t2[1]-cy,t2[0]-cx);let da=a2-a1;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;
     const N=Math.max(2,Math.ceil(Math.abs(da)/(Math.PI/18)));for(let k=0;k<=N;k++){const ang=a1+da*k/N;out.push([cx+rr*Math.cos(ang),cy+rr*Math.sin(ang)]);}}
   return out;}
-const roundedPx=()=>filletPoints(st.polyPx.map(p=>[p[0],p[1],(p[2]||0)*PPM]));
+const roundedPx=()=>filletPoints(expandNodes(st.polyPx,PPM));
 /* dimension lines A-A (X direction) and B-B (Y direction): start next to the part, the user drags them */
 /* color mask */
 function ensureLab(){if(st.lab)return st.lab;const d=st.wid.data,n=st.ww*st.wh,L=new Float32Array(n*3),lin=new Float32Array(256);
@@ -11215,24 +11204,18 @@ function colorPanel(){if(st.tool!=='color')return '';
    <div class="seg" id="ppPMode"><button data-m="fg" aria-pressed="${(st.pmode||'fg')==='fg'}">Add (green)</button><button data-m="bg" aria-pressed="${st.pmode==='bg'}">Remove (red)</button></div>
    <div class="ppfield"><span id="ppBrushLbl">Brush size: Ø${f1(st.brushMm||10)} mm</span><input type="range" id="ppBrush" min="2" max="30" value="${st.brushMm||10}"></div></div>`;}
 const minR=()=>{const v=(typeof S!=='undefined'&&S&&S.set&&+S.set.toolR>0)?+S.set.toolR:4;return v;};
-function effRadius(i){const P=st.polyPx,n=P.length,p=P[i],r=(p[2]||0)*PPM;if(!(r>0))return 0;const a=P[(i-1+n)%n],b=P[(i+1)%n];let ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1];const lu=Math.hypot(ux,uy),lv=Math.hypot(vx,vy);if(lu<1e-6||lv<1e-6)return 0;ux/=lu;uy/=lu;vx/=lv;vy/=lv;
+function effRadius(i){const P=st.polyPx,n=P.length,p=P[i],r=(p[2]||0)*PPM;if(!(r>0))return 0;if(P[(i-1+n)%n][3]||p[3])return 0;const a=P[(i-1+n)%n],b=P[(i+1)%n];let ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1];const lu=Math.hypot(ux,uy),lv=Math.hypot(vx,vy);if(lu<1e-6||lv<1e-6)return 0;ux/=lu;uy/=lu;vx/=lv;vy/=lv;
   const th=Math.acos(Math.max(-1,Math.min(1,ux*vx+uy*vy)));if(th<0.05||th>Math.PI-0.05)return 0;let t=r/Math.tan(th/2);const tmax=0.5*Math.min(lu,lv);if(t>tmax)t=tmax;return t*Math.tan(th/2)/PPM;}
-function roundPanel(){if(st.tool!=='move')return '';const mn=minR();
-  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Edit line</b><div class="ppnote">• <b>Press a point and drag</b> to move it<br>• <b>Press on the line</b> to add a point<br>• Select a point and press <b>Delete</b> (or the button Delete point) to erase it<br>• <b>Double-click a point</b> to set the radius of that point only (minimum R${f1(mn)}, CNC tool Ø${f1(mn*2)})</div><button class="btn sm" id="ppRadAll">Round all corners</button> <button class="btn sm" id="ppRadSharp">Make all sharp</button></div>`;}
 function updRound(){if(!st||st.tool!=='round')return;const mn=minR(),P=st.polyPx,i=st.selV,has=!!(P&&i>=0&&P[i]);
   const no=$q('#ppPtNo');if(no)no.textContent=has?'Point '+(i+1)+' of '+P.length:'No point selected';
   const rd=$q('#ppRad');if(rd){rd.disabled=!has;if(document.activeElement!==rd)rd.value=has&&P[i][2]>0?f1(P[i][2]):'';}
   const msg=$q('#ppRadMsg');if(msg){const r=has?(P[i][2]||0):0,eff=has?effRadius(i):0,warn=has&&r>0&&eff<mn-0.05;msg.style.color=warn?'#d84c55':'#666';
     msg.textContent=warn?'This corner is too short for R'+f1(mn)+' (it gets only R'+f1(eff)+'). Move the points apart or delete a point.':(has&&r>0?'Real radius of this point: R'+f1(eff)+' mm':(has?'This point is sharp.':''));}}
 function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2,a=m.dirAB,c=m.dirCD,ka=st.k||1,kc=(st.kcd&&st.kcd>0)?st.kcd:ka,kr=(ka+kc)/2;
-  return filletPoints(st.poly.map(p=>{const x=p[0]-cx,y=p[1]-cy;return [(x*a[0]+y*a[1])*ka,(x*c[0]+y*c[1])*kc,(p[2]>0?Math.max(minR(),p[2]*kr):0)];}));}
-
-{const _live=live;live=function(){_live.apply(this,arguments);updRound();};}
-/* ---------- V3.2: direct line editing, sizes first, magnifier, size popups ---------- */
-const stepIdx=()=>st.step===3?(st.phase==='dims'?3:4):(st.step>=4?5:st.step);
+  return filletPoints(expandNodes(st.poly,1).map(p=>{const x=p[0]-cx,y=p[1]-cy;return [(x*a[0]+y*a[1])*ka,(x*c[0]+y*c[1])*kc,(p[2]>0?Math.max(minR(),p[2]*kr):0)];}));}
 function closePops(){['ppRadPop','ppDimPop'].forEach(id=>{const e=$q('#'+id);if(e)e.remove();});}
 function popPos(pop,cx,cy){const w=pop.offsetWidth||276,h=pop.offsetHeight||150;let x=cx+16,y=cy+16;x=Math.max(8,Math.min(window.innerWidth-w-8,x));y=Math.max(8,Math.min(window.innerHeight-h-8,y));pop.style.left=x+'px';pop.style.top=y+'px';}
-function delSelected(){if(!st.polyPx||st.selV<0||st.polyPx.length<=3)return;snap();st.polyPx.splice(st.selV,1);st.selV=-1;syncPoly();draw3();live();}
+function delSelected(){if(!st.polyPx||st.selV<0||st.polyPx.length<=3)return;snap();deleteVertex(st.selV);syncPoly();draw3();live();}
 /* magnifier while a point or a line end is dragged */
 function ensureLoupe(){let lp=$q('#ppLoupe');if(lp)return lp;const dpr=Math.min(2,window.devicePixelRatio||1);lp=document.createElement('canvas');lp.id='ppLoupe';lp.width=lp.height=176*dpr;
   lp.style.cssText='position:fixed;pointer-events:none;border-radius:50%;border:3px solid #f05325;box-shadow:0 6px 22px rgba(0,0,0,.45);display:none;z-index:10001;background:#222;width:176px;height:176px';root.appendChild(lp);return lp;}
@@ -11240,7 +11223,7 @@ function showLoupeAt(e,u){const lp=ensureLoupe(),img=st.wcHi||st.wc,sc=img.width
   g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,S,S);g.save();g.beginPath();g.arc(S/2,S/2,S/2,0,7);g.clip();g.imageSmoothingEnabled=true;g.drawImage(img,u[0]*sc-LR/2,u[1]*sc-LR/2,LR,LR,0,0,S,S);
   const to=p=>[(p[0]-u[0])*k+S/2,(p[1]-u[1])*k+S/2],dpr=S/176;
   if(st.polyPx&&st.phase!=='dims'){g.strokeStyle='#f05325';g.lineWidth=2*dpr;g.beginPath();roundedPx().forEach((p,i)=>{const q=to(p);i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);});g.closePath();g.stroke();}
-  if(st.dim){[['A','#1d4ed8'],['B','#7c3aed']].forEach(([L,col])=>{if(st.dimHide[L])return;const a=to(st.dim[L][0]),b=to(st.dim[L][1]);g.strokeStyle=col;g.lineWidth=2*dpr;g.setLineDash([8*dpr,5*dpr]);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.setLineDash([]);});}
+  if(st.dim&&st.phase==='dims'){[['A','#1d4ed8'],['B','#7c3aed']].forEach(([L,col])=>{if(st.dimHide[L])return;const a=to(st.dim[L][0]),b=to(st.dim[L][1]);g.strokeStyle=col;g.lineWidth=2*dpr;g.setLineDash([8*dpr,5*dpr]);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.setLineDash([]);});}
   g.strokeStyle='rgba(255,255,255,.95)';g.lineWidth=1.5*dpr;g.beginPath();g.moveTo(S/2-20*dpr,S/2);g.lineTo(S/2+20*dpr,S/2);g.moveTo(S/2,S/2-20*dpr);g.lineTo(S/2,S/2+20*dpr);g.stroke();g.strokeStyle='#1d2a44';g.lineWidth=dpr;g.beginPath();g.arc(S/2,S/2,5*dpr,0,7);g.stroke();g.restore();
   let x=e.clientX-88,y=e.clientY-176-34;if(y<8)y=e.clientY+44;x=Math.max(8,Math.min(window.innerWidth-184,x));lp.style.left=x+'px';lp.style.top=y+'px';lp.style.display='block';}
 function hideLoupe(){const lp=$q('#ppLoupe');if(lp)lp.style.display='none';}
@@ -11250,15 +11233,15 @@ function openRadPop(i){closePops();const P=st.polyPx;if(!P||!P[i])return;st.selV
   pop.innerHTML=`<b>Point ${i+1}: radius</b><div class="ppnote" style="margin:2px 0 6px">Only this point. Minimum R${f1(mn)} mm (CNC tool Ø${f1(mn*2)}).</div><div class="ppflex" style="margin:0"><button class="btn sm" id="ppRpM">−</button><input id="ppRpV" type="number" min="${mn}" step="0.5" style="width:84px" placeholder="sharp"><button class="btn sm" id="ppRpP">+</button><button class="btn sm" id="ppRpS">Sharp</button></div><div class="ppnote" id="ppRpMsg" style="margin:6px 0"></div><button class="btn primary sm" id="ppRpOk">Done</button>`;
   root.appendChild(pop);popPos(pop,r.left+q[0]/g.k,r.top+q[1]/g.k);
   const v=pop.querySelector('#ppRpV'),msg=pop.querySelector('#ppRpMsg');
-  const upd=()=>{const p=st.polyPx&&st.polyPx[i];if(!p){closePops();return;}if(document.activeElement!==v)v.value=p[2]>0?f1(p[2]):'';const e=effRadius(i),warn=p[2]>0&&e<mn-0.05;msg.style.color=warn?'#d84c55':'#666';msg.textContent=warn?'Too short for R'+f1(mn)+': this corner gets only R'+f1(e)+'. Move the points apart or delete one.':(p[2]>0?'Real radius: R'+f1(e)+' mm':'This point is sharp.');};
-  const set=val=>{snap();st.polyPx[i][2]=val;if(val>0)st.radDef=val;syncPoly();draw3();live();upd();};
-  v.oninput=ev=>{const n=parseFloat(ev.target.value);if(!(n>=mn))return;if(!pop._on){snap();pop._on=true;}st.polyPx[i][2]=n;st.radDef=n;syncPoly();draw3();live();upd();};
+  const upd=()=>{const p=st.polyPx&&st.polyPx[i];if(!p){closePops();return;}if(document.activeElement!==v)v.value=p[2]>0?f1(p[2]):'';const adj=!!(st.polyPx[(i-1+st.polyPx.length)%st.polyPx.length][3]||p[3]),e=effRadius(i),warn=p[2]>0&&(adj||e<mn-0.05);msg.style.color=warn?'#d84c55':'#666';msg.textContent=warn?(adj?'A corner next to an arc has no radius. Make the lines next to it straight, or shape the arc with its ◆ handle.':'Too short for R'+f1(mn)+': this corner gets only R'+f1(e)+'. Move the points apart or delete one.'):(p[2]>0?'Real radius: R'+f1(e)+' mm':'This point is sharp.');};
+  const set=val=>{snap();st.polyPx[i][2]=val;if(val>0)st.radDef=val;if(st.mir)mirrorSync(i);syncPoly();draw3();live();upd();};
+  v.oninput=ev=>{const n=parseFloat(ev.target.value);if(!(n>=mn))return;if(!pop._on){snap();pop._on=true;}st.polyPx[i][2]=n;st.radDef=n;if(st.mir)mirrorSync(i);syncPoly();draw3();live();upd();};
   v.onchange=()=>{pop._on=false;if(v.value==='')return;const n=Math.max(mn,parseFloat(v.value)||mn);if(st.polyPx[i][2]!==n)set(n);v.value=f1(n);};
   pop.querySelector('#ppRpM').onclick=()=>{const c=st.polyPx[i][2]||0;set(Math.max(mn,c>0?c-0.5:mn));};
   pop.querySelector('#ppRpP').onclick=()=>{const c=st.polyPx[i][2]||0;set(c>0?c+0.5:Math.max(mn,st.radDef||mn));};
   pop.querySelector('#ppRpS').onclick=()=>set(0);pop.querySelector('#ppRpOk').onclick=closePops;
   v.onkeydown=ev=>{if(ev.key==='Enter'){v.blur();closePops();}};
-  if(!(P[i][2]>0)){snap();P[i][2]=Math.max(mn,st.radDef||mn);syncPoly();draw3();live();}
+  if(!(P[i][2]>0)){snap();P[i][2]=Math.max(mn,st.radDef||mn);if(st.mir)mirrorSync(i);syncPoly();draw3();live();}
   upd();setTimeout(()=>{v.focus();v.select();},30);}
 /* the real size at the place where a dimension line is */
 function openDimPop(L){closePops();if(!st.dim||st.dimHide[L])return;const g=G(),r=g.cv.getBoundingClientRect(),pts=st.dim[L],mid=g.toS((pts[0][0]+pts[1][0])/2,(pts[0][1]+pts[1][1])/2),key=L==='A'?'ab':'cd';
@@ -11283,7 +11266,7 @@ function autoDims(){if(st.dim||st.dimBusy)return;st.dimBusy=true;const id=st.war
 function dimMeasure(){const to=p=>[p[0]/PPM,(st.wh-p[1])/PPM],a1=to(st.dim.A[0]),a2=to(st.dim.A[1]),b1=to(st.dim.B[0]),b2=to(st.dim.B[1]),ax=a2[0]-a1[0],ay=a2[1]-a1[1],al=Math.max(0.5,Math.hypot(ax,ay)),ua=[ax/al,ay/al],uc=[-ua[1],ua[0]],bl=Math.abs((b2[0]-b1[0])*uc[0]+(b2[1]-b1[1])*uc[1]);
   return {dirAB:ua,dirCD:uc,ab:al,cd:Math.max(0.5,bl),A:a1,B:a2,C:b1,D:b2};}
 function measure(poly){if(st&&st.dim)return dimMeasure();if(st&&st.polyPx){initDims();if(st.dim)return dimMeasure();}return poly?measureRect(poly):null;}
-function drawDims(c,g,d){if(!st.dim)return;const m=st.meas;st._dimLabels=[];
+function drawDims(c,g,d){if(!st.dim||st.phase!=='dims'){st._dimLabels=[];return;}const m=st.meas;st._dimLabels=[];
   const defs=[['A',st.dim.A,'#1d4ed8',+st.cal.ab>0?f1(+st.cal.ab)+' mm':(m?f1(m.ab)+' mm (photo)':'')],['B',st.dim.B,'#7c3aed',+st.cal.cd>0?f1(+st.cal.cd)+' mm':(m?f1(m.cd)+' mm (photo)':'')]];
   defs.forEach(([L,pts,col,txt])=>{if(st.dimHide[L])return;const p1=g.toS(pts[0][0],pts[0][1]),p2=g.toS(pts[1][0],pts[1][1]),dx=p2[0]-p1[0],dy=p2[1]-p1[1],len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
     c.save();c.strokeStyle=col;c.lineWidth=2*d;c.setLineDash([8*d,5*d]);c.beginPath();c.moveTo(p1[0],p1[1]);c.lineTo(p2[0],p2[1]);c.stroke();c.setLineDash([]);
@@ -11292,10 +11275,99 @@ function drawDims(c,g,d){if(!st.dim)return;const m=st.meas;st._dimLabels=[];
     const label=L+'–'+L+'   '+txt+(st.tool==='dim'||st.phase==='dims'?'  ✎':'');c.font='bold '+(13*d)+'px sans-serif';const mx=(p1[0]+p2[0])/2+nx*18*d,my=(p1[1]+p2[1])/2+ny*18*d,tw=c.measureText(label).width+14*d;
     c.fillStyle='rgba(255,255,255,.95)';c.fillRect(mx-tw/2,my-11*d,tw,22*d);c.fillStyle=col;c.textAlign='center';c.fillText(label,mx,my);c.restore();st._dimLabels.push({L,x:mx-tw/2,y:my-11*d,w:tw,h:22*d});});}
 
+/* ---------- V3.4: arcs with a handle, mirror, simple outline page ---------- */
+/* An arc: bulge b = tan(angle/4) written on the point where the line starts. The handle in the middle of a line bends it. */
+function arcGeom(p,q,b){const dx=q[0]-p[0],dy=q[1]-p[1],c=Math.hypot(dx,dy);if(c<1e-6||!b)return null;const nx=-dy/c,ny=dx/c,s=b*c/2,sg=s>0?1:-1,R=(c*c/4+s*s)/(2*Math.abs(s)),mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,
+    cx=mx+nx*(s-sg*R),cy=my+ny*(s-sg*R),ax=mx+nx*s,ay=my+ny*s,a1=Math.atan2(p[1]-cy,p[0]-cx),a2=Math.atan2(q[1]-cy,q[0]-cx),aA=Math.atan2(ay-cy,ax-cx),
+    norm=a=>{a%=2*Math.PI;return a<0?a+2*Math.PI:a;},dccw=norm(a2-a1),da=norm(aA-a1)<dccw?dccw:dccw-2*Math.PI;
+  return {cx,cy,R,a1,da,mid:[ax,ay],chord:c,nx,ny,mx,my};}
+function arcPts(p,q,b){const g=arcGeom(p,q,b);if(!g)return [];const N=Math.max(2,Math.ceil(Math.abs(g.da)/(6*Math.PI/180))),out=[];for(let k=1;k<N;k++){const a=g.a1+g.da*k/N;out.push([g.cx+g.R*Math.cos(a),g.cy+g.R*Math.sin(a)]);}return out;}
+function segPts(P,i){const n=P.length,p=P[i],q=P[(i+1)%n];return p[3]?[p,...arcPts(p,q,p[3]),q]:[p,q];}
+function hasHandle(P,i,g){const p=P[i],q=P[(i+1)%P.length];if(p[3])return true;const a=g.toS(p[0],p[1]),b=g.toS(q[0],q[1]);return Math.hypot(a[0]-b[0],a[1]-b[1])>=34*g.k;}
+function segMid(P,i){const n=P.length,p=P[i],q=P[(i+1)%n],g=p[3]?arcGeom(p,q,p[3]):null;return g?g.mid:[(p[0]+q[0])/2,(p[1]+q[1])/2];}
+function splitArc(p,q,b,m){const g=arcGeom(p,q,b);const am=Math.atan2(m[1]-g.cy,m[0]-g.cx),norm=a=>{a%=2*Math.PI;return a<0?a+2*Math.PI:a;};
+  let d=am-g.a1;d=g.da>0?norm(d):-norm(-d);const t=Math.max(0.03,Math.min(0.97,d/g.da)),a=g.a1+g.da*t;
+  return {pt:[g.cx+g.R*Math.cos(a),g.cy+g.R*Math.sin(a)],b1:-Math.tan(g.da*t/4),b2:-Math.tan(g.da*(1-t)/4)};}
+/* polygon nodes [x,y,r]: arcs written as points; a corner keeps its radius only when both lines next to it are straight */
+function expandNodes(P,rk){const n=P.length,out=[];for(let i=0;i<n;i++){const p=P[i],pr=P[(i-1+n)%n],nx=P[(i+1)%n],ok=!pr[3]&&!p[3];out.push([p[0],p[1],ok?(p[2]||0)*rk:0]);if(p[3])for(const a of arcPts(p,nx,p[3]))out.push([a[0],a[1],0]);}return out;}
+/* mirror */
+const reflectPt=(p,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1e-9,t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2,fx=a[0]+t*dx,fy=a[1]+t*dy;return [2*fx-p[0],2*fy-p[1]];};
+const projAxis=(p,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1e-9,t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;return [a[0]+t*dx,a[1]+t*dy];};
+const sideOf=(p,a,b)=>(b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0]);
+function mirrorOn(side){if(!st.polyPx||st.polyPx.length<4)return false;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;st.polyPx.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+  if(!st.mir){const cx=(x0+x1)/2;st.mir={a:[cx,y0-22],b:[cx,y1+22]};}
+  const P=st.polyPx,n=P.length,{a,b}=st.mir;if(!side){let l=0;P.forEach(p=>{if(sideOf(p,a,b)>0)l++;});side=l>=n-l?'L':'R';}
+  const sg=side==='L'?1:-1,d=P.map(p=>sideOf(p,a,b)*sg);let best=null;
+  for(let s=0;s<n;s++)if(d[s]>0&&d[(s-1+n)%n]<=0){let e=s,len=1;while(d[(e+1)%n]>0&&len<n){e=(e+1)%n;len++;}if(!best||len>best.len)best={s,e,len};}
+  if(!best){st.mir=null;return false;}
+  const prev=P[(best.s-1+n)%n],next=P[(best.e+1)%n],first=P[best.s],last=P[best.e],cross=(p,q)=>{const dp=sideOf(p,a,b)*sg,dq=sideOf(q,a,b)*sg,t=dp/(dp-dq||1e-9);return [p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];};
+  const H0=projAxis(cross(first,prev),a,b),Hm=projAxis(cross(last,next),a,b),run=[];for(let k=0,i=best.s;k<best.len;k++,i=(i+1)%n)run.push(P[i].slice());
+  const full=[[H0[0],H0[1],0,0]];run.forEach((p,k)=>full.push([p[0],p[1],p[2]||0,p[3]||0]));full.push([Hm[0],Hm[1],0,run[run.length-1][3]||0]);
+  for(let k=run.length-1;k>=0;k--){const m=reflectPt(run[k],a,b);full.push([m[0],m[1],run[k][2]||0,k>0?(run[k-1][3]||0):0]);}
+  st.polyPx=full;st.selV=-1;st.mirSide=side;syncPoly();return true;}
+function mirrorOff(){st.mir=null;draw3();live();}
+/* keep the two halves together: the vertex k was changed, copy it to its twin */
+function mirrorSync(k){if(!st.mir)return;const P=st.polyPx,N=P.length,t=(N-k)%N,{a,b}=st.mir;
+  if(k===0||k===N/2){const q=projAxis(P[k],a,b);P[k][0]=q[0];P[k][1]=q[1];}
+  else{const m=reflectPt(P[k],a,b);P[t][0]=m[0];P[t][1]=m[1];P[t][2]=P[k][2]||0;}
+  const sk=k,ts=(N-k-1+N)%N;P[ts][3]=P[sk][3]||0;const sp=(k-1+N)%N,tp=(N-sp-1+N)%N;P[tp][3]=P[sp][3]||0;}
+function resym(){if(!st.mir)return;const P=st.polyPx,N=P.length,{a,b}=st.mir;for(const k of [0,N/2]){const q=projAxis(P[k],a,b);P[k][0]=q[0];P[k][1]=q[1];}
+  for(let k=1;k<N/2;k++){const t=N-k,m=reflectPt(P[k],a,b);P[t][0]=m[0];P[t][1]=m[1];P[t][2]=P[k][2]||0;}
+  for(let k=0;k<N/2;k++)P[(N-k-1)%N][3]=P[k][3]||0;syncPoly();}
+function addVertexOn(i,pt){const P=st.polyPx,N=P.length,sp=(j,m)=>{const b=P[j][3]||0;if(!b)return {pt:m,b1:0,b2:0};return splitArc(P[j],P[(j+1)%P.length],b,m);};
+  if(!st.mir){const s=sp(i,pt);P[i][3]=s.b1;P.splice(i+1,0,[s.pt[0],s.pt[1],0,s.b2]);st.selV=i+1;return;}
+  const j=(N-i-1+N)%N,s1=sp(i,pt),m2=reflectPt(s1.pt,st.mir.a,st.mir.b),s2={pt:m2,b1:s1.b2,b2:s1.b1};const hi=Math.max(i,j),lo=Math.min(i,j),sh=hi===i?s1:s2,sl=hi===i?s2:s1;
+  P[hi][3]=sh.b1;P.splice(hi+1,0,[sh.pt[0],sh.pt[1],0,sh.b2]);P[lo][3]=sl.b1;P.splice(lo+1,0,[sl.pt[0],sl.pt[1],0,sl.b2]);st.selV=i<j?i+1:i+2;}
+function deleteVertex(k){const P=st.polyPx,N=P.length;if(N<=3)return;
+  if(!st.mir){P[(k-1+N)%N][3]=0;P.splice(k,1);st.selV=-1;return;}
+  if(k===0||k===N/2||N<=5)return;const t=N-k,hi=Math.max(k,t),lo=Math.min(k,t);P[(hi-1+N)%N][3]=0;P[(lo-1+N)%N][3]=0;P.splice(hi,1);P.splice(lo,1);st.selV=-1;}
+
+const stepIdx=()=>st.step===3?(st.phase==='dims'?3:4):(st.step>=4?5:st.step);
+function partSize(){const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;if(!st.polyPx||!st.meas)return 'Tap the part first.';const q=scaledPoly();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;q.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});return 'Part size: <b>'+f1(x1-x0)+' × '+f1(y1-y0)+' mm</b> (from the Sizes step)';}
+function scr3(){const dp=st.phase==='dims',hid=dp?' style="display:none"':'',hidD=dp?'':' style="display:none"';
+  const tb=(k,l)=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&k!=='color'&&!st.polyPx?'disabled':''}>${l}</button>`;
+  return shell(`
+  <div class="ppcol3"><div>
+   <div class="pptb"><div class="pptoolrow"${hid}><div class="seg pptools">${tb('move','✋ Move points')}${tb('color','🖌 Paint')}</div><button class="btn sm" id="ppMirror" title="Trace only half of the part. The other half follows." style="${st.mir?'background:#1d2a44;color:#fff':''}" ${st.polyPx?'':'disabled'}>⇋ Mirror</button></div>
+    <span class="ppgap"></span><button class="btn sm" id="ppUndo" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" id="ppRedo" title="Redo (Ctrl+Y)">↷ Redo</button><button class="btn sm" id="ppDelSel" title="Delete the selected point (Delete key)" disabled${hid}>Delete point</button>
+    <span class="ppgap"></span><span style="white-space:nowrap"><button class="btn sm" id="ppZm" title="Zoom out">−</button> <button class="btn sm" id="ppZf" title="Show the whole sheet">Fit</button> <button class="btn sm" id="ppZpart" title="${dp?'Zoom to the lines':'Zoom to the part'}">${dp?'Lines':'Part'}</button> <button class="btn sm" id="ppZp" title="Zoom in">+</button></span></div>
+   <div class="ppwrap"><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
+   <div class="ppnote" id="ppHint"></div></div>
+  <div>
+   <div id="ppOutPanel"${hid}>
+    ${colorPanel()}${roundPanel()}
+    <details class="ppadv" style="margin:10px 0"><summary style="cursor:pointer"><b>More options</b></summary>
+     <div style="margin-top:8px"><button class="btn primary sm" id="ppAuto" title="Find the outline of the part by itself">Find outline again</button></div>
+     <div class="ppfield"><span>Other tools</span><div class="seg pptools">${tb('detect','Tap to find part')}${tb('shadow','Remove shadow')}</div></div>
+     <div class="ppflex"><b>Show</b><div class="seg" id="ppView">${['photo','outline','both'].map(v=>`<button data-v="${v}" aria-pressed="${st.view===v}">${v==='photo'?'Photo':v==='outline'?'Outline':'Both'}</button>`).join('')}</div></div>
+     <div class="ppfield"><span>Line: Smooth ⟷ Exact</span><input type="range" id="ppLine" min="0" max="100" value="${st.line}"></div>
+     <div class="ppfield"><span>Not found well? Detection</span><div class="seg" id="ppSens">${[['Less',1.6],['Normal',1],['More',0.65]].map(([l,v])=>`<button data-s="${v}" aria-pressed="${st.sens===v}">${l}</button>`).join('')}</div></div>
+     <label class="ppchk" style="margin:6px 0"><input type="checkbox" id="ppTrim" ${st.trim===true?'checked':''}> Cut shadow automatically (beta)</label>
+     <button class="btn sm" id="ppReset">Start again</button></details>
+   </div>
+   <div id="ppSize" class="ppnote"></div>
+   <div id="ppDimPanel"${hidD}>
+    <div class="ppnote"><b>Measure first.</b> Measure the real part with a caliper. Drag the points A and A (and B and B) to where you measured. Then type the size you read at that place. The lines can be anywhere on the part.</div>
+    <div class="ppfield"><span><b>A–A</b> (X direction, mm) required</span><div class="ppflex" style="margin:0"><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line A–A"><input type="checkbox" id="ppShowA" ${st.dimHide.A?'':'checked'}> Show</label></div></div>
+    <div class="ppfield"><span><b>B–B</b> (Y direction, mm) optional, better</span><div class="ppflex" style="margin:0"><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line B–B"><input type="checkbox" id="ppShowB" ${st.dimHide.B?'':'checked'}> Show</label></div></div>
+    <div id="ppDiff"></div></div></div></div>`,
+  `<button class="btn" id="ppBack"${dp&&st.editGid?' style="visibility:hidden"':''}>Back</button><button class="btn primary" id="ppNext" disabled>Next: ${dp?'outline':'height'}</button>`,true);}
+/* the panel for the Move points tool: plain words, and the Mirror switch */
+function roundPanel(){if(st.tool!=='move')return '';const mn=minR();
+  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Fix the line</b><div class="ppnote">• <b>Drag a dot</b> to move it<br>• <b>Tap the line</b> to add a dot<br>• <b>Drag the ◆</b> on a line to bend it into an arc (double-click the ◆ to make it straight)<br>• Select a dot and press <b>Delete</b> to remove it<br>• <b>Double-click a dot</b> to round that corner (minimum R${f1(mn)})</div>
+   <div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>
+  ${st.mir?`<div class="ppmsg ok" style="background:#eef3f7;margin-top:8px"><b>⇋ Mirror is ON</b><div class="ppnote">Fix one half. The other half follows, so you see the result on the photo. Drag the grey handles at the ends of the dashed line to put the mirror line in the middle of the part.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppMirL">Edit the left half</button><button class="btn sm" id="ppMirR">Edit the right half</button></div><button class="btn sm" id="ppMirOff">Turn Mirror off</button></div>`:`<div class="ppnote" style="margin-top:8px">The part is symmetrical? Press <b>⇋ Mirror</b> and fix only half of it.</div>`}`;}
+function openEdit(gid){const p=S.parts.find(q=>String(q.gid)===String(gid)&&q.photo&&q.photo.edit);if(!p){toast('This part has no saved photo data. Add it again from a photo.');return;}
+  const e=p.photo.edit;css();st=fresh();if(root)root.remove();root=document.createElement('div');root.className='ppov';document.body.appendChild(root);document.addEventListener('keydown',kd,true);document.addEventListener('keyup',ku,true);
+  const img=new Image();img.onload=()=>{if(!st||!root)return;const c=document.createElement('canvas');c.width=e.ww;c.height=e.wh;c.getContext('2d').drawImage(img,0,0);st.wc=c;st.ww=e.ww;st.wh=e.wh;st.sheetW=e.sheetW;st.sheetH=e.sheetH;st.sheet=p.photo.sheet||'A4';st.wid=c.getContext('2d').getImageData(0,0,e.ww,e.wh);
+    const ee=computeEdges(st.wid,e.ww,e.wh);st.E=ee.E;st.E2=ee.E2;st.warpURL=e.warp;st.polyPx=e.poly.map(q=>q.slice());st.dim=JSON.parse(JSON.stringify(e.dim));st.dimHide={...e.dimHide};st.dimMoved=true;st.cal={...e.cal,name:p.name};st.line=e.line;
+    st.editGid=gid;st.step=3;st.phase='outline';st.tool='move';st.autoTried=true;st.warpId=1;st.vw=null;st.undo=[];st.redo=[];syncPoly();render();setTimeout(()=>{if(st&&root)zoomToPart();},60);};img.src=e.warp;
+  root.innerHTML='<div class="ppbox"><div class="pphd"><h3>Opening the part…</h3></div></div>';}
+
 function doTap(x,y,noSnap){if(!noSnap)snap();st.tap=[x,y];const r=segment(x,y);if(r&&st.trim===true){const t=trimShadow(r.mask);if(t){r.mask=t.mask;r.trimmed=t.removedArea;}}
   if(!r){st.seg=null;st.loop=null;st.polyPx=null;st.poly=null;st.meas=null;st.tool='detect';render();const m=$q('#ppHint');if(m)m.textContent='Could not find the part there. Tap the middle of the part, or set Detection to More.';return;}
   st.seg=r;st.loop=outerLoop(r.mask,st.ww,st.wh);buildPoly();st.tool='move';st.selV=-1;render();}
-function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM,p[2]||0]);st.meas=measure(st.poly);}
+function syncPoly(){st.poly=st.polyPx.map(p=>[p[0]/PPM,(st.wh-p[1])/PPM,p[2]||0,-(p[3]||0)]);st.meas=measure(st.poly);}
 /* shared size check: caliper readings against the photo */
 function calcScale(){const m=st.meas;let k=1,kc=0,html='',okAB=false;if(!m)return {k,kc,html,okAB};
   const A=+st.cal.ab,Cd=+st.cal.cd;
@@ -11309,7 +11381,7 @@ function calcScale(){const m=st.meas;let k=1,kc=0,html='',okAB=false;if(!m)retur
     if(!good)html+=`<div class="ppnote">Large difference. Check the line for bumps or shadow (tool Edit line).</div>`;}
   return {k,kc,html,okAB};}
 function live(){if(!root||!st||st.step!==3)return;const m=st.meas,sz=$q('#ppSize');
-  if(sz)sz.innerHTML=m?`Photo: A–A <b>${f1(m.ab)}</b> mm · B–B <b>${f1(m.cd)}</b> mm`:'Tap the part first.';
+  if(sz)sz.innerHTML=st.phase==='dims'?(m?`Photo: A–A <b>${f1(m.ab)}</b> mm · B–B <b>${f1(m.cd)}</b> mm`:''):partSize();
   const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;const df=$q('#ppDiff');if(df)df.innerHTML=cs.html;
   const nb=$q('#ppNext');if(nb)nb.disabled=!(m&&cs.okAB);
   const u=$q('#ppUndo'),r=$q('#ppRedo');if(u)u.disabled=!st.undo.length;if(r)r.disabled=!st.redo.length;const dsel=$q('#ppDelSel');if(dsel)dsel.disabled=!(st.polyPx&&st.selV>=0&&st.polyPx.length>3);
@@ -11327,6 +11399,9 @@ function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.g
     if(st.view==='both'){c.fillStyle='rgba(240,83,37,.16)';c.fill();}c.lineWidth=2.5*d;c.strokeStyle='#f05325';c.stroke();}
   if(st.polyPx&&st.tool!=='detect'&&st.tool!=='shadow'&&st.tool!=='color'&&st.tool!=='dim'&&st.phase!=='dims'){st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);c.beginPath();c.arc(q[0],q[1],(i===st.selV?7:5)*d,0,7);c.fillStyle=i===st.selV?'#f05325':(st.tool==='del'?'#fbe3e5':'#fff');c.fill();c.lineWidth=1.6*d;c.strokeStyle=st.tool==='del'?'#d84c55':'#f05325';c.stroke();});}
   if(st.polyPx&&st.tool==='move'&&st.phase!=='dims'){const mn=minR();st.polyPx.forEach((p,i)=>{const r=p[2]||0;if(!(r>0))return;const e=effRadius(i),q=g.toS(p[0],p[1]),bad=e<mn-0.05,lab='R'+f1(e);c.font='bold '+(11*d)+'px sans-serif';c.textAlign='left';c.textBaseline='middle';const w=c.measureText(lab).width+8*d;c.fillStyle='rgba(255,255,255,.92)';c.fillRect(q[0]+9*d,q[1]-9*d,w,18*d);c.fillStyle=bad?'#d84c55':'#1d2a44';c.fillText(lab,q[0]+13*d,q[1]);});}
+if(st.polyPx&&st.tool==='move'&&st.phase!=='dims'){const P=st.polyPx;P.forEach((p,i)=>{if(!hasHandle(P,i,g))return;const mm=segMid(P,i),q=g.toS(mm[0],mm[1]);c.save();c.translate(q[0],q[1]);c.rotate(Math.PI/4);c.fillStyle=p[3]?'#0e9aa7':'rgba(255,255,255,.95)';c.strokeStyle='#0e9aa7';c.lineWidth=2*d;const s=5.5*d;c.fillRect(-s,-s,2*s,2*s);c.strokeRect(-s,-s,2*s,2*s);c.restore();});
+    if(st.arcLabel&&st.arcI!=null&&P[st.arcI]&&P[st.arcI][3]){const g2=arcGeom(P[st.arcI],P[(st.arcI+1)%P.length],P[st.arcI][3]),mm=segMid(P,st.arcI),q=g.toS(mm[0],mm[1]),lab='Arc R '+f1(g2.R/PPM)+' mm';c.font='bold '+(12*d)+'px sans-serif';const tw=c.measureText(lab).width+12*d;c.fillStyle='rgba(255,255,255,.95)';c.fillRect(q[0]+12*d,q[1]-28*d,tw,20*d);c.fillStyle='#0e9aa7';c.textAlign='left';c.textBaseline='middle';c.fillText(lab,q[0]+18*d,q[1]-18*d);}
+    if(st.mir){const a=g.toS(st.mir.a[0],st.mir.a[1]),b=g.toS(st.mir.b[0],st.mir.b[1]);c.save();c.strokeStyle='#6b7280';c.lineWidth=2*d;c.setLineDash([10*d,6*d]);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();c.setLineDash([]);for(const q of [a,b]){c.beginPath();c.arc(q[0],q[1],11*d,0,7);c.fillStyle='#6b7280';c.fill();c.fillStyle='#fff';c.font='bold '+(12*d)+'px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('⇋',q[0],q[1]);}c.restore();}}
   drawDims(c,g,d);
   if(st.tap&&st.tool==='detect'){const q=g.toS(st.tap[0],st.tap[1]);c.strokeStyle='#2f8f5b';c.lineWidth=3*d;c.beginPath();c.arc(q[0],q[1],9*d,0,7);c.stroke();}
   if(!st.polyPx&&st.phase!=='dims'){const msg=st.autoBusy?'Finding the outline…':'Tap on your part to find its outline';c.font='bold '+(18*d)+'px sans-serif';const tw=c.measureText(msg).width+40*d,th=44*d,x0=(g.W-tw)/2,y0=g.H*0.05;c.fillStyle='rgba(29,42,68,.9)';c.beginPath();if(c.roundRect)c.roundRect(x0,y0,tw,th,12*d);else c.rect(x0,y0,tw,th);c.fill();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(msg,g.W/2,y0+th/2);}}
@@ -11339,7 +11414,7 @@ function scr4(){const cs=calcScale(),m=st.meas;return shell(`
    <div class="ppfield"><span>Part name</span><input id="ppName" type="text" value="${st.cal.name}"></div>
    <div class="ppnote">Added as one-depth 3D part, tagged <b>From photo: estimate</b>.</div></div>
    <div><canvas class="ppcv" id="pp3d" width="300" height="260" style="width:100%;background:#f4f1ea"></canvas><div class="ppnote" id="pp3dt"></div></div></div>`,
-  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppAdd" disabled>Add as 3D part</button>`);}
+  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppAdd" disabled>${st.editGid?'Update part':'Add as 3D part'}</button>`);}
 function wire4(){
   $q('#ppBack').onclick=()=>go(3);
   const h=$q('#ppH'),nm=$q('#ppName'),add=$q('#ppAdd');
@@ -11367,13 +11442,16 @@ function extrude(poly,H){let a=0;for(let i=0;i<poly.length;i++){const u=poly[i],
   return new Float32Array(out);}
 function thumb(){const c=document.createElement('canvas');c.width=200;c.height=Math.round(200*st.wh/st.ww);c.getContext('2d').drawImage(st.wc,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.6);}
 function addToTool(){const H=+st.cal.h,poly=scaledPoly(),pos=extrude(poly,H),stt=meshStats(pos),name=(st.cal.name||'Photo part').trim()||'Photo part';
-  const p=newPart({name,pos,st:stt,R0:RI,box:true,simple:true,kind:'photo',sample:pos});
-  p.photo={source:'photo',estimate:true,sheet:st.sheet,diffMm:Math.abs(+st.cal.ab-st.meas.ab),diffCdMm:st.cal.cd?Math.abs(+st.cal.cd-st.meas.cd):null,heightMm:H,outline:poly.map(q=>[+q[0].toFixed(2),+q[1].toFixed(2)]),thumb:thumb()};
+  const photo={source:'photo',estimate:true,sheet:st.sheet,diffMm:Math.abs(+st.cal.ab-st.meas.ab),diffCdMm:st.cal.cd?Math.abs(+st.cal.cd-st.meas.cd):null,heightMm:H,outline:poly.map(q=>[+q[0].toFixed(2),+q[1].toFixed(2)]),thumb:thumb(),
+    edit:{warp:st.warpURL||st.wc.toDataURL('image/jpeg',0.82),ww:st.ww,wh:st.wh,sheetW:st.sheetW,sheetH:st.sheetH,poly:st.polyPx.map(q=>q.map(v=>+(+v).toFixed(2))),dim:JSON.parse(JSON.stringify(st.dim)),dimHide:{...st.dimHide},cal:{ab:st.cal.ab,cd:st.cal.cd,h:st.cal.h,name:st.cal.name},line:st.line}};
+  if(st.editGid){const g=S.parts.filter(q=>String(q.gid)===String(st.editGid));for(const q of g){q.pos=pos;q.st=stt;q.sample=pos;q.photo=photo;q.name=name;const al=allowedTs(q);if(!al.includes(q.T))q.T=al[0];}
+    S.cache.clear();S.cav.clear();S.vecC.clear();S.ladder=null;S.custom=null;S.dirty3=true;S.vec=null;S.vecWant=true;close();renderAll();toast('Part updated. Please check it with a real sample.');return;}
+  const p=newPart({name,pos,st:stt,R0:RI,box:true,simple:true,kind:'photo',sample:pos});p.photo=photo;
   placeNew(p);S.parts.push(p);S.sel=p.id;S.open=new Set([p.gid]);S.ladder=null;S.custom=null;
   close();renderAll();toast('Photo part added. It is an estimate. Please check it with a real sample.');}
 
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a="photo"]');if(b){e.stopPropagation();e.preventDefault();open();}},true);
-window.PP={_paint:(pts,mo,r)=>{ensureScrib();clearScrib();st.brushMm=r||10;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;snap();applyStroke(s.mode);},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a="photo"]');if(b){e.stopPropagation();e.preventDefault();open();return;}const eb=e.target.closest('[data-a="editphoto"]');if(eb){e.stopPropagation();e.preventDefault();openEdit(eb.dataset.gid);}},true);
+window.PP={_arc:arcGeom,edit:openEdit,_paint:(pts,mo,r)=>{ensureScrib();clearScrib();st.brushMm=r||10;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;snap();applyStroke(s.mode);},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
 })();
 
 
