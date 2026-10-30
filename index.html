@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V3.0 — Shell-Case</title>
+<title>Foam Insert Tool V3.1 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V3.0 · 30 Oct 2026&#10;&#10;V3.0: Phone layout: header wraps, step bar scrolls, the photo window&#10;fills the phone screen. The automatic outline now takes the whole part&#10;more reliably. Includes the photo tools: Paint mask,&#10;Dimension lines A-A / B-B, Round corner, magnifier on the corners.&#10;&#10;V2.9: Magnifier on the corners screen&#10;V2.8: Paint mask, Dimension lines, Round corner, Part zoom&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.6: outline page as a drawing tool, undo, zoom&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.0</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V3.1 · 30 Oct 2026&#10;&#10;V3.1: Round corner: every point has its own radius. Minimum R4 mm&#10;(CNC tool Ø8, from the tool radius setting). Point selector, radius&#10;written next to each point, warning when a corner is too short.&#10;&#10;V3.0: Phone layout, more reliable automatic outline&#10;V2.9: Magnifier on the corners screen&#10;V2.8: Paint mask, Dimension lines, Round corner, Part zoom&#10;V2.7: outline by itself, Remove shadow tool&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.1</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -11021,8 +11021,14 @@ function wire3(){
   const pm=$q('#ppPMode');if(pm)pm.onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;st.pmode=b.dataset.m;pm.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));};
   const bs=$q('#ppBrush');if(bs)bs.oninput=e=>{st.brushMm=+e.target.value;};
   const pc=$q('#ppPClear');if(pc)pc.onclick=()=>{snap();st.strokes=[];rebuildScrib();draw3();};
-  const rd=$q('#ppRad');if(rd){rd.oninput=e=>{const v=Math.max(0,+e.target.value||0);st.radDef=v||st.radDef||3;if(st.selV>=0&&st.polyPx&&st.polyPx[st.selV]){if(!st.radOn){snap();st.radOn=true;}st.polyPx[st.selV][2]=v;syncPoly();draw3();live();}};rd.onchange=()=>{st.radOn=false;};}
-  const ra=$q('#ppRadAll');if(ra)ra.onclick=()=>{if(!st.polyPx)return;snap();const P=st.polyPx,n=P.length;for(let i=0;i<n;i++){const a=P[(i-1+n)%n],p=P[i],b=P[(i+1)%n],ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1],c2=(ux*vx+uy*vy)/((Math.hypot(ux,uy)*Math.hypot(vx,vy))||1);p[2]=c2>-0.9?(st.radDef||3):0;}syncPoly();draw3();live();};
+  const setR=v=>{if(st.selV<0||!st.polyPx||!st.polyPx[st.selV])return;snap();st.polyPx[st.selV][2]=v;if(v>0)st.radDef=v;syncPoly();draw3();live();};
+  const rd=$q('#ppRad');if(rd){rd.oninput=e=>{const v=parseFloat(e.target.value);if(!(v>=minR())||st.selV<0)return;if(!st.radOn){snap();st.radOn=true;}st.polyPx[st.selV][2]=v;st.radDef=v;syncPoly();draw3();live();};
+    rd.onchange=()=>{st.radOn=false;if(rd.value==='')return;const v=parseFloat(rd.value),nv=Math.max(minR(),isNaN(v)?minR():v);if(st.selV>=0&&st.polyPx[st.selV]&&st.polyPx[st.selV][2]!==nv)setR(nv);rd.value=f1(nv);updRound();};}
+  const rm=$q('#ppRadM');if(rm)rm.onclick=()=>{if(st.selV<0)return;const c=st.polyPx[st.selV][2]||0;setR(Math.max(minR(),c>0?c-0.5:minR()));};
+  const rp=$q('#ppRadP');if(rp)rp.onclick=()=>{if(st.selV<0)return;const c=st.polyPx[st.selV][2]||0;setR(c>0?c+0.5:Math.max(minR(),st.radDef||minR()));};
+  const rsh=$q('#ppRadS');if(rsh)rsh.onclick=()=>{if(st.selV<0)return;setR(0);};
+  const pp=$q('#ppPrevPt'),np=$q('#ppNextPt');if(pp)pp.onclick=()=>{const n=st.polyPx.length;st.selV=((st.selV<0?0:st.selV)-1+n)%n;draw3();updRound();};if(np)np.onclick=()=>{const n=st.polyPx.length;st.selV=((st.selV<0?-1:st.selV)+1)%n;draw3();updRound();};
+  const ra=$q('#ppRadAll');if(ra)ra.onclick=()=>{if(!st.polyPx)return;snap();const P=st.polyPx,n=P.length;for(let i=0;i<n;i++){const a=P[(i-1+n)%n],p=P[i],b=P[(i+1)%n],ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1],c2=(ux*vx+uy*vy)/((Math.hypot(ux,uy)*Math.hypot(vx,vy))||1);p[2]=c2>-0.9?Math.max(minR(),st.radDef||minR()):0;}syncPoly();draw3();live();};
   const rs=$q('#ppRadSharp');if(rs)rs.onclick=()=>{if(!st.polyPx)return;snap();st.polyPx.forEach(p=>{p[2]=0;});syncPoly();draw3();live();};
   $q('#ppZm').onclick=()=>zoomAt(null,null,1/1.4);$q('#ppZp').onclick=()=>zoomAt(null,null,1.4);$q('#ppZf').onclick=()=>{st.vw={k:1,cx:st.ww/2,cy:st.wh/2};draw3();};
   const sl=$q('#ppLine');sl.oninput=e=>{if(!st.sliderOn){snap();st.sliderOn=true;}st.line=+e.target.value;st.selV=-1;if(st.loop){buildPoly();draw3();live();}};sl.onchange=()=>{st.sliderOn=false;};
@@ -11058,7 +11064,7 @@ function bindCanvas(cv){
     if(st.polyPx&&st.tool==='add'){const r=nearSeg(X,Y,g);if(r){snap();st.polyPx.splice(r.i+1,0,r.pt);st.selV=r.i+1;syncPoly();mode='drag';draw3();live();return;}}
     if(st.polyPx&&st.tool==='del'){const i=nearV(X,Y,g);if(i>=0&&st.polyPx.length>3){snap();st.polyPx.splice(i,1);st.selV=-1;syncPoly();draw3();live();mode=null;return;}}
     if(st.tool==='color'){snap();ensureScrib();st.stroke={mode:st.pmode||'fg',pts:[],last:null};const u0=g.toU(X,Y);paintTo(u0[0],u0[1]);mode='paint';draw3();return;}
-    if(st.polyPx&&st.tool==='round'){const i=nearV(X,Y,g);if(i>=0){const P=st.polyPx[i];if(!(P[2]>0)){snap();P[2]=st.radDef||3;}st.selV=i;syncPoly();const el=$q('#ppRad');if(el)el.value=f1(P[2]);draw3();live();mode=null;return;}}
+    if(st.polyPx&&st.tool==='round'){const i=nearV(X,Y,g);if(i>=0){const P=st.polyPx[i];if(!(P[2]>0)){snap();P[2]=Math.max(minR(),st.radDef||minR());}st.selV=i;syncPoly();const el=$q('#ppRad');if(el)el.value=f1(P[2]);draw3();live();mode=null;return;}}
     if(st.polyPx&&st.dim&&st.tool==='dim'){let best=null,bd=(26*g.k)**2;['A','B'].forEach(k=>st.dim[k].forEach((p,j)=>{const q=g.toS(p[0],p[1]),d2=(q[0]-X)**2+(q[1]-Y)**2;if(d2<bd){bd=d2;best=[k,j];}}));if(best){snap();st.dimSel=best;st.dimMoved=true;mode='dimdrag';draw3();return;}}
     mode='pan';};
   cv.onpointermove=e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
@@ -11213,14 +11219,24 @@ function colorPanel(){if(st.tool!=='color')return '';
    <div class="ppfield"><span>Brush size</span><input type="range" id="ppBrush" min="2" max="14" value="${st.brushMm||5}"></div>
    <button class="btn sm" id="ppPClear">Clear paint</button></div>`;}
 
-function roundPanel(){if(st.tool!=='round')return '';const v=st.selV>=0&&st.polyPx&&st.polyPx[st.selV]?(st.polyPx[st.selV][2]||0):(st.radDef||3);
-  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Round corner</b><div class="ppnote">Tap a corner point to round it. Then set the radius here, or use the buttons.</div>
-   <div class="ppfield"><span>Radius (mm)</span><input id="ppRad" type="number" min="0" step="0.5" value="${f1(v)}"></div>
+const minR=()=>{const v=(typeof S!=='undefined'&&S&&S.set&&+S.set.toolR>0)?+S.set.toolR:4;return v;};
+function effRadius(i){const P=st.polyPx,n=P.length,p=P[i],r=(p[2]||0)*PPM;if(!(r>0))return 0;const a=P[(i-1+n)%n],b=P[(i+1)%n];let ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1];const lu=Math.hypot(ux,uy),lv=Math.hypot(vx,vy);if(lu<1e-6||lv<1e-6)return 0;ux/=lu;uy/=lu;vx/=lv;vy/=lv;
+  const th=Math.acos(Math.max(-1,Math.min(1,ux*vx+uy*vy)));if(th<0.05||th>Math.PI-0.05)return 0;let t=r/Math.tan(th/2);const tmax=0.5*Math.min(lu,lv);if(t>tmax)t=tmax;return t*Math.tan(th/2)/PPM;}
+function roundPanel(){if(st.tool!=='round')return '';const mn=minR();
+  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Round corner</b><div class="ppnote">Tap a point to select it. <b>Each point has its own radius.</b> Minimum <b>R${f1(mn)} mm</b> (CNC tool Ø${f1(mn*2)}).</div>
+   <div class="ppflex" style="margin:4px 0"><button class="btn sm" id="ppPrevPt" title="Previous point">◀</button><b id="ppPtNo">No point selected</b><button class="btn sm" id="ppNextPt" title="Next point">▶</button></div>
+   <div class="ppfield"><span>Radius of this point (mm)</span><div class="ppflex" style="margin:0"><button class="btn sm" id="ppRadM">−</button><input id="ppRad" type="number" min="${mn}" step="0.5" placeholder="sharp" style="width:92px" disabled><button class="btn sm" id="ppRadP">+</button><button class="btn sm" id="ppRadS">Sharp</button></div></div>
+   <div class="ppnote" id="ppRadMsg"></div>
    <button class="btn sm" id="ppRadAll">Round all corners</button> <button class="btn sm" id="ppRadSharp">Make all sharp</button></div>`;}
-/* part used by Add as 3D part: turned so A-A runs along X and B-B along Y, each scaled to its caliper size, corners rounded */
+function updRound(){if(!st||st.tool!=='round')return;const mn=minR(),P=st.polyPx,i=st.selV,has=!!(P&&i>=0&&P[i]);
+  const no=$q('#ppPtNo');if(no)no.textContent=has?'Point '+(i+1)+' of '+P.length:'No point selected';
+  const rd=$q('#ppRad');if(rd){rd.disabled=!has;if(document.activeElement!==rd)rd.value=has&&P[i][2]>0?f1(P[i][2]):'';}
+  const msg=$q('#ppRadMsg');if(msg){const r=has?(P[i][2]||0):0,eff=has?effRadius(i):0,warn=has&&r>0&&eff<mn-0.05;msg.style.color=warn?'#d84c55':'#666';
+    msg.textContent=warn?'This corner is too short for R'+f1(mn)+' (it gets only R'+f1(eff)+'). Move the points apart or delete a point.':(has&&r>0?'Real radius of this point: R'+f1(eff)+' mm':(has?'This point is sharp.':''));}}
 function scaledPoly(){const m=st.meas,cx=(m.A[0]+m.B[0])/2,cy=(m.A[1]+m.B[1])/2,a=m.dirAB,c=m.dirCD,ka=st.k||1,kc=(st.kcd&&st.kcd>0)?st.kcd:ka,kr=(ka+kc)/2;
-  return filletPoints(st.poly.map(p=>{const x=p[0]-cx,y=p[1]-cy;return [(x*a[0]+y*a[1])*ka,(x*c[0]+y*c[1])*kc,(p[2]||0)*kr];}));}
+  return filletPoints(st.poly.map(p=>{const x=p[0]-cx,y=p[1]-cy;return [(x*a[0]+y*a[1])*ka,(x*c[0]+y*c[1])*kc,(p[2]>0?Math.max(minR(),p[2]*kr):0)];}));}
 
+{const _live=live;live=function(){_live.apply(this,arguments);updRound();};}
 function doTap(x,y,noSnap){if(!noSnap)snap();st.tap=[x,y];const r=segment(x,y);if(r&&st.trim===true){const t=trimShadow(r.mask);if(t){r.mask=t.mask;r.trimmed=t.removedArea;}}
   if(!r){st.seg=null;st.loop=null;st.polyPx=null;st.poly=null;st.meas=null;st.tool='detect';render();const m=$q('#ppHint');if(m)m.textContent='Could not find the part there. Tap the middle of the part, or set Detection to More.';return;}
   st.seg=r;st.loop=outerLoop(r.mask,st.ww,st.wh);buildPoly();st.tool='move';st.selV=-1;render();}
@@ -11251,6 +11267,7 @@ function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.g
   if(st.polyPx&&st.view!=='photo'){c.beginPath();roundedPx().forEach((p,i)=>{const q=g.toS(p[0],p[1]);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});c.closePath();
     if(st.view==='both'){c.fillStyle='rgba(240,83,37,.16)';c.fill();}c.lineWidth=2.5*d;c.strokeStyle='#f05325';c.stroke();}
   if(st.polyPx&&st.tool!=='detect'&&st.tool!=='shadow'&&st.tool!=='color'&&st.tool!=='dim'){st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);c.beginPath();c.arc(q[0],q[1],(i===st.selV?7:5)*d,0,7);c.fillStyle=i===st.selV?'#f05325':(st.tool==='del'?'#fbe3e5':'#fff');c.fill();c.lineWidth=1.6*d;c.strokeStyle=st.tool==='del'?'#d84c55':'#f05325';c.stroke();});}
+  if(st.polyPx&&st.tool==='round'){const mn=minR();st.polyPx.forEach((p,i)=>{const r=p[2]||0;if(!(r>0))return;const e=effRadius(i),q=g.toS(p[0],p[1]),bad=e<mn-0.05,lab='R'+f1(e);c.font='bold '+(11*d)+'px sans-serif';c.textAlign='left';c.textBaseline='middle';const w=c.measureText(lab).width+8*d;c.fillStyle='rgba(255,255,255,.92)';c.fillRect(q[0]+9*d,q[1]-9*d,w,18*d);c.fillStyle=bad?'#d84c55':'#1d2a44';c.fillText(lab,q[0]+13*d,q[1]);});}
   drawDims(c,g,d);
   if(st.tap&&st.tool==='detect'){const q=g.toS(st.tap[0],st.tap[1]);c.strokeStyle='#2f8f5b';c.lineWidth=3*d;c.beginPath();c.arc(q[0],q[1],9*d,0,7);c.stroke();}
   if(!st.polyPx){const msg=st.autoBusy?'Finding the outline…':'Tap on your part to find its outline';c.font='bold '+(18*d)+'px sans-serif';const tw=c.measureText(msg).width+40*d,th=44*d,x0=(g.W-tw)/2,y0=g.H*0.05;c.fillStyle='rgba(29,42,68,.9)';c.beginPath();if(c.roundRect)c.roundRect(x0,y0,tw,th,12*d);else c.rect(x0,y0,tw,th);c.fill();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(msg,g.W/2,y0+th/2);}}
@@ -11299,6 +11316,7 @@ function addToTool(){const H=+st.cal.h,poly=scaledPoly(),pos=extrude(poly,H),stt
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a="photo"]');if(b){e.stopPropagation();e.preventDefault();open();}},true);
 window.PP={_paint:(pts,mo,r)=>{ensureScrib();st.brushMm=r||5;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;(st.strokes=st.strokes||[]).push({mode:s.mode,r:brushPx(),pts:s.pts});runPaintMask();},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
 })();
+
 
 
 
