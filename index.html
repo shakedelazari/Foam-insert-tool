@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V3.2 — Shell-Case</title>
+<title>Foam Insert Tool V3.3 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V3.2 · 30 Oct 2026&#10;&#10;V3.2: Edit line: press a point to move it, press the line to add a point,&#10;Delete key erases, double-click a point for its own radius (min R4).&#10;New step Sizes BEFORE the outline: place A-A and B-B, magnifier while&#10;dragging, type the size at the new place, hide or show each line.&#10;&#10;V3.1: radius per point, min R4&#10;V3.0: Phone layout, more reliable automatic outline&#10;V2.9: Magnifier on the corners screen&#10;V2.8: Paint mask, Dimension lines, Round corner&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.2</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V3.3 · 30 Oct 2026&#10;&#10;V3.3: Paint mask edits the outline you already have: green adds,&#10;red removes. A brush circle with its real size (diameter in mm) is&#10;shown before you press. Ctrl switches between green and red.&#10;&#10;V3.2: Edit line gestures, Sizes step before the outline&#10;V3.1: radius per point, min R4&#10;V3.0: Phone layout&#10;V2.8: Paint mask, Dimension lines&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.3</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10777,12 +10777,13 @@ function fresh(){return {step:1,cv:null,iw:0,ih:0,sheet:'A4',cw:210,ch:297,corne
 /* ---------- open / close ---------- */
 function open(){css();st=fresh();if(root)root.remove();
   root=document.createElement('div');root.className='ppov';root.addEventListener('mousedown',e=>{if(e.target===root&&false)close();});
-  document.body.appendChild(root);document.addEventListener('keydown',kd,true);render();}
-function kd(e){if(!st||!root||st.step!==3)return;const t=e.target,tag=t&&t.tagName,typing=(tag==='INPUT'&&t.type!=='range')||tag==='TEXTAREA';
+  document.body.appendChild(root);document.addEventListener('keydown',kd,true);document.addEventListener('keyup',ku,true);render();}
+function ku(e){if(!st||!root||st.step!==3)return;if((e.key==='Control'||e.key==='Meta')&&st.ctrlTap){st.ctrlTap=false;if(st.tool==='color')togglePMode();}}
+function kd(e){if(!st||!root||st.step!==3)return;if(e.key==='Control'||e.key==='Meta'){if(!e.repeat)st.ctrlTap=true;return;}if(e.ctrlKey||e.metaKey)st.ctrlTap=false;const t=e.target,tag=t&&t.tagName,typing=(tag==='INPUT'&&t.type!=='range')||tag==='TEXTAREA';
   if(e.key==='Escape'){closePops();return;}
   if(!typing&&(e.key==='Delete'||e.key==='Backspace')&&st.polyPx&&st.selV>=0&&st.phase!=='dims'){e.preventDefault();e.stopPropagation();delSelected();return;}
   const mod=e.ctrlKey||e.metaKey;if(!mod||typing)return;const k=(e.key||'').toLowerCase();if(k==='z'){e.preventDefault();e.stopPropagation();e.shiftKey?redo():undo();}else if(k==='y'){e.preventDefault();e.stopPropagation();redo();}}
-function close(){if(root){root.remove();root=null;}document.removeEventListener('keydown',kd,true);st=null;}
+function close(){if(root){root.remove();root=null;}document.removeEventListener('keydown',kd,true);document.removeEventListener('keyup',ku,true);st=null;}
 
 const STEPS=['Photo','Corners','Sizes','Outline','Height'];
 function shell(inner,footer,wide){const cur=stepIdx();
@@ -11024,13 +11025,12 @@ function wire3(){
   $q('#ppDelSel').onclick=delSelected;
   $q('#ppShowA').onchange=e=>{st.dimHide.A=!e.target.checked;draw3();};$q('#ppShowB').onchange=e=>{st.dimHide.B=!e.target.checked;draw3();};
   $q('#ppView').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.view=b.dataset.v;render();};
-  root.querySelectorAll('.pptools').forEach(el=>{el.onclick=e=>{const b=e.target.closest('[data-t]');if(!b||b.disabled)return;st.tool=b.dataset.t;st.selV=-1;render();};});
+  root.querySelectorAll('.pptools').forEach(el=>{el.onclick=e=>{const b=e.target.closest('[data-t]');if(!b||b.disabled)return;st.tool=b.dataset.t;st.selV=-1;st.hover=null;render();};});
   $q('#ppUndo').onclick=undo;$q('#ppRedo').onclick=redo;$q('#ppZpart').onclick=()=>{if(st.phase==='dims')zoomToDims();else zoomToPart();};$q('#ppAuto').onclick=()=>autoOutline(true);
   $q('#ppTrim').onchange=e=>{st.trim=e.target.checked;if(st.tap)doTap(st.tap[0],st.tap[1]);};
   const pm=$q('#ppPMode');if(pm)pm.onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;st.pmode=b.dataset.m;pm.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));};
-  const bs=$q('#ppBrush');if(bs)bs.oninput=e=>{st.brushMm=+e.target.value;};
-  const pc=$q('#ppPClear');if(pc)pc.onclick=()=>{snap();st.strokes=[];rebuildScrib();draw3();};
-  const setR=v=>{if(st.selV<0||!st.polyPx||!st.polyPx[st.selV])return;snap();st.polyPx[st.selV][2]=v;if(v>0)st.radDef=v;syncPoly();draw3();live();};
+  const bs=$q('#ppBrush');if(bs)bs.oninput=e=>{st.brushMm=+e.target.value;const l=$q('#ppBrushLbl');if(l)l.textContent='Brush size: Ø'+f1(st.brushMm)+' mm';draw3();};
+    const setR=v=>{if(st.selV<0||!st.polyPx||!st.polyPx[st.selV])return;snap();st.polyPx[st.selV][2]=v;if(v>0)st.radDef=v;syncPoly();draw3();live();};
   const rd=$q('#ppRad');if(rd){rd.oninput=e=>{const v=parseFloat(e.target.value);if(!(v>=minR())||st.selV<0)return;if(!st.radOn){snap();st.radOn=true;}st.polyPx[st.selV][2]=v;st.radDef=v;syncPoly();draw3();live();};
     rd.onchange=()=>{st.radOn=false;if(rd.value==='')return;const v=parseFloat(rd.value),nv=Math.max(minR(),isNaN(v)?minR():v);if(st.selV>=0&&st.polyPx[st.selV]&&st.polyPx[st.selV][2]!==nv)setR(nv);rd.value=f1(nv);updRound();};}
   const rm=$q('#ppRadM');if(rm)rm.onclick=()=>{if(st.selV<0)return;const c=st.polyPx[st.selV][2]||0;setR(Math.max(minR(),c>0?c-0.5:minR()));};
@@ -11076,24 +11076,25 @@ function bindCanvas(cv){
         st.lastTap={t:now,vi:i};st.selV=i;mode='drag';draw3();live();showLoupeAt(e,st.polyPx[i]);return;}
       const r=nearSeg(X,Y,g);if(r){snap();st.polyPx.splice(r.i+1,0,r.pt);st.selV=r.i+1;syncPoly();down.snapped=true;mode='drag';draw3();live();showLoupeAt(e,r.pt);return;}
       st.selV=-1;draw3();live();}
-    if(st.tool==='color'){snap();ensureScrib();st.stroke={mode:st.pmode||'fg',pts:[],last:null};const u0=g.toU(X,Y);paintTo(u0[0],u0[1]);mode='paint';draw3();return;}
+    if(st.tool==='color'){snap();ensureScrib();clearScrib();st.hover=[X,Y];st.stroke={mode:st.pmode||'fg',pts:[],last:null};const u0=g.toU(X,Y);paintTo(u0[0],u0[1]);mode='paint';draw3();return;}
     if((st.tool==='dim'||st.phase==='dims')&&st.dim){let best=null,bd=(30*g.k)**2;['A','B'].forEach(k=>{if(st.dimHide[k])return;st.dim[k].forEach((p,j)=>{const q=g.toS(p[0],p[1]),d2=(q[0]-X)**2+(q[1]-Y)**2;if(d2<bd){bd=d2;best=[k,j];}});});if(best){snap();st.dimSel=best;st.dimMoved=true;mode='dimdrag';draw3();showLoupeAt(e,st.dim[best[0]][best[1]]);return;}}
     mode='pan';};
-  cv.onpointermove=e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
+  cv.onpointermove=e=>{if(!ptrs.has(e.pointerId)){if(st.tool==='color'){const g0=G(),p0=g0.pos(e);st.hover=[p0[0],p0[1]];draw3();}return;}ptrs.set(e.pointerId,[e.clientX,e.clientY]);const g=G();
     if(mode==='pinch'&&ptrs.size>=2){const [p1,p2]=[...ptrs.values()],d=Math.hypot(p1[0]-p2[0],p1[1]-p2[1]),mx=(p1[0]+p2[0])/2,my=(p1[1]+p2[1])/2,r=cv.getBoundingClientRect(),X=(mx-r.left)*g.W/r.width,Y=(my-r.top)*g.H/r.height;
       zoomAt(X,Y,d/pinch.d);const g2=G();st.vw.cx-=(mx-pinch.mx)*(g2.W/r.width)/g2.s;st.vw.cy-=(my-pinch.my)*(g2.H/r.height)/g2.s;clampView();pinch={d,mx,my};draw3();return;}
     const [X,Y]=g.pos(e);
-    if(mode==='paint'&&st.stroke){const u=g.toU(X,Y);paintTo(u[0],u[1]);draw3();return;}
+    if(mode==='paint'&&st.stroke){const u=g.toU(X,Y);paintTo(u[0],u[1]);st.hover=[X,Y];draw3();return;}
     if(mode==='dimdrag'&&st.dimSel){const u=g.toU(X,Y);st.dim[st.dimSel[0]][st.dimSel[1]]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];st.meas=measure(st.poly);draw3();live();showLoupeAt(e,st.dim[st.dimSel[0]][st.dimSel[1]]);return;}
     if(mode==='drag'&&st.selV>=0){if(!down.snapped){if(Math.hypot(X-down.X,Y-down.Y)<4*g.k)return;snap();down.snapped=true;}const u=g.toU(X,Y),r0=st.polyPx[st.selV][2]||0;st.polyPx[st.selV]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1])),r0];syncPoly();draw3();live();showLoupeAt(e,st.polyPx[st.selV]);}
     else if(mode==='pan'&&down){if(Math.hypot(X-down.X,Y-down.Y)>6*g.k)down.moved=true;if(down.moved){st.vw.cx=down.cx-(X-down.X)/g.s;st.vw.cy=down.cy-(Y-down.Y)/g.s;clampView();draw3();}}};
   cv.onpointerup=e=>{const g=G();ptrs.delete(e.pointerId);
     if(mode==='dimdrag'){const L=st.dimSel&&st.dimSel[0];mode=null;st.dimSel=null;hideLoupe();live();if(L)openDimPop(L);return;}
-    if(mode==='paint'){mode=null;const s=st.stroke;st.stroke=null;if(s&&s.pts.length){(st.strokes=st.strokes||[]).push({mode:s.mode,r:brushPx(),pts:s.pts});runPaintMask();}return;}
+    if(mode==='paint'){mode=null;const s=st.stroke;st.stroke=null;if(s&&s.pts.length)applyStroke(s.mode);return;}
     if(mode==='pan'&&down&&!down.moved&&st.tool==='shadow'&&st.polyPx){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;removeShadow(u[0],u[1]);return;}
     if(mode==='pan'&&down&&!down.moved&&st.tool==='detect'){const [X,Y]=g.pos(e),u=g.toU(X,Y);mode=null;doTap(u[0],u[1]);return;}
     hideLoupe();if(ptrs.size<2&&mode==='pinch')mode=null;if(mode==='drag'||mode==='pan')mode=null;};
   cv.onpointercancel=()=>{ptrs.clear();mode=null;hideLoupe();};
+  cv.onpointerleave=()=>{if(st.hover&&!ptrs.size){st.hover=null;draw3();}};
   cv.onwheel=e=>{e.preventDefault();const g=G(),[X,Y]=g.pos(e);zoomAt(X,Y,Math.pow(1.0014,-e.deltaY));};}
 /* ---------- V2.7: automatic first outline, automatic shadow cut, Remove shadow tool ---------- */
 function rasterPoly(P,w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#000';g.beginPath();P.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fill();
@@ -11178,43 +11179,41 @@ function ensureLab(){if(st.lab)return st.lab;const d=st.wid.data,n=st.ww*st.wh,L
     L[i*3]=116*fy-16;L[i*3+1]=500*(fx-fy);L[i*3+2]=200*(fy-fz);}
   st.lab=L;return L;}
 /* paint mask: paint over the part (green) and over what is NOT the part (red). The tool learns the colors and builds the mask */
-const brushPx=()=>Math.max(4,Math.round((st.brushMm||5)*PPM));
+/* paint mask V3.3: green ADDS to the outline you already have, red REMOVES from it. The brush circle shows the real size */
+const brushPx=()=>Math.max(3,Math.round((st.brushMm||10)/2*PPM));
 function ensureScrib(){if(!st.sfg){st.sfg=new Uint8Array(st.ww*st.wh);st.sbg=new Uint8Array(st.ww*st.wh);st.scCv=document.createElement('canvas');st.scCv.width=st.ww;st.scCv.height=st.wh;}}
-function stamp(x,y,r,mode){const w=st.ww,h=st.wh,A=mode==='fg'?st.sfg:st.sbg,B=mode==='fg'?st.sbg:st.sfg,r2=r*r;
-  for(let yy=Math.max(0,Math.floor(y-r));yy<=Math.min(h-1,Math.ceil(y+r));yy++)for(let xx=Math.max(0,Math.floor(x-r));xx<=Math.min(w-1,Math.ceil(x+r));xx++)if((xx-x)*(xx-x)+(yy-y)*(yy-y)<=r2){A[yy*w+xx]=1;B[yy*w+xx]=0;}
-  const g=st.scCv.getContext('2d');g.globalCompositeOperation='destination-out';g.beginPath();g.arc(x,y,r,0,7);g.fill();g.globalCompositeOperation='source-over';
-  g.fillStyle=mode==='fg'?'rgba(47,143,91,.7)':'rgba(216,76,85,.7)';g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function clearScrib(){if(!st.sfg)return;st.sfg.fill(0);st.sbg.fill(0);st.scCv.getContext('2d').clearRect(0,0,st.ww,st.wh);}
+function stamp(x,y,r,mode){const w=st.ww,h=st.wh,A=mode==='fg'?st.sfg:st.sbg,r2=r*r;
+  for(let yy=Math.max(0,Math.floor(y-r));yy<=Math.min(h-1,Math.ceil(y+r));yy++)for(let xx=Math.max(0,Math.floor(x-r));xx<=Math.min(w-1,Math.ceil(x+r));xx++)if((xx-x)*(xx-x)+(yy-y)*(yy-y)<=r2)A[yy*w+xx]=1;
+  const g=st.scCv.getContext('2d');g.fillStyle=mode==='fg'?'rgba(47,143,91,.55)':'rgba(216,76,85,.55)';g.beginPath();g.arc(x,y,r,0,7);g.fill();}
 function paintTo(x,y){const s=st.stroke,r=brushPx();if(s.last){const dx=x-s.last[0],dy=y-s.last[1],d=Math.hypot(dx,dy),step=Math.max(2,r/3);for(let t=step;t<d;t+=step)stamp(s.last[0]+dx*t/d,s.last[1]+dy*t/d,r,s.mode);}stamp(x,y,r,s.mode);s.last=[x,y];s.pts.push([x,y]);}
-function rebuildScrib(){st.sfg=null;st.sbg=null;st.scCv=null;if(!(st.strokes&&st.strokes.length))return;ensureScrib();
-  for(const s of st.strokes){let last=null;for(const p of s.pts){if(last){const dx=p[0]-last[0],dy=p[1]-last[1],d=Math.hypot(dx,dy),step=Math.max(2,s.r/3);for(let t=step;t<d;t+=step)stamp(last[0]+dx*t/d,last[1]+dy*t/d,s.r,s.mode);}stamp(p[0],p[1],s.r,s.mode);last=p;}}}
+function rebuildScrib(){st.sfg=null;st.sbg=null;st.scCv=null;}
 function kmeans(S,k){if(S.length<=k)return S.map(p=>p.slice());let C=[];for(let i=0;i<k;i++)C.push(S[Math.floor(i*S.length/k)].slice());
   for(let it=0;it<6;it++){const sum=C.map(()=>[0,0,0,0]);for(const p of S){let bi=0,bd=1e18;C.forEach((c,i)=>{const d=(p[0]-c[0])**2+(p[1]-c[1])**2+(p[2]-c[2])**2;if(d<bd){bd=d;bi=i;}});const s=sum[bi];s[0]+=p[0];s[1]+=p[1];s[2]+=p[2];s[3]++;}
     C=C.map((c,i)=>sum[i][3]?[sum[i][0]/sum[i][3],sum[i][1]/sum[i][3],sum[i][2]/sum[i][3]]:c);}return C;}
-function runPaintMask(){if(!st.sfg)return;const w=st.ww,h=st.wh,n=w*h,L=ensureLab(),hint=$q('#ppHint');let fgN=0;for(let i=0;i<n;i++)fgN+=st.sfg[i];if(!fgN)return;
-  const sampleFrom=(mask,max)=>{const idx=[];for(let i=0;i<n;i++)if(mask[i])idx.push(i);const step=Math.max(1,Math.floor(idx.length/max)),S=[];for(let k=0;k<idx.length;k+=step){const i=idx[k];S.push([L[i*3],L[i*3+1],L[i*3+2]]);}return S;};
-  const fgC=kmeans(sampleFrom(st.sfg,700),6),near=morph(st.sfg,w,h,60,false),far=morph(st.sfg,w,h,160,false),ring=new Uint8Array(n);for(let i=0;i<n;i++)ring[i]=far[i]&&!near[i]?1:0;
-  const bgC=kmeans(sampleFrom(ring,500).concat(sampleFrom(st.sbg,600)),6),roi=morph(st.sfg,w,h,36,false),m0=new Uint8Array(n);
-  for(let i=0;i<n;i++){if(st.sfg[i]){m0[i]=1;continue;}if(st.sbg[i]||!roi[i])continue;const l=L[i*3],a=L[i*3+1],b=L[i*3+2];let df=1e18,db=1e18;
-    for(const c of fgC){const d=(l-c[0])**2+(a-c[1])**2+(b-c[2])**2;if(d<df)df=d;}for(const c of bgC){const d=(l-c[0])**2+(a-c[1])**2+(b-c[2])**2;if(d<db)db=d;}if(df<=db)m0[i]=1;}
-  let m=morph(morph(m0,w,h,3,false),w,h,3,true,0);const fill=mk=>{const bg=new Uint8Array(n),q=new Int32Array(n);let hh=0,tt=0;const push=i=>{if(!mk[i]&&!bg[i]){bg[i]=1;q[tt++]=i;}};
-    for(let x=0;x<w;x++){push(x);push((h-1)*w+x);}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1);}
-    while(hh<tt){const i=q[hh++],x=i%w,y=(i/w)|0;if(x>0)push(i-1);if(x<w-1)push(i+1);if(y>0)push(i-w);if(y<h-1)push(i+w);}const o=new Uint8Array(n);for(let i=0;i<n;i++)o[i]=bg[i]?0:1;return o;};
-  m=fill(m);m=morph(morph(m,w,h,3,true),w,h,3,false);
-  /* keep the pieces you painted on, join them, fill holes */
-  const lab=new Int32Array(n),q2=new Int32Array(n),keep=new Uint8Array(n);let id=0;
-  for(let s0=0;s0<n;s0++){if(!m[s0]||lab[s0])continue;id++;let hh=0,tt=0,hit=false;q2[tt++]=s0;lab[s0]=id;
-    while(hh<tt){const i=q2[hh++];if(st.sfg[i])hit=true;const x=i%w,y=(i/w)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const j=Y*w+X;if(m[j]&&!lab[j]){lab[j]=id;q2[tt++]=j;}}}
-    if(hit)for(let k=0;k<tt;k++)keep[q2[k]]=1;}
-  let mm=fill(morph(morph(keep,w,h,4,false),w,h,4,true,0));const res=keepLargest(mm,w,h);
-  if(!res||res.area<n*0.0015){if(hint)hint.textContent='Could not make a mask. Paint more of the part.';draw3();return;}
+function fillHoles(mk,w,h){const n=w*h,bg=new Uint8Array(n),q=new Int32Array(n);let hh=0,tt=0;const push=i=>{if(!mk[i]&&!bg[i]){bg[i]=1;q[tt++]=i;}};
+  for(let x=0;x<w;x++){push(x);push((h-1)*w+x);}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1);}
+  while(hh<tt){const i=q[hh++],x=i%w,y=(i/w)|0;if(x>0)push(i-1);if(x<w-1)push(i+1);if(y>0)push(i-w);if(y<h-1)push(i+w);}const o=new Uint8Array(n);for(let i=0;i<n;i++)o[i]=bg[i]?0:1;return o;}
+/* one stroke = one edit of the outline you already have */
+function applyStroke(mode){if(!st.sfg)return;const w=st.ww,h=st.wh,n=w*h,L=ensureLab(),S=mode==='fg'?st.sfg:st.sbg,hint=$q('#ppHint');let cnt=0;for(let i=0;i<n;i++)cnt+=S[i];if(!cnt){clearScrib();return;}
+  const base=st.polyPx?rasterPoly(roundedPx(),w,h):new Uint8Array(n),zone=morph(S,w,h,7,false),ring=morph(S,w,h,30,false),near=morph(S,w,h,8,false),ctx=new Uint8Array(n);
+  const sample=(mask,max)=>{const idx=[];for(let i=0;i<n;i++)if(mask[i])idx.push(i);const step=Math.max(1,Math.floor(idx.length/max)),out=[];for(let k=0;k<idx.length;k+=step){const i=idx[k];out.push([L[i*3],L[i*3+1],L[i*3+2]]);}return out;};
+  for(let i=0;i<n;i++)ctx[i]=(ring[i]&&!near[i]&&(mode==='fg'?!base[i]:base[i]))?1:0;
+  const sC=kmeans(sample(S,500),4),cs=sample(ctx,500),cC=cs.length>=20?kmeans(cs,4):null,out=base.slice();
+  for(let i=0;i<n;i++){if(S[i]){out[i]=mode==='fg'?1:0;continue;}if(!zone[i]||!cC)continue;
+    if(mode==='fg'?base[i]:!base[i])continue;const l=L[i*3],a=L[i*3+1],b=L[i*3+2];let ds=1e18,dc=1e18;
+    for(const c of sC){const d=(l-c[0])**2+(a-c[1])**2+(b-c[2])**2;if(d<ds)ds=d;}for(const c of cC){const d=(l-c[0])**2+(a-c[1])**2+(b-c[2])**2;if(d<dc)dc=d;}
+    if(ds<=dc*0.64)out[i]=mode==='fg'?1:0;}
+  let m=out;if(mode==='fg'){m=fillHoles(morph(morph(out,w,h,2,false),w,h,2,true,0),w,h);}
+  const res=keepLargest(m,w,h);clearScrib();
+  if(!res||res.area<n*0.0015){if(st.undo.length)st.undo.pop();if(hint)hint.textContent='That would remove the whole part. Paint a smaller area with red.';draw3();return;}
   st.seg={mask:res.mask,area:res.area,sol:1,T:0};st.tap=null;st.loop=outerLoop(res.mask,w,h);buildPoly();st.selV=-1;draw3();live();
-  if(hint)hint.textContent='Mask made. Paint more of the part (green) or over the shadow (red) to improve it. Undo (Ctrl+Z) removes the last stroke.';}
+  if(hint)hint.textContent=(mode==='fg'?'Added to the outline.':'Removed from the outline.')+' Press Ctrl to switch between green and red. Ctrl+Z undoes the last stroke.';}
+function togglePMode(){st.pmode=st.pmode==='bg'?'fg':'bg';const pm=$q('#ppPMode');if(pm)pm.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===(st.pmode||'fg')));draw3();}
 function colorPanel(){if(st.tool!=='color')return '';
-  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Paint mask</b><div class="ppnote">Paint over the part with <b>Part</b> (green). Paint over the shadow or anything that is not the part with <b>Not part</b> (red). The outline follows the colors.</div>
-   <div class="seg" id="ppPMode"><button data-m="fg" aria-pressed="${(st.pmode||'fg')==='fg'}">Part</button><button data-m="bg" aria-pressed="${st.pmode==='bg'}">Not part</button></div>
-   <div class="ppfield"><span>Brush size</span><input type="range" id="ppBrush" min="2" max="14" value="${st.brushMm||5}"></div>
-   <button class="btn sm" id="ppPClear">Clear paint</button></div>`;}
-
+  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Paint mask</b><div class="ppnote"><b style="color:#2f8f5b">Green adds</b> to the outline you already have. <b style="color:#d84c55">Red removes</b> from it. Press <b>Ctrl</b> to switch between green and red.</div>
+   <div class="seg" id="ppPMode"><button data-m="fg" aria-pressed="${(st.pmode||'fg')==='fg'}">Add (green)</button><button data-m="bg" aria-pressed="${st.pmode==='bg'}">Remove (red)</button></div>
+   <div class="ppfield"><span id="ppBrushLbl">Brush size: Ø${f1(st.brushMm||10)} mm</span><input type="range" id="ppBrush" min="2" max="30" value="${st.brushMm||10}"></div></div>`;}
 const minR=()=>{const v=(typeof S!=='undefined'&&S&&S.set&&+S.set.toolR>0)?+S.set.toolR:4;return v;};
 function effRadius(i){const P=st.polyPx,n=P.length,p=P[i],r=(p[2]||0)*PPM;if(!(r>0))return 0;const a=P[(i-1+n)%n],b=P[(i+1)%n];let ux=a[0]-p[0],uy=a[1]-p[1],vx=b[0]-p[0],vy=b[1]-p[1];const lu=Math.hypot(ux,uy),lv=Math.hypot(vx,vy);if(lu<1e-6||lv<1e-6)return 0;ux/=lu;uy/=lu;vx/=lv;vy/=lv;
   const th=Math.acos(Math.max(-1,Math.min(1,ux*vx+uy*vy)));if(th<0.05||th>Math.PI-0.05)return 0;let t=r/Math.tan(th/2);const tmax=0.5*Math.min(lu,lv);if(t>tmax)t=tmax;return t*Math.tan(th/2)/PPM;}
@@ -11320,6 +11319,10 @@ function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.g
   const o=g.toS(0,0);
   if(st.view==='outline'){c.fillStyle='#f6f3ec';c.fillRect(o[0],o[1],st.ww*g.s,st.wh*g.s);}else c.drawImage(img,o[0],o[1],st.ww*g.s,st.wh*g.s);
   if(st.tool==='color'&&st.scCv){c.drawImage(st.scCv,o[0],o[1],st.ww*g.s,st.wh*g.s);}
+  if(st.tool==='color'){const hv=st.hover||[g.W/2,g.H/2],add=(st.pmode||'fg')==='fg',col=add?'#2f8f5b':'#d84c55',rp=brushPx()*g.s;c.save();c.lineWidth=2.5*d;c.strokeStyle=col;c.fillStyle=add?'rgba(47,143,91,.18)':'rgba(216,76,85,.18)';c.beginPath();c.arc(hv[0],hv[1],rp,0,7);c.fill();c.stroke();
+    c.strokeStyle='#fff';c.lineWidth=1*d;c.beginPath();c.arc(hv[0],hv[1],rp+1.5*d,0,7);c.stroke();c.fillStyle=col;c.beginPath();c.arc(hv[0],hv[1],2.5*d,0,7);c.fill();
+    const lab=(add?'Add  Ø':'Remove  Ø')+f1(st.brushMm||10)+' mm';c.font='bold '+(12*d)+'px sans-serif';const tw=c.measureText(lab).width+12*d,lx=Math.min(g.W-tw-4*d,Math.max(4*d,hv[0]-tw/2)),ly=hv[1]-rp-24*d<4*d?hv[1]+rp+6*d:hv[1]-rp-24*d;
+    c.fillStyle='rgba(255,255,255,.95)';c.fillRect(lx,ly,tw,20*d);c.fillStyle=col;c.textAlign='left';c.textBaseline='middle';c.fillText(lab,lx+6*d,ly+10*d);c.restore();}
   if(st.polyPx&&st.view!=='photo'&&st.phase!=='dims'){c.beginPath();roundedPx().forEach((p,i)=>{const q=g.toS(p[0],p[1]);i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});c.closePath();
     if(st.view==='both'){c.fillStyle='rgba(240,83,37,.16)';c.fill();}c.lineWidth=2.5*d;c.strokeStyle='#f05325';c.stroke();}
   if(st.polyPx&&st.tool!=='detect'&&st.tool!=='shadow'&&st.tool!=='color'&&st.tool!=='dim'&&st.phase!=='dims'){st.polyPx.forEach((p,i)=>{const q=g.toS(p[0],p[1]);c.beginPath();c.arc(q[0],q[1],(i===st.selV?7:5)*d,0,7);c.fillStyle=i===st.selV?'#f05325':(st.tool==='del'?'#fbe3e5':'#fff');c.fill();c.lineWidth=1.6*d;c.strokeStyle=st.tool==='del'?'#d84c55':'#f05325';c.stroke();});}
@@ -11370,8 +11373,9 @@ function addToTool(){const H=+st.cal.h,poly=scaledPoly(),pos=extrude(poly,H),stt
   close();renderAll();toast('Photo part added. It is an estimate. Please check it with a real sample.');}
 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a="photo"]');if(b){e.stopPropagation();e.preventDefault();open();}},true);
-window.PP={_paint:(pts,mo,r)=>{ensureScrib();st.brushMm=r||5;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;(st.strokes=st.strokes||[]).push({mode:s.mode,r:brushPx(),pts:s.pts});runPaintMask();},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
+window.PP={_paint:(pts,mo,r)=>{ensureScrib();clearScrib();st.brushMm=r||10;const s={mode:mo||'fg',pts:[],last:null};st.stroke=s;for(const p of pts)paintTo(p[0],p[1]);st.stroke=null;snap();applyStroke(s.mode);},_mask:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);return r?{w:st.ww,h:st.wh,m:Array.from(r.mask)}:null;},_try:(x,y,T,d,g)=>{const r=trySeg(x,y,T,d,g);if(!r)return null;let x0=1e9,x1=-1,y0=1e9,y1=-1;for(let i=0;i<r.mask.length;i++)if(r.mask[i]){const X=i%st.ww,Y=(i/st.ww)|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}return {T,d,g,area:r.area,sol:+r.sol.toFixed(3),wmm:+((x1-x0+1)/PPM).toFixed(1),hmm:+((y1-y0+1)/PPM).toFixed(1)};},open,close,_st:()=>st,_tap:(x,y)=>doTap(x,y),_go:go};
 })();
+
 
 
 
