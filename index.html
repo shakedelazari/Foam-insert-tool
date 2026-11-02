@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V4.4 — Shell-Case</title>
+<title>Foam Insert Tool V4.5 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V4.4 · 2 Nov 2026&#10;&#10;V4.4: Separate Notches tool next to Finger access (own list, own colour, own count). Sharp corners of a drawn part get a small round relief (about 1 mm) instead of big wings at the sides.&#10;&#10;V4.3: Finger access window shows the part the same way up as the preview and the layout (up is up). New rectangle starts at 0 degrees.&#10;&#10;V4.2: Finger access: notches show in the first preview (Top, Front, Side). New Rectangle notch with fillet (min R4), turn handle and Align to the part. Every notch can have its own depth (5 mm up to the cavity depth). Before leaving the Parts step the tool asks: Do you need finger access?&#10;&#10;V4.1: simpler Mirror and length window&#10;V4.0: cavity corner keeps the drawn radius&#10;V3.9: STEP of drawn parts follows the drawing&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.4</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V4.5 · 2 Nov 2026&#10;&#10;V4.5: Photo flow: Straighten the photo is the first screen after the corners, then Sizes, then Outline. Much less text on the photo pages.&#10;&#10;V4.4: Separate Notches tool next to Finger access (own list, own colour, own count). Sharp corners of a drawn part get a small round relief (about 1 mm) instead of big wings at the sides.&#10;&#10;V4.3: Finger access window shows the part the same way up as the preview and the layout (up is up). New rectangle starts at 0 degrees.&#10;&#10;V4.2: Finger access: notches show in the first preview (Top, Front, Side). New Rectangle notch with fillet (min R4), turn handle and Align to the part. Every notch can have its own depth (5 mm up to the cavity depth). Before leaving the Parts step the tool asks: Do you need finger access?&#10;&#10;V4.1: simpler Mirror and length window&#10;V4.0: cavity corner keeps the drawn radius&#10;V3.9: STEP of drawn parts follows the drawing&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.5</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -10874,7 +10874,7 @@ function kd(e){if(!st||!root||st.step!==3)return;if(e.key==='Control'||e.key==='
   const mod=e.ctrlKey||e.metaKey;if(!mod||typing)return;const k=(e.key||'').toLowerCase();if(k==='z'){e.preventDefault();e.stopPropagation();e.shiftKey?redo():undo();}else if(k==='y'){e.preventDefault();e.stopPropagation();redo();}}
 function close(){if(root){root.remove();root=null;}document.removeEventListener('keydown',kd,true);document.removeEventListener('keyup',ku,true);if(st&&st._rs)window.removeEventListener('resize',st._rs);st=null;}
 
-const STEPS=['Photo','Corners','Sizes','Outline','Height'];
+const STEPS=['Photo','Corners','Straighten','Sizes','Outline','Height'];
 
 function render(){
   const fn=[scr0,scr1,scr2,scr3,scr4][st.step];root.innerHTML='';
@@ -10885,11 +10885,9 @@ const go=n=>{st.step=n;render();};
 
 /* ---------- SCREEN 1: photo ---------- */
 function scr1(){return shell(`
-  <div class="pptips"><b>Photo tips</b><ul>
-   <li>Part on plain paper. Dark part: white paper. White or shiny part: dark paper.</li>
-   <li>Camera flat, straight above the part. Zoom 2x, about 0.6 m away for A4.</li>
-   <li>Even light, no hard shadows.</li>
-   <li>All 4 corners of the sheet must be in the photo.</li></ul></div>
+  <div class="pptips"><ul>
+   <li>Part on plain paper, camera straight above.</li>
+   <li>All 4 sheet corners in the photo. Even light.</li></ul></div>
   <label class="btn primary ppbtn">Upload or take a photo<input type="file" id="ppFile" accept="image/*" style="display:none"></label>
   <div id="ppPhoto" style="margin-top:12px"></div>`,
   `<span></span><button class="btn primary" id="ppNext" ${st.cv?'':'disabled'}>Next: corners</button>`);}
@@ -10902,7 +10900,7 @@ function wire1(){
     const sc=t.width/st.iw,g=t.getContext('2d');
     if(st.corners){g.strokeStyle='#f05325';g.lineWidth=2;g.beginPath();st.corners.forEach((c,i)=>{i?g.lineTo(c[0]*sc,c[1]*sc):g.moveTo(c[0]*sc,c[1]*sc);});g.closePath();g.stroke();}
     $q('#ppCh').innerHTML='<b>Photo check</b>'+st.checks.map(c=>`<div class="ppchk ${c.s}"><b>${c.s==='ok'?'✓':c.s==='warn'?'!':'✗'}</b><span>${c.k}: ${c.t}</span></div>`).join('')+
-      (st.checks.some(c=>c.s==='bad')?'<div class="ppmsg bad">Please retake the photo. You can also continue.</div>':st.checks.some(c=>c.s==='warn')?'<div class="ppmsg warn">Usable. A better photo gives a better result.</div>':'<div class="ppmsg ok">Photo looks good.</div>');}}
+      (st.checks.some(c=>c.s==='bad')?'<div class="ppmsg bad">Retake the photo, or continue.</div>':st.checks.some(c=>c.s==='warn')?'<div class="ppmsg warn">OK.</div>':'<div class="ppmsg ok">Photo looks good.</div>');}}
 
 async function loadImage(file){
   const url=URL.createObjectURL(file);
@@ -10937,7 +10935,7 @@ function detectSheet(cv){
   const k=cv.width/sw;res.corners=[tlp,trp,brp,blp].map(p=>[(p[0]+0.5)*k,(p[1]+0.5)*k]);return res;}
 function photoChecks(cv,det){
   const out=[],C=det.corners;
-  if(!C){out.push({k:'Sheet',s:'bad',t:'not found. Move the 4 dots by hand.'});}
+  if(!C){out.push({k:'Sheet',s:'bad',t:'not found. Move the dots.'});}
   else{out.push({k:'Sheet',s:'ok',t:'found'});
     const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),r1=Math.max(d(C[0],C[1]),d(C[3],C[2]))/Math.min(d(C[0],C[1]),d(C[3],C[2])),r2=Math.max(d(C[0],C[3]),d(C[1],C[2]))/Math.min(d(C[0],C[3]),d(C[1],C[2])),w=Math.max(r1,r2);
     out.push({k:'Camera angle',s:w<=1.04?'ok':w<=1.10?'warn':'bad',t:w<=1.04?'straight':w<=1.10?'slightly tilted':'too tilted'});
@@ -10974,9 +10972,9 @@ function warp(ppm){const {W,H}=sheetSize(),Wd=Math.round(W*ppm),Hd=Math.round(H*
 function scr2(){return shell(`
   <div class="ppflex"><b>Sheet</b><div class="seg" id="ppSheet">${Object.keys(SHEETS).map(k=>`<button data-s="${k}" aria-pressed="${st.sheet===k}">${k==='A4'?'A4':k}</button>`).join('')}</div>
    <span id="ppCustom" style="display:${st.sheet==='Custom'?'inline-flex':'none'};gap:6px;align-items:center"><input id="ppCW" type="number" value="${st.cw}" style="width:74px"> × <input id="ppCH" type="number" value="${st.ch}" style="width:74px"> mm</span></div>
-  <div class="ppnote">${st.cornersAuto?'The 4 dots were placed for you. Press and hold a dot: a magnifier shows the exact point. Move it onto the sheet corner.':'Press and hold a dot: a magnifier shows the exact point. Move each dot onto a sheet corner.'}</div>
+  <div class="ppnote">Move each dot onto a sheet corner.</div>
   <div class="ppcol"><canvas class="ppcv" id="ppCorner"></canvas><div><div class="ppnote"><b>Straightened sheet</b></div><canvas class="ppcv" id="ppPrev"></canvas></div></div>`,
-  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext">Next: outline</button>`);}
+  `<button class="btn" id="ppBack">Back</button><button class="btn primary" id="ppNext">Next: straighten</button>`);}
 function wire2(){
   $q('#ppBack').onclick=()=>go(1);
   $q('#ppNext').onclick=()=>{buildWarp();go(3);};
@@ -11004,7 +11002,7 @@ function wire2(){
   cv.onpointercancel=()=>{lp.style.display='none';drag=-1;};
   st._drawCorner=draw;draw();drawPrev();}
 function drawPrev(){const c=$q('#ppPrev');if(!c)return;const w=warp(1.1);c.width=w.w;c.height=w.h;c.getContext('2d').drawImage(w.cv,0,0);}
-function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.wcBase=w.cv;st.rot=0;st.wcHiBase=null;st.dimMask=null;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.mir=null;st.phase='dims';st.dimBusy=false;st.autoTried=false;st.autoBusy=false;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.lab=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.stroke=null;}
+function buildWarp(){const w=warp(PPM);st.wc=w.cv;st.wcBase=w.cv;st.rot=0;st.wcHiBase=null;st.dimMask=null;st.ww=w.w;st.wh=w.h;st.sheetW=w.W;st.sheetH=w.H;st.wid=st.wc.getContext('2d').getImageData(0,0,w.w,w.h);{const ee=computeEdges(st.wid,w.w,w.h);st.E=ee.E;st.E2=ee.E2;}st.tap=null;st.seg=null;st.loop=null;st.poly=null;st.polyPx=null;st.meas=null;st.tool='detect';st.vw=null;st.undo=[];st.redo=[];st.selV=-1;st.wcHi=null;st.hiBusy=false;st.warpId=(st.warpId||0)+1;st.mir=null;st.phase='straight';st.grid=true;st.view='both';st.panMode=false;st.dimBusy=false;st.autoTried=false;st.autoBusy=false;st.dim=null;st.dimMoved=false;st.colors=[];st.maskCv=null;st.lab=null;st.strokes=[];st.sfg=null;st.sbg=null;st.scCv=null;st.stroke=null;}
 
 /* ---------- edges + segmentation ---------- */
 function computeEdges(id,w,h){const d=id.data,n=w*h,ch=[new Float32Array(n),new Float32Array(n),new Float32Array(n)];
@@ -11080,11 +11078,11 @@ function measureRect(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.
 
 /* ---------- SCREEN 3: outline (drawing-tool style) ---------- */
 const TOOLS=[['detect','Tap to find part'],['color','Paint'],['shadow','Remove shadow'],['move','Move points'],['dim','Dimension lines']];
-const HINTS={move:'Drag a dot to move it (hold Shift for 90° lines). Tap the line to add a dot. Ctrl + press on a line to curve it.',curve:'Press on a line between two points and pull it into a curve. Drag the blue dot to change the shape. Double-click the line to make it straight.',radius:'Click a point to set its radius. Inside corners need R4 or more. Outside corners can stay sharp.',dim:'Drag the points A and B to where you measured. Tap the size on the line to type the caliper size at that place.',detect:'Tap on the part and the tool finds its outline again.',shadow:'Tap on the shadow next to the part. It is cut away from the outline.',color:''};
+const HINTS={move:'Drag a dot. Shift = straight 90° lines.',curve:'Press a line and pull.',radius:'Click a point to set its radius.',dim:'Drag A and B to where you measured.',detect:'Tap the part.',shadow:'Tap the shadow.',color:''};
 function wire3(){
-  const dp=st.phase==='dims';if(dp)st.tool='dim';
-  $q('#ppBack').onclick=()=>{closePops();if(st.sketch){if(!st.editGid)go(0);return;}if(dp){if(!st.editGid)go(2);}else{st.phase='dims';st.tool='dim';render();}};
-  $q('#ppNext').onclick=()=>{if($q('#ppNext').disabled)return;closePops();if(dp){st.dimMoved=true;st.phase='outline';st.tool=st.polyPx?'move':'detect';render();}else go(4);};
+  const dp=st.phase==='dims',sp=st.phase==='straight';if(dp)st.tool='dim';if(sp){st.tool='move';st.panMode=true;}
+  $q('#ppBack').onclick=()=>{closePops();if(st.sketch){if(!st.editGid)go(0);return;}if(sp){st.panMode=false;go(2);}else if(dp){if(!st.editGid){st.phase='straight';render();}}else{st.phase='dims';st.tool='dim';render();}};
+  $q('#ppNext').onclick=()=>{if($q('#ppNext').disabled)return;closePops();if(sp){st.panMode=false;st.phase='dims';st.tool='dim';render();return;}if(dp){st.dimMoved=true;st.phase='outline';st.tool=st.polyPx?'move':'detect';render();}else go(4);};
   $q('#ppDelSel').onclick=delSelected;
   const tgl=(id,fn)=>{const b=$q(id);if(b)b.onclick=()=>{fn();b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true');draw3();live();};};
   tgl('#ppPts',()=>{st.hidePts=!st.hidePts;});tgl('#ppImg',()=>{st.view=st.view==='outline'?'both':'outline';});tgl('#ppGrid',()=>{st.grid=!st.grid;});tgl('#ppLen',()=>{st.showLen=!st.showLen;});
@@ -11120,7 +11118,7 @@ function wire3(){
   if(!st.vw)st.vw={k:1,cx:st.ww/2,cy:st.wh/2};
   bindCanvas(cv);
   if(!st.wcHi&&!st.hiBusy&&st.cv){st.hiBusy=true;const id=st.warpId;setTimeout(()=>{if(!st||st.warpId!==id)return;const w=warp(7);if(!st||st.warpId!==id)return;st.wcHiBase=w.cv;st.wcHi=st.rot?rotCanvas(w.cv,st.rot):w.cv;st.hiBusy=false;if(root&&st.step===3)draw3();},60);}
-  draw3();live();if(dp){if(!st.dim)autoDims();else zoomToDims();}else if(!st.polyPx&&!st.autoTried)autoOutline(false);}
+  draw3();live();if(dp||sp){if(!st.dim)autoDims();else zoomToDims();}else if(!st.polyPx&&!st.autoTried)autoOutline(false);}
 function G(){const cv=$q('#ppWarp'),W=cv.width,H=cv.height,f=Math.min(W/st.ww,H/st.wh),s=f*st.vw.k,rect=cv.getBoundingClientRect();
   return {cv,W,H,s,k:W/rect.width,toS:(u,v)=>[W/2+(u-st.vw.cx)*s,H/2+(v-st.vw.cy)*s],toU:(X,Y)=>[(X-W/2)/s+st.vw.cx,(Y-H/2)/s+st.vw.cy],pos:e=>[(e.clientX-rect.left)*W/rect.width,(e.clientY-rect.top)*H/rect.height]};}
 function clampView(){const v=st.vw;v.k=Math.max(1,Math.min(14,v.k));v.cx=Math.max(0,Math.min(st.ww,v.cx));v.cy=Math.max(0,Math.min(st.wh,v.cy));}
@@ -11342,7 +11340,7 @@ function initDimsBox(b){const [x0,y0,x1,y1]=b,ya=y0+(y1-y0)*0.3,xb=x0+(x1-x0)*0.
 function initDims(){if(!st.polyPx||st.dim)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;st.polyPx.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});initDimsBox([x0,y0,x1,y1]);}
 function zoomToDims(){if(!st.dim||!$q('#ppWarp'))return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;['A','B'].forEach(k=>st.dim[k].forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);}));
   const g=G(),bw=Math.max(60,x1-x0),bh=Math.max(60,y1-y0);st.vw.k=Math.min(g.W/(bw*1.7),g.H/(bh*1.7))/Math.min(g.W/st.ww,g.H/st.wh);clampView();st.vw.cx=(x0+x1)/2;st.vw.cy=(y0+y1)/2;clampView();draw3();}
-function autoDims(){if(st.dim||st.dimBusy)return;st.dimBusy=true;const id=st.warpId,hh=$q('#ppHint');if(hh)hh.textContent='Placing A–A and B–B next to the part…';
+function autoDims(){if(st.dim||st.dimBusy)return;st.dimBusy=true;const id=st.warpId,hh=$q('#ppHint');if(hh)hh.textContent='';
   setTimeout(()=>{if(!st||!root||st.warpId!==id||st.step!==3){if(st)st.dimBusy=false;return;}let box=null;
     try{const seed=autoSeed();if(seed){const r=segment(seed[0],seed[1]);if(r){let x0=1e9,y0=1e9,x1=-1,y1=-1;const w=st.ww,n=w*st.wh;for(let i=0;i<n;i++)if(r.mask[i]){const x=i%w,y=(i/w)|0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}box=[x0,y0,x1,y1];try{const lp=outerLoop(r.mask,w,st.wh);st.dimMask=lp.filter((_,k)=>k%3===0);}catch(e2){}}}}catch(e){console.warn(e);}
     if(!box)box=[st.ww/2-75,st.wh/2-90,st.ww/2+75,st.wh/2+90];
@@ -11384,7 +11382,7 @@ function mirrorOff(){st.mir=null;draw3();live();}
 
 
 
-const stepIdx=()=>st.step===3?(st.phase==='dims'?3:4):(st.step>=4?5:st.step);
+const stepIdx=()=>st.step===3?(st.phase==='straight'?3:st.phase==='dims'?4:5):(st.step>=4?6:st.step);
 
 /* ---------- V3.5: curve tool, show/hide, grid, straighten, big screen ---------- */
 function bulgeThrough(p,q,u){const ax=p[0],ay=p[1],bx=q[0],by=q[1],cx=u[0],cy=u[1],d=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));if(Math.abs(d)<1e-6)return 0;
@@ -11475,9 +11473,9 @@ function shell(inner,footer,wide){const sk=st.sketch,labels=sk?['Sketch','Height
    ${inner}<div class="ppft">${footer}</div></div>`;}
 /* start screen: with a photo, or a simple sketch without a photo */
 function scr0(){return `<div class="ppbox"><div class="pphd"><h3>Trace a part</h3><button class="btn sm" id="ppX">Close</button></div>
-  <div class="ppnote" style="margin:6px 0 12px">How do you want to start?</div>
-  <button class="btn primary ppbig" id="ppWithPhoto"><b>Sketch with a photo</b><br><span>Take or upload a photo of the part on a sheet of paper. The tool finds the outline and you fix it.</span></button>
-  <button class="btn ppbig" id="ppBlank"><b>Start a simple sketch without a photo</b><br><span>Draw the shape on a grid. You type the lengths, and you see the angles.</span></button></div>`;}
+  <div class="ppnote" style="margin:6px 0 12px">Start</div>
+  <button class="btn primary ppbig" id="ppWithPhoto"><b>Sketch with a photo</b><br><span>Part on a sheet of paper.</span></button>
+  <button class="btn ppbig" id="ppBlank"><b>Sketch without a photo</b><br><span>Draw on a grid.</span></button></div>`;}
 function wire0(){$q('#ppWithPhoto').onclick=()=>go(1);$q('#ppBlank').onclick=startSketch;}
 function startSketch(){const w=900,h=900,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#f6f3ec';g.fillRect(0,0,w,h);
   st.sketch=true;st.wc=c;st.wcBase=c;st.ww=w;st.wh=h;st.sheetW=300;st.sheetH=300;st.sheet='Sketch';st.wid=g.getImageData(0,0,w,h);st.E=new Uint8Array(w*h);st.E2=new Uint8Array(w*h);
@@ -11515,27 +11513,27 @@ function openRadPop(i){closePops();const P=st.polyPx;if(!P||!P[i])return;st.selV
 
 const mirBox=()=>'';const mirBoxOld=()=>st.mir?`<div class="ppmsg ok" style="background:#eef3f7;margin-top:8px"><b>⇋ Mirror is ON</b><div class="ppnote">Fix one half. The other half follows, so you see the result on the photo. Drag the grey handles at the ends of the dashed line to put the mirror line in the middle of the part.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppMirL">Edit the left half</button><button class="btn sm" id="ppMirR">Edit the right half</button></div><button class="btn sm" id="ppMirOff">Turn Mirror off</button></div>`:`<div class="ppnote" style="margin-top:8px">The part is symmetrical? Press <b>⇋ Mirror</b> and fix only half of it.</div>`;
 function roundPanel(){const mn=minR();
-  if(st.tool==='curve')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Curve</b><div class="ppnote">• <b>Press on a line</b> between two points and <b>pull</b> it. The curve follows your finger or mouse.<br>• Drag the <b style="color:#2b7cff">blue dot</b> to change the shape (it does not have to be symmetric).<br>• <b>Double-click</b> a curved line to make it straight again.<br>• The points stay where they are.</div></div>`+mirBox();
-  if(st.tool==='radius')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Radius</b><div class="ppnote">• <b>Click a point</b> to set its radius.<br>• <b>Inside corners</b> of the cavity (where the tool cannot reach) need <b>R${f1(mn)}</b> or more.<br>• <b>Outside corners</b> can stay sharp (90°).</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all inside corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>`+mirBox();
+  if(st.tool==='curve')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Curve</b><div class="ppnote">• <b>Press a line</b> and pull.<br>• Drag the <b style="color:#2b7cff">blue dot</b> to shape it.<br>• <b>Double-click</b> the line = straight.</div></div>`+mirBox();
+  if(st.tool==='radius')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Radius</b><div class="ppnote">• <b>Click a point</b> to set its radius.<br>• Inside corners: <b>R${f1(mn)}</b> or more.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all inside corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>`+mirBox();
   if(st.tool!=='move')return '';
-  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Fix the line</b><div class="ppnote">• <b>Drag a dot</b> to move it. Hold <b>Shift</b> to make straight lines at 90°.<br>• <b>Tap the line</b> to add a dot<br>• <b>Ctrl + press on a line</b> and pull to make a curve<br>• Select a dot and press <b>Delete</b> to remove it<br>• <b>Double-click a dot</b> for its radius<br>• <b>Tap a length</b> (for example 23.4 mm) to type a new length</div>
+  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Fix the line</b><div class="ppnote">• <b>Drag a dot</b>. Hold <b>Shift</b> = straight 90° lines.<br>• <b>Tap a line</b> = add a dot.<br>• <b>Tap a length</b> = type a new length.</div>
    <div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all inside corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>`+mirBox();}
-function scr3(){const dp=st.phase==='dims',sk=!!st.sketch,hid=dp?' style="display:none"':'',hidD=dp?'':' style="display:none"',hidS=sk?' style="display:none"':'';
+function scr3(){const dp=st.phase==='dims',sp=st.phase==='straight',sk=!!st.sketch,hid=(dp||sp)?' style="display:none"':'',hidD=dp?'':' style="display:none"',hidS=(sk||sp)?' style="display:none"':'';
   const tb=(k,l)=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&!st.polyPx?'disabled':''}>${l}</button>`;
   const tg=(id,on,l,t,x)=>`<button class="btn sm" id="${id}" aria-pressed="${on}" title="${t}"${x||''}>${l}</button>`;
   return shell(`
   <div class="ppcol3"><div>
-   <div class="pptb"><div class="pptoolrow"${hid}><div class="seg pptools">${tb('move','✋ Move points')}${tb('curve','〰 Curve')}${tb('radius','◜ Radius')}</div>${tg('ppMirror',!!st.mir,'⇋ Mirror','Trace only half of the part. The other half follows.',st.polyPx?'':' disabled')}</div>
+   <div class="pptb"${sp?' style="display:none"':''}><div class="pptoolrow"${hid}><div class="seg pptools">${tb('move','✋ Move points')}${tb('curve','〰 Curve')}${tb('radius','◜ Radius')}</div>${tg('ppMirror',!!st.mir,'⇋ Mirror','Trace only half of the part. The other half follows.',st.polyPx?'':' disabled')}</div>
     <span class="ppgap"></span><button class="btn sm" id="ppUndo" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" id="ppRedo" title="Redo (Ctrl+Y)">↷ Redo</button><button class="btn sm" id="ppDelSel" title="Delete the selected point (Delete key)" disabled${hid}>Delete point</button></div>
    <div class="pptb" style="margin-top:4px"><span${hid}>${tg('ppPts',!st.hidePts,'● Points','Show or hide the points')}</span><span${hidS}>${tg('ppImg',st.view!=='outline','▣ Photo','Show or hide the photo')}</span>${tg('ppGrid',!!st.grid,'▦ Grid','Show or hide the grid')}<span${hid}>${tg('ppLen',!!st.showLen,'↔ Lengths','Show the length and the angle of every straight line')}</span><span${hidD}>${tg('ppDimTog',!(st.dimHide.A&&st.dimHide.B),'↔ Dimensions','Show or hide the lines A–A and B–B')}</span>${tg('ppPan',!!st.panMode,'🖐 Pan','Drag anywhere to move the view (or hold the Space key)')}
     <span class="ppgap"></span><span style="white-space:nowrap"><button class="btn sm" id="ppZm" title="Zoom out (or use the mouse wheel)">−</button> <button class="btn sm" id="ppZf" title="Show the whole sheet">Fit</button> <button class="btn sm" id="ppZpart" title="${dp?'Zoom to the lines':'Zoom to the part'}">${dp?'Lines':'Part'}</button> <button class="btn sm" id="ppZp" title="Zoom in">+</button></span></div>
    <div class="ppwrap"><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
    <div class="ppnote" id="ppHint"></div></div>
   <div>
-   <div class="ppmsg" style="background:#f6f2ea;margin-bottom:8px${sk?';display:none':''}"><b>Straighten the photo</b> <span id="ppRotV" style="float:right"><b>${f1(st.rot||0)}°</b></span>
+   <div class="ppmsg" style="background:#f6f2ea;margin-bottom:8px${(sk||!sp)?';display:none':''}"><b>Straighten the photo</b> <span id="ppRotV" style="float:right"><b>${f1(st.rot||0)}°</b></span>
     <input type="range" id="ppRot" min="-20" max="20" step="0.1" value="${st.rot||0}" style="width:100%">
     <div class="ppflex" style="margin:4px 0 0"><button class="btn sm" id="ppRotM">◀ 0.5°</button><button class="btn sm" id="ppRotP">0.5° ▶</button><button class="btn sm primary" id="ppRotAuto" title="Turn the photo so the part is straight on the grid">Auto</button><button class="btn sm" id="ppRot0">Reset</button></div>
-    <div class="ppnote" style="margin:4px 0 0">Turn the photo until the part is straight on the grid.</div></div>
+    <div class="ppnote" style="margin:4px 0 0">Part straight on the grid.</div></div>
    <div id="ppOutPanel"${hid}>
     ${roundPanel()}
     <details class="ppadv" style="margin:10px 0${sk?';display:none':''}"><summary style="cursor:pointer"><b>More options</b></summary>
@@ -11549,11 +11547,11 @@ function scr3(){const dp=st.phase==='dims',sk=!!st.sketch,hid=dp?' style="displa
    </div>
    <div id="ppSize" class="ppnote"></div>
    <div id="ppDimPanel"${hidD}>
-    <div class="ppnote"><b>Measure first.</b> Measure the real part with a caliper. <b>A–A is the width</b> (left to right) and <b>B–B is the height</b> (top to bottom). Drag the points to where you measured, then type the size you read at that place.</div>
-    <div class="ppfield"><span><b>A–A</b> width (mm) required</span><div class="ppflex" style="margin:0"><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line A–A"><input type="checkbox" id="ppShowA" ${st.dimHide.A?'':'checked'}> Show</label></div></div>
-    <div class="ppfield"><span><b>B–B</b> height (mm) optional, better</span><div class="ppflex" style="margin:0"><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line B–B"><input type="checkbox" id="ppShowB" ${st.dimHide.B?'':'checked'}> Show</label></div></div>
+    <div class="ppnote">Type your caliper sizes. A–A = width, B–B = height.</div>
+    <div class="ppfield"><span><b>A–A</b> width (mm)</span><div class="ppflex" style="margin:0"><input id="ppAB" type="number" step="0.1" value="${st.cal.ab}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line A–A"><input type="checkbox" id="ppShowA" ${st.dimHide.A?'':'checked'}> Show</label></div></div>
+    <div class="ppfield"><span><b>B–B</b> height (mm)</span><div class="ppflex" style="margin:0"><input id="ppCD" type="number" step="0.1" value="${st.cal.cd}" placeholder="caliper reading" style="flex:1"><label class="ppchk" style="margin:0" title="Show or hide the line B–B"><input type="checkbox" id="ppShowB" ${st.dimHide.B?'':'checked'}> Show</label></div></div>
     <div id="ppDiff"></div></div></div></div>`,
-  `<button class="btn" id="ppBack"${(dp&&st.editGid)||(sk&&st.editGid)?' style="visibility:hidden"':''}>Back</button><button class="btn primary" id="ppNext" disabled>Next: ${dp?'outline':'height'}</button>`,true);}
+  `<button class="btn" id="ppBack"${(dp&&st.editGid)||(sk&&st.editGid)?' style="visibility:hidden"':''}>Back</button><button class="btn primary" id="ppNext" disabled>Next: ${sp?'sizes':dp?'outline':'height'}</button>`,true);}
 
 /* ---------- V3.7: clear Start (green) and End (red) points, typed angle, review with show/hide ---------- */
 function closePops(){['ppRadPop','ppDimPop'].forEach(id=>{const e=$q('#'+id);if(e)e.remove();});if(st&&st.lenSel!=null){st.lenSel=null;try{draw3();}catch(e){}}}
@@ -11719,11 +11717,11 @@ function calcScale(){const m=st.meas;let k=1,kc=0,html='',okAB=false;if(!m)retur
     if(!good)html+=`<div class="ppnote">Large difference. Check the line for bumps or shadow (tool Edit line).</div>`;}
   return {k,kc,html,okAB};}
 function live(){if(!root||!st||st.step!==3)return;const m=st.meas,sz=$q('#ppSize');
-  if(sz)sz.innerHTML=st.phase==='dims'?(m?`Photo: A–A <b>${f1(m.ab)}</b> mm · B–B <b>${f1(m.cd)}</b> mm`:''):partSize();
+  if(sz)sz.innerHTML=st.phase==='straight'?'':st.phase==='dims'?(m?`Photo: A–A <b>${f1(m.ab)}</b> mm · B–B <b>${f1(m.cd)}</b> mm`:''):partSize();
   const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;const df=$q('#ppDiff');if(df)df.innerHTML=cs.html;
-  const nb=$q('#ppNext');if(nb)nb.disabled=!(m&&cs.okAB);
+  const nb=$q('#ppNext');if(nb)nb.disabled=st.phase==='straight'?false:!(m&&cs.okAB);
   const u=$q('#ppUndo'),r=$q('#ppRedo');if(u)u.disabled=!st.undo.length;if(r)r.disabled=!st.redo.length;const dsel=$q('#ppDelSel');if(dsel)dsel.disabled=!(st.polyPx&&st.selV>=0&&st.polyPx.length>3);
-  const h=$q('#ppHint');if(h&&!/Could not/.test(h.textContent))h.textContent=(st.seg&&st.seg.trimmed&&st.tool==='detect'?'Shadow cut away automatically. ':'')+(st.tool==='detect'&&st.polyPx?'Is this the part? If not, tap another spot. ':'')+HINTS[st.tool]+(st.mir?'  Mirror is ON: fix one half, the other half follows. Press Mirror again to turn it off.':'')+(st.vw&&st.vw.k>1.05?'  Zoom x'+f1(st.vw.k)+'.':'  Scroll or pinch to zoom.');}
+  const h=$q('#ppHint');if(h&&!/Could not/.test(h.textContent))h.textContent=st.phase==='straight'?'':(st.seg&&st.seg.trimmed&&st.tool==='detect'?'Shadow cut away automatically. ':'')+(st.tool==='detect'&&st.polyPx?'Not the part? Tap another spot. ':'')+HINTS[st.tool]+(st.mir?'  Mirror ON: fix one half.':'')+(st.vw&&st.vw.k>1.05?'  Zoom x'+f1(st.vw.k)+'.':'');}
 function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.getContext('2d'),d=g.k,img=st.wcHi||st.wc;
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#e8e3d8';c.fillRect(0,0,g.W,g.H);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const o=g.toS(0,0);
@@ -11757,7 +11755,7 @@ if(st.lenSel!=null&&st.polyPx&&st.polyPx[st.lenSel]&&st.phase!=='dims'){const P=
     mk(a,'#16a34a','S','START');mk(b,'#dc2626','E','END');const ang=Math.atan2(b[1]-a[1],b[0]-a[0]),ex=b[0]-Math.cos(ang)*20*d,ey=b[1]-Math.sin(ang)*20*d,ah=14*d;c.fillStyle='#dc2626';c.beginPath();c.moveTo(ex+Math.cos(ang)*ah*0.5,ey+Math.sin(ang)*ah*0.5);c.lineTo(ex-Math.cos(ang)*ah*0.5-Math.sin(ang)*ah*0.6,ey-Math.sin(ang)*ah*0.5+Math.cos(ang)*ah*0.6);c.lineTo(ex-Math.cos(ang)*ah*0.5+Math.sin(ang)*ah*0.6,ey-Math.sin(ang)*ah*0.5-Math.cos(ang)*ah*0.6);c.closePath();c.fill();c.restore();}
   drawDims(c,g,d);
   if(st.tap&&st.tool==='detect'){const q=g.toS(st.tap[0],st.tap[1]);c.strokeStyle='#2f8f5b';c.lineWidth=3*d;c.beginPath();c.arc(q[0],q[1],9*d,0,7);c.stroke();}
-  if(!st.polyPx&&st.phase!=='dims'){const msg=st.autoBusy?'Finding the outline…':'Tap on your part to find its outline';c.font='bold '+(18*d)+'px sans-serif';const tw=c.measureText(msg).width+40*d,th=44*d,x0=(g.W-tw)/2,y0=g.H*0.05;c.fillStyle='rgba(29,42,68,.9)';c.beginPath();if(c.roundRect)c.roundRect(x0,y0,tw,th,12*d);else c.rect(x0,y0,tw,th);c.fill();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(msg,g.W/2,y0+th/2);}}
+  if(!st.polyPx&&st.phase==='outline'){const msg=st.autoBusy?'Finding the outline…':'Tap on your part to find its outline';c.font='bold '+(18*d)+'px sans-serif';const tw=c.measureText(msg).width+40*d,th=44*d,x0=(g.W-tw)/2,y0=g.H*0.05;c.fillStyle='rgba(29,42,68,.9)';c.beginPath();if(c.roundRect)c.roundRect(x0,y0,tw,th,12*d);else c.rect(x0,y0,tw,th);c.fill();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(msg,g.W/2,y0+th/2);}}
 
 /* ---------- SCREEN 4: height, name, 3D block ---------- */
 
