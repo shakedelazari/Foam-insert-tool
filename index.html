@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V4.1 — Shell-Case</title>
+<title>Foam Insert Tool V4.2 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V4.1 · 2 Nov 2026&#10;&#10;V4.1: Simpler. The Mirror box is removed (the Mirror button stays). The length window is Length, Angle and OK: the red end moves, the green start stays.&#10;&#10;V4.0: The cavity corner keeps the drawn radius. The sides move out by the clearance,&#10;the corner is rebuilt with (radius - clearance) but never below the tool radius.&#10;Example: drawn R4 and clearance 1.0 = cavity corner R4.0 (not R5.0). Also in the 3D view,&#10;the drawing, the DXF and the STEP.&#10;&#10;V3.9: STEP of drawn parts follows the drawing (exact outline, exact arcs)&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review with show/hide&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.1</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V4.2 · 2 Nov 2026&#10;&#10;V4.2: Finger access: notches show in the first preview (Top, Front, Side). New Rectangle notch with fillet (min R4), turn handle and Align to the part. Every notch can have its own depth (5 mm up to the cavity depth). Before leaving the Parts step the tool asks: Do you need finger access?&#10;&#10;V4.1: simpler Mirror and length window&#10;V4.0: cavity corner keeps the drawn radius&#10;V3.9: STEP of drawn parts follows the drawing&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.2</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -9573,11 +9573,12 @@ function circleLS(pts){let sx=0,sy=0,sxx=0,syy=0,sxy=0,sxz=0,syz=0,sz=0;const n=
   for(const p of pts){const x=p[0]-mx,y=p[1]-my,z=x*x+y*y;sx+=x;sy+=y;sxx+=x*x;syy+=y*y;sxy+=x*y;sxz+=x*z;syz+=y*z;sz+=z;}
   const A=sxx,B=sxy,C=syy,D=0.5*(sxz+0),E=0.5*syz;const det=A*C-B*B;if(Math.abs(det)<1e-12)return null;
   const a=(sxz/2*C-syz/2*B)/det,b=(A*syz/2-B*sxz/2)/det;const cx=a+mx,cy=b+my;let r=0;for(const p of pts)r+=Math.hypot(p[0]-cx,p[1]-cy);return {cx,cy,r:r/n};}
+let FIT_BP=null,FIT_BPL=[];
 function fitCanon(ring,tolL,tolA){
   tolL=tolL||FT.L;tolA=tolA||FT.A;let P=ring.slice();if(areaOf(P)<0)P.reverse();
   const n=P.length;let s0=0,bt=-1;for(let i=0;i<n;i++){const t=turnAt(P,i);if(t>bt+1e-9||(Math.abs(t-bt)<=1e-9&&(P[i][0]<P[s0][0]-1e-9||(Math.abs(P[i][0]-P[s0][0])<=1e-9&&P[i][1]<P[s0][1])))){bt=t;s0=i;}}
   if(bt<0.45){let bl=0,bi=-1;for(let i=0;i<n;i++){const a=P[i],b=P[(i+1)%n],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(l>bl){bl=l;bi=i;}}if(bi>=0&&bl>=6)s0=bi;}
-  const Q=P.slice(s0).concat(P.slice(0,s0)),G=k=>Q[k%n];
+  const Q=P.slice(s0).concat(P.slice(0,s0)),G=k=>Q[k%n],isBP=k=>FIT_BP!==null&&FIT_BP.has(Math.round(G(k)[0]*1000)+','+Math.round(G(k)[1]*1000));
   const lineOK=(s,e)=>{const a=G(s),b=G(e),dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1e-9;for(let k=s+1;k<e;k++){const p=G(k);if(Math.abs((p[0]-a[0])*dy-(p[1]-a[1])*dx)/l>tolL)return false;}return true;};
   const arcFit=(s,e)=>{const pts=[];for(let k=s;k<=e;k++)pts.push(G(k));if(pts.length<4)return null;
     const a=pts[0],b=pts[pts.length-1],mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);if(L<1e-6)return null;const nx=-dy/L,ny=dx/L,half=L/2;
@@ -9592,8 +9593,8 @@ function fitCanon(ring,tolL,tolA){
     let prev=Math.atan2(pts[0][1]-cy,pts[0][0]-cx);for(let k=1;k<pts.length;k++){const an=Math.atan2(pts[k][1]-cy,pts[k][0]-cx);let d=an-prev;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;if(d*sgn<=0)return null;sweep+=Math.abs(d);prev=an;}
     if(sweep>6.0||sweep<0.1)return null;return {cx,cy,r,ccw:sgn>0,sweep};};
   const prims=[];let s=0;
-  while(s<n){let eL=s+1;while(eL+1<=n&&lineOK(s,eL+1))eL++;
-    let eA=0,info=null;if(s+3<=n){let e=s+3;while(e<=n){const f=arcFit(s,e);if(!f)break;info=f;eA=e;e++;}}
+  while(s<n){let eL=s+1;while(eL+1<=n&&!isBP(eL)&&lineOK(s,eL+1))eL++;
+    let eA=0,info=null;if(s+3<=n&&!isBP(s+1)&&!isBP(s+2)){let e=s+3;while(e<=n){if(e>s+3&&isBP(e-1))break;const f=arcFit(s,e);if(!f)break;info=f;eA=e;e++;}}
     if(info&&eA>eL){prims.push({t:'A',p0:G(s),p1:G(eA),c:[info.cx,info.cy],r:info.r,ccw:info.ccw});s=eA;}else{prims.push({t:'L',p0:G(s),p1:G(eL)});s=eL;}}
   return prims;}
 function denseOf(prims,step){const out=[];for(const p of prims){if(p.t==='L'){out.push(p.p0);continue;}const a0=Math.atan2(p.p0[1]-p.c[1],p.p0[0]-p.c[0]),a1=Math.atan2(p.p1[1]-p.c[1],p.p1[0]-p.c[0]);let d=a1-a0;if(p.ccw){while(d<=0)d+=2*Math.PI;}else{while(d>=0)d-=2*Math.PI;}const n=Math.max(2,Math.ceil(Math.abs(d)*p.r/step));for(let k=0;k<n;k++){const a=a0+d*k/n;out.push([p.c[0]+p.r*Math.cos(a),p.c[1]+p.r*Math.sin(a)]);}}return out;}
@@ -9619,7 +9620,12 @@ function refinePrims(pr,shrink){const n=pr.length;if(n<3)return pr;const q=pr.ma
   for(const c of q){if(c.t!=='A')continue;if(Math.abs(c.r-S.set.toolR)<0.2)c.r=S.set.toolR;const rs=Math.round(c.r*10)/10,ch=Math.hypot(c.p1[0]-c.p0[0],c.p1[1]-c.p0[1]);if(Math.abs(c.r-rs)<0.06&&rs*2>ch+1e-6)c.r=rs;}
   return q;}
 const revPrim=p=>p.t==='L'?{t:'L',p0:p.p1,p1:p.p0}:{t:'A',p0:p.p1,p1:p.p0,c:p.c,r:p.r,ccw:!p.ccw};
-const _fc=new Map();function primsOf(ring,ccw){const key=ring.map(p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000)).sort().join(';');let c=_fc.get(key);if(!c){c=refinePrims(fitSafe(ring));_fc.set(key,c);if(_fc.size>400)_fc.delete(_fc.keys().next().value);}
+function insBP(ring){if(!FIT_BP)return ring;const out=[],n=ring.length,tol=0.004;
+  for(let i=0;i<n;i++){const a=ring[i],b=ring[(i+1)%n];out.push(a);const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(L2<1e-9)continue;const ins=[];
+    for(const p of FIT_BPL){const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;if(t<=0||t>=1)continue;const px=a[0]+t*dx-p[0],py=a[1]+t*dy-p[1];if(px*px+py*py>tol*tol)continue;if(Math.hypot(p[0]-a[0],p[1]-a[1])<tol||Math.hypot(p[0]-b[0],p[1]-b[1])<tol)continue;ins.push([t,p]);}
+    ins.sort((u,v)=>u[0]-v[0]);for(const q of ins)out.push([q[1][0],q[1][1]]);}
+  return out;}
+const _fc=new Map();function primsOf(ring,ccw){const key=ring.map(p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000)).sort().join(';');let c=_fc.get(key);if(!c){c=refinePrims(fitSafe(insBP(ring)));_fc.set(key,c);if(_fc.size>400)_fc.delete(_fc.keys().next().value);}
   return ccw?c:c.slice().reverse().map(revPrim);}
 function snapPrims(pr){const R=v=>Math.round(v*1000)/1000;const q=pr.map(e=>({...e,p0:[R(e.p0[0]),R(e.p0[1])],p1:[R(e.p1[0]),R(e.p1[1])]}));
   for(let i=0;i<q.length;i++)q[i].p0=q[(i+q.length-1)%q.length].p1;
@@ -9628,7 +9634,17 @@ function snapPrims(pr){const R=v=>Math.round(v*1000)/1000;const q=pr.map(e=>({..
 function rrPrims(L,W,R){R=Math.min(R,L/2,W/2);const P=[],ln=(a,b)=>{if(Math.hypot(b[0]-a[0],b[1]-a[1])>1e-6)P.push({t:'L',p0:a,p1:b});},ar=(a,b,c)=>P.push({t:'A',p0:a,p1:b,c,r:R,ccw:true});
   ln([R,0],[L-R,0]);ar([L-R,0],[L,R],[L-R,R]);ln([L,R],[L,W-R]);ar([L,W-R],[L-R,W],[L-R,W-R]);ln([L-R,W],[R,W]);ar([R,W],[0,W-R],[R,W-R]);ln([0,W-R],[0,R]);ar([0,R],[R,0],[R,R]);return P;}
 function dxfFromPrims(prims,layer){const out=['0\nLWPOLYLINE\n8\n'+layer+'\n90\n'+prims.length+'\n70\n1'];for(const p of prims){let b=0;if(p.t==='A'){const a0=Math.atan2(p.p0[1]-p.c[1],p.p0[0]-p.c[0]),a1=Math.atan2(p.p1[1]-p.c[1],p.p1[0]-p.c[0]);let d=a1-a0;if(p.ccw){while(d<=0)d+=2*Math.PI;}else{while(d>=0)d-=2*Math.PI;}b=Math.tan(d/4);}out.push('10\n'+p.p0[0].toFixed(4)+'\n20\n'+p.p0[1].toFixed(4)+'\n42\n'+b.toFixed(6));}return out;}
-function stepSolidArcs(name,outerPaths,levels,Hf,outerPrims,shell){
+function bpBuild(outerPaths,levels){const pts=new Map(),rs=[];
+  for(const o of polyTree(outerPaths,[],CL.ClipType.ctUnion))rs.push(o.outer,...o.holes);
+  for(const lv of levels)for(const o of polyTree(lv.paths,[],CL.ClipType.ctUnion))rs.push(o.outer,...o.holes);
+  for(const r of rs){try{for(const e of fitSafe(r))for(const p of [e.p0,e.p1])pts.set(Math.round(p[0]*1000)+','+Math.round(p[1]*1000),p);}catch(e){}}
+  FIT_BP=new Set(pts.keys());FIT_BPL=[...pts.values()];}
+function stepSolidArcs(...a){let r=null,err=null;try{r=stepSolidArcs0(...a);}catch(e){err=e;}
+  if(r&&!r.badEdges)return r;
+  if(a[2]&&a[2].length>1){_fc.clear();try{bpBuild(a[1],a[2]);r=stepSolidArcs0(...a);}catch(e){err=e;r=null;}finally{FIT_BP=null;FIT_BPL=[];_fc.clear();}
+    if(r&&!r.badEdges)return r;}
+  if(!r&&err)throw err;return r;}
+function stepSolidArcs0(name,outerPaths,levels,Hf,outerPrims,shell){
   const useShell=!!(shell&&Math.abs(shell.H-Hf)<0.01);
   if(!useShell&&outerPrims&&outerPrims.length){const sn=snapPrims(outerPrims),ring=sn.map(p=>p.p0);outerPaths=[toCL(ring)];_fc.set(ring.map(p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000)).sort().join(';'),sn);}
   const vid=new Map(),vp=[],edges=[],evt=new Map(),faces=[];
@@ -9754,18 +9770,28 @@ function evalLayout(f,entries){
   for(const q of per){const cv=q.cav,m=new Uint8Array(fm.w*fm.h);let outside=0;
     for(let j=0;j<cv.h;j++)for(let i=0;i<cv.w;i++){const k=j*cv.w+i;if(cv.D[k]<=0)continue;const X=q.x+i,Y=q.y+j;
       if(X<0||Y<0||X>=fm.w||Y>=fm.h){outside++;continue;}const z=Y*fm.w+X;if(!fm.m[z]){outside++;continue;}m[z]=1;if(cv.D[k]>D[z])D[z]=cv.D[k];}
-    for(const fg of (q.p.fingers||[])){if(!fgValid(q.p,fg))continue;const r=fingerRect(q,fg);for(let Y=Math.floor(r.y0);Y<Math.ceil(r.y1);Y++)for(let X=Math.floor(r.x0);X<Math.ceil(r.x1);X++){if(r.sh&&!inEll(r.sh,X+0.5,Y+0.5))continue;if(X<0||Y<0||X>=fm.w||Y>=fm.h||!fm.m[Y*fm.w+X]){outside++;continue;}const z=Y*fm.w+X;m[z]=1;const dd=cv.maxDepth;if(dd>D[z])D[z]=dd;}}
+    for(const fg of (q.p.fingers||[])){if(!fgValid(q.p,fg))continue;const r=fingerRect(q,fg);for(let Y=Math.floor(r.y0);Y<Math.ceil(r.y1);Y++)for(let X=Math.floor(r.x0);X<Math.ceil(r.x1);X++){if(r.sh&&!inEll(r.sh,X+0.5,Y+0.5))continue;if(X<0||Y<0||X>=fm.w||Y>=fm.h||!fm.m[Y*fm.w+X]){outside++;continue;}const z=Y*fm.w+X;m[z]=1;const dd=fgDep(fg,cv.maxDepth);if(dd>D[z])D[z]=dd;}}
     masks.push(m);out.push(outside);}
   return {f,Hf,fm,D,per,masks,out};
 }
 const SIDE_ORDER=['left','front','right','back'];
 function effSide(fg,zd){const k=((Math.round((zd-(fg.ang||0))/90)%4)+4)%4;return SIDE_ORDER[(SIDE_ORDER.indexOf(fg.side)+k)%4];}
 function fgValid(p,fg){return !fg.shape||fg.T===p.T;}
-function inEll(s,X,Y){const dx=X-s.cx,dy=Y-s.cy,c=Math.cos(s.rot*Math.PI/180),sn=Math.sin(s.rot*Math.PI/180),u=dx*c+dy*sn,v=-dx*sn+dy*c;return (u*u)/(s.a*s.a)+(v*v)/(s.b*s.b)<=1;}
-function ellPoly(s,N){N=N||96;const c=Math.cos(s.rot*Math.PI/180),sn=Math.sin(s.rot*Math.PI/180),o=[];for(let k=0;k<N;k++){const t=2*Math.PI*k/N,u=s.a*Math.cos(t),v=s.b*Math.sin(t);o.push([s.cx+u*c-v*sn,s.cy+u*sn+v*c]);}return o;}
+function inEll(s,X,Y){const dx=X-s.cx,dy=Y-s.cy,c=Math.cos(s.rot*Math.PI/180),sn=Math.sin(s.rot*Math.PI/180),u=dx*c+dy*sn,v=-dx*sn+dy*c;
+  if(s.rect){const au=Math.abs(u),av=Math.abs(v),r=Math.min(s.rad||0,s.a,s.b);if(au>s.a||av>s.b)return false;const ex=au-(s.a-r),ey=av-(s.b-r);if(ex>0&&ey>0)return ex*ex+ey*ey<=r*r;return true;}
+  return (u*u)/(s.a*s.a)+(v*v)/(s.b*s.b)<=1;}
+function rrPoly(s){const a=s.a,b=s.b,r=Math.max(0,Math.min(s.rad||0,a,b)),c=Math.cos(s.rot*Math.PI/180),sn=Math.sin(s.rot*Math.PI/180),loc=[],cr=[[a-r,b-r,0],[-(a-r),b-r,Math.PI/2],[-(a-r),-(b-r),Math.PI],[a-r,-(b-r),1.5*Math.PI]];
+  for(const [px,py,a0] of cr){if(r<0.01){loc.push([px,py]);continue;}const m=Math.max(3,Math.ceil((Math.PI/2)/0.12));for(let k=0;k<=m;k++){const q=a0+(Math.PI/2)*k/m;loc.push([px+r*Math.cos(q),py+r*Math.sin(q)]);}}
+  return loc.map(([u,v])=>[s.cx+u*c-v*sn,s.cy+u*sn+v*c]);}
+function fgDep(fg,full){const d=+fg.dep||0;return d>0?Math.min(full,Math.max(Math.min(5,full),d)):full;}
+function addNotchLevels(levels,rect,d,full){if(d>=full-0.05)return levels.map(l=>({depth:l.depth,paths:unionP(l.paths,rect)}));
+  const has=levels.some(l=>Math.abs(l.depth-d)<0.05),deeper=levels.find(l=>l.depth>=d-0.05),out=levels.map(l=>l.depth<=d+0.05?{depth:l.depth,paths:unionP(l.paths,rect)}:l);
+  if(!has){out.push({depth:d,paths:unionP(deeper?deeper.paths:[],rect)});out.sort((x,y)=>x.depth-y.depth);}return out;}
+function previewNotches(q,tt){const T=(tt===''||tt==null)?q.p.T:+tt,out=[];for(const fg of (q.p.fingers||[])){if(fg.shape?fg.T!==T:(tt!=null&&tt!==''))continue;const r=fingerRect(q,fg),rect=openP([toCL(r.sh?ellPoly(r.sh):[[r.x0,r.y0],[r.x1,r.y0],[r.x1,r.y1],[r.x0,r.y1]])],S.set.toolR*0.99);out.push({r,fg,rect,dep:fgDep(fg,q.cav.maxDepth)});}return out;}
+function ellPoly(s,N){if(s.rect)return rrPoly(s);N=N||96;const c=Math.cos(s.rot*Math.PI/180),sn=Math.sin(s.rot*Math.PI/180),o=[];for(let k=0;k<N;k++){const t=2*Math.PI*k/N,u=s.a*Math.cos(t),v=s.b*Math.sin(t);o.push([s.cx+u*c-v*sn,s.cy+u*sn+v*c]);}return o;}
 function shapeRect(q,fg,zd){const b=q.cav.bbox,cx0=q.x+(b[0]+b[2]+1)/2,cy0=q.y+(b[1]+b[3]+1)/2;if(!fgValid(q.p,fg))return {x0:cx0,x1:cx0,y0:cy0,y1:cy0};
   const z=zd!=null?zd:q.p.ang.z,k=(((Math.round((z-(fg.ang0||0))/90))%4)+4)%4;let ox=fg.ox,oy=fg.oy,rot=fg.rot||0;for(let i=0;i<k;i++){const t=ox;ox=-oy;oy=t;rot+=90;}
-  const sh={cx:cx0+ox,cy:cy0+oy,a:fg.a,b:fg.b,rot},c=Math.cos(rot*Math.PI/180),sn=Math.sin(rot*Math.PI/180),hx=Math.hypot(sh.a*c,sh.b*sn),hy=Math.hypot(sh.a*sn,sh.b*c);
+  const rc=fg.shape==='rect',sh={cx:cx0+ox,cy:cy0+oy,a:fg.a,b:fg.b,rot,rect:rc,rad:fg.rad||4,dep:fg.dep||0},c=Math.cos(rot*Math.PI/180),sn=Math.sin(rot*Math.PI/180),hx=rc?Math.abs(sh.a*c)+Math.abs(sh.b*sn):Math.hypot(sh.a*c,sh.b*sn),hy=rc?Math.abs(sh.a*sn)+Math.abs(sh.b*c):Math.hypot(sh.a*sn,sh.b*c);
   return {x0:sh.cx-hx,x1:sh.cx+hx,y0:sh.cy-hy,y1:sh.cy+hy,sh};}
 function fingerRect(q,fg,zd){if(fg.shape)return shapeRect(q,fg,zd);const side=effSide(fg,zd!=null?zd:q.p.ang.z),b=q.cav.bbox,w=fg.w||12,len=18,x0=q.x+b[0],x1=q.x+b[2]+1,y0=q.y+b[1],y1=q.y+b[3]+1,cx=(x0+x1)/2,cy=(y0+y1)/2;
   if(side==='left')return {x0:x0-len+3,x1:x0+3,y0:cy-w/2,y1:cy+w/2};if(side==='right')return {x0:x1-3,x1:x1+len-3,y0:cy-w/2,y1:cy+w/2};
@@ -9992,8 +10018,7 @@ function keepCornerR(paths,c){if(!(c>0.05)||S.set.keepR===false)return paths;con
 function composeVec(L2){
   const f=L2.f,outer=[toCL(normRing(ringOf(f),true))],parts=[];
   for(const q of L2.per){const v=vecPart(q);let levels=v.levels.map(l=>({depth:l.depth,paths:shiftP(l.paths,q.x,q.y)}));
-    for(const fg of q.p.fingers){if(!fgValid(q.p,fg))continue;const r=fingerRect(q,fg),rect=openP([toCL(r.sh?ellPoly(r.sh):[[r.x0,r.y0],[r.x1,r.y0],[r.x1,r.y1],[r.x0,r.y1]])],S.set.toolR*0.99);const full=q.cav.maxDepth;
-      levels=levels.map(l=>({depth:l.depth,paths:unionP(l.paths,rect)}));}
+    for(const fg of q.p.fingers){if(!fgValid(q.p,fg))continue;const r=fingerRect(q,fg),rect=openP([toCL(r.sh?ellPoly(r.sh):[[r.x0,r.y0],[r.x1,r.y0],[r.x1,r.y1],[r.x0,r.y1]])],S.set.toolR*0.99);levels=addNotchLevels(levels,rect,fgDep(fg,q.cav.maxDepth),q.cav.maxDepth);}
     parts.push({levels,tc:shiftP(v.tc,q.x,q.y)});}
   const raw=[...new Set(parts.flatMap(p=>p.levels.map(l=>Math.round(l.depth*100))))].sort((a,b)=>a-b).map(v=>v/100),depths=[],lowD=[];
   for(const d of raw){if(depths.length&&d-lowD[lowD.length-1]<0.25){depths[depths.length-1]=d;}else{depths.push(d);lowD.push(d);}}
@@ -10141,7 +10166,15 @@ async function go(n){
   if(n<1||n>6)return;if(S.step===1&&n===3){S.chosen=false;S.step=3;S.side='base';applySideFoam();syncWhere();recalc();renderAll();await autoPack();renderAll();return;}
   S.step=n;if(n<4||n===6)S.side='base';applySideFoam();syncWhere();recalc();if(n===4){S.view='top';S.fit3=true;S.dirty3=true;}renderAll();if(n===4)setTimeout(()=>{drawPanes();scheduleVec();},40);
 }
-function next(){if(S.step===1&&!S.parts.length)return;if(S.step===3&&!S.chosen)return;if(S.step===5){S.fitConfirmed=true;}go(S.step===1?3:S.step===4?6:S.step+1);}
+function fgAskShow(){const ids=[...new Set(S.parts.map(p=>p.gid))],key=ids.join(',');if(S.fgAskKey===key)return false;
+  const gs=ids.map(g=>S.parts.find(p=>p.gid===g)),without=gs.filter(p=>!(p.fingers||[]).some(f=>f.shape));if(!without.length)return false;S.fgAskKey=key;
+  const ov=document.createElement('div');ov.id='fgAsk';ov.style.cssText='position:fixed;inset:0;z-index:300;background:rgba(20,20,25,.55);display:flex;align-items:center;justify-content:center;padding:14px';
+  ov.innerHTML=`<div style="background:var(--panel,#fff);color:var(--ink,#222);border-radius:14px;max-width:540px;width:100%;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35);max-height:90vh;overflow:auto" role="dialog" aria-modal="true"><h3 style="margin:0 0 8px;font-size:20px">Do you need finger access?</h3><p style="margin:0 0 12px;font-size:14.5px;line-height:1.5">For easy operation, a <b>finger access</b> lets a finger reach under the part to lift it out. Use the <b>Finger access</b> tool of the part: round, oval or rectangle notches, full depth or a depth you choose.</p><div>${gs.map(p=>{const n=(p.fingers||[]).filter(f=>f.shape).length;return `<div style="display:flex;align-items:center;gap:10px;margin:7px 0;padding:8px 10px;border:1px solid var(--line,#ddd);border-radius:10px"><span style="flex:1;font-weight:600">${esc(p.name)}${n?` <span class="hint" style="font-weight:400">(${n} notch${n>1?'es':''} added)</span>`:''}</span><button class="btn primary sm" data-fgask="${p.gid}">Finger access</button></div>`;}).join('')}</div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button class="btn" id="fgAskStay">Stay here</button><button class="btn" id="fgAskNo">No, continue</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.onclick=e=>{const b=e.target.closest('[data-fgask]');if(b){ov.remove();window.PP.finger(b.dataset.fgask);return;}
+    if(e.target.id==='fgAskNo'){ov.remove();next();return;}if(e.target.id==='fgAskStay'||e.target===ov)ov.remove();};
+  return true;}
+function next(){if(S.step===1&&!S.parts.length)return;if(S.step===1&&fgAskShow())return;if(S.step===3&&!S.chosen)return;if(S.step===5){S.fitConfirmed=true;}go(S.step===1?3:S.step===4?6:S.step+1);}
 /* ---- screens ---- */
 function renderAll(){renderBar();renderFoot();$('#screen').hidden=S.step===4;$('#layout').hidden=S.step!==4;
   if(S.step===4){renderLayout();}else{$('#screen').innerHTML=[null,scr1,scr2,scr3,null,scr5,scr6][S.step]();if(S.step===1)drawPartCav();if(S.step===3)drawMinis();if(S.step===5)drawFitMinis();}
@@ -10207,7 +10240,8 @@ function drawPartCav(){
   $$('.cavblock').forEach(bl=>{
     const row=bl.closest('[data-gid]');if(!row)return;const p=S.parts.find(x=>x.gid===+row.dataset.gid),tt=bl.dataset.t,q=p&&partQ(p,tt===''||tt==null?null:+tt);if(!q)return;
     let vec;try{vec=vecPart(q);}catch(e){console.error('cavprev',e);return;}
-    const levels=vec.levels.map(l=>({depth:l.depth,paths:l.paths})),all=levels[0]?levels[0].paths:[];if(!all.length)return;
+    let levels=vec.levels.map(l=>({depth:l.depth,paths:l.paths}));const nts=previewNotches(q,tt);for(const n of nts)levels=addNotchLevels(levels,n.rect,n.dep,q.cav.maxDepth);const all=levels[0]?levels[0].paths:[];if(!all.length)return;
+    const nDepth=(x,y)=>{let m=0;for(const n of nts){const r=n.r;if(x+0.5<r.x0||x+0.5>r.x1||y+0.5<r.y0||y+0.5>r.y1)continue;if(r.sh&&!inEll(r.sh,x+0.5,y+0.5))continue;m=Math.max(m,n.dep);}return m;};
     let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const pa of all)for(const pt of pa){const x=pt.X/SC,y=pt.Y/SC;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
     const acc=cssv('--accent')||'#F05325',M=12,cavW=x1-x0,cavH=y1-y0,cav=q.cav,D=cav.D,w=cav.w,hh=cav.h,bb=cav.bbox,H=q.H,s=q.s,Hp=Math.ceil(H-s)+S.set.floor,c=q.c,FOAMV='#4a4542',PARTV='#1f9ea3';profiles(c);
     const cen=levels.map(l=>{let sx=0,sy=0,n=0;for(let j=0;j<hh;j++)for(let i=0;i<w;i++)if(Math.abs(D[j*w+i]-l.depth)<0.05){sx+=i+0.5;sy+=j+0.5;n++;}return n>25?[sx/n,sy/n]:null;});
@@ -10219,12 +10253,13 @@ function drawPartCav(){
       pathsDraw(g,levels[0].paths,X,Y);g.strokeStyle='rgba(255,255,255,0.9)';g.lineWidth=1.4;g.stroke();
       if(S.part3d){g.globalAlpha=0.94;g.fillStyle=PARTV;pathsDraw(g,silPaths(q.c),X,Y);g.fill('nonzero');g.globalAlpha=1;g.strokeStyle='#0f5a5d';g.lineWidth=1;g.stroke();}
       let lastY=-1e9;levels.forEach((l,i)=>{const cc=cen[i];if(!cc)return;let py=Y(cc[1]);if(Math.abs(py-lastY)<28)py=lastY+28;lastY=py;pillTxt(g,X(cc[0]),py,depthLines(l.depth),acc);});
+      for(const n of nts){if(n.dep>=q.cav.maxDepth-0.05)continue;const r=n.r,cx=r.sh?r.sh.cx:(r.x0+r.x1)/2,cy=r.sh?r.sh.cy:(r.y0+r.y1)/2;pillTxt(g,X(cx),Y(cy),depthLines(n.dep),acc);}
     }
     for(const view of ['front','side']){const front=view==='front',cv=bl.querySelector(`[data-cv="${view}"]`),g=cv.getContext('2d'),W=cv.width,Hh=cv.height;g.clearRect(0,0,W,Hh);
-      const a0=front?bb[0]:bb[1],a1=front?bb[2]:bb[3],len=a1-a0+1+2*M,i0=a0-M,sc=Math.min((W-26)/len,(Hh-30)/(Hp+Math.max(0,s))),ox=(W-len*sc)/2,Z=z=>Hh-16-z*sc,X=i=>ox+(i-i0)*sc;
-      const cut=front?Math.round((bb[1]+bb[3])/2):Math.round((bb[0]+bb[2])/2),arr=front?c.fp:c.sp,z0=Hp+s-H,along=front?w:hh;let dm=0;
-      g.fillStyle=FOAMV;for(let t=i0;t<i0+len;t++){let d=0;if(t>=0&&t<along)d=front?D[cut*w+t]:D[t*w+cut];dm=Math.max(dm,d);const top=Hp-d;g.fillRect(X(t),Z(top),sc+0.7,top*sc);}
-      g.fillStyle=acc;for(let t=i0;t<i0+len;t++){let d=0;if(t>=0&&t<along)d=front?D[cut*w+t]:D[t*w+cut];if(d>0)g.fillRect(X(t),Z(Hp),sc+0.7,d*sc+0.4);}
+      const a0=Math.min(front?bb[0]:bb[1],...nts.map(n=>Math.floor(front?n.r.x0:n.r.y0))),a1=Math.max(front?bb[2]:bb[3],...nts.map(n=>Math.ceil(front?n.r.x1:n.r.y1)-1)),len=a1-a0+1+2*M,i0=a0-M,sc=Math.min((W-26)/len,(Hh-30)/(Hp+Math.max(0,s))),ox=(W-len*sc)/2,Z=z=>Hh-16-z*sc,X=i=>ox+(i-i0)*sc;
+      const cut=front?Math.round((bb[1]+bb[3])/2):Math.round((bb[0]+bb[2])/2),arr=front?c.fp:c.sp,z0=Hp+s-H,along=front?w:hh;let dm=0;const Dg=t=>{let d=0;if(t>=0&&t<along)d=front?D[cut*w+t]:D[t*w+cut];return Math.max(d,front?nDepth(t,cut):nDepth(cut,t));};
+      g.fillStyle=FOAMV;for(let t=i0;t<i0+len;t++){let d=Dg(t);dm=Math.max(dm,d);const top=Hp-d;g.fillRect(X(t),Z(top),sc+0.7,top*sc);}
+      g.fillStyle=acc;for(let t=i0;t<i0+len;t++){let d=Dg(t);if(d>0)g.fillRect(X(t),Z(Hp),sc+0.7,d*sc+0.4);}
       if(S.part3d){g.fillStyle=PARTV;for(let t=i0;t<i0+len;t++){const e=arr[t];if(!e)continue;g.fillRect(X(t),Z(z0+e[1]),sc+0.7,(e[1]-e[0])*sc+0.5);}}
       g.setLineDash([4,3]);g.strokeStyle='#9a9aa2';g.beginPath();g.moveTo(X(i0),Z(Hp));g.lineTo(X(i0+len),Z(Hp));g.stroke();g.setLineDash([]);
       dm=cav.maxDepth;if(false){const xd=Math.min(W-30,X(Math.min(i0+len-2,a1+5)));g.strokeStyle=acc;g.lineWidth=2;g.beginPath();g.moveTo(xd,Z(Hp));g.lineTo(xd,Z(Hp-dm));g.stroke();for(const zz of[Hp,Hp-dm]){g.beginPath();g.moveTo(xd-5,Z(zz));g.lineTo(xd+5,Z(zz));g.stroke();}pillTxt(g,xd,(Z(Hp)+Z(Hp-dm))/2,depthLines(dm),acc);}}
@@ -10237,7 +10272,7 @@ function scr1(){const gs=groups();const small=p=>p.cur&&p.cur.cav&&p.cur.cav.nr.
   <div class="addtiles"><button class="addt" data-a="step"><span class="plusic">+</span><span class="tt"><b>Upload a STEP file</b></span></button><button class="addt${S.form==='lib'?' pick':''}" data-a="lib"><span class="plusic">+</span><span class="tt"><b>Add a simple shape</b></span></button><button class="addt" data-a="photo"><span class="plusic">+</span><span class="tt"><b>Trace a part (photo or sketch)</b></span></button></div>
   <input type="file" id="fileIn" accept=".step,.stp,.stl" multiple class="vis-hidden">
   ${S.form==='lib'?libPanel():''}
-  <div class="plist">${gs.length?gs.map(g=>{const p=g[0],open=S.open.has(p.gid),nf=allowedTs(p).length;return `<div class="prow2" data-gid="${p.gid}"><div class="phead" data-a="toggle"><img class="pthumb" src="${thumb(p)}" alt="${esc(p.name)}" width="56" height="56"><div class="pname"><b>${esc(p.name)}</b>${p.kind==='photo'?' <span class="badge">'+(p.photo&&p.photo.source==='sketch'?'Sketch':'From photo: estimate')+'</span>'+(p.photo&&p.photo.edit?` <button class="btn sm" data-a="editphoto" data-gid="${p.gid}" title="Open the outline again and fix it">Edit outline</button>`:''):''} <button class="btn sm" data-a="fingeracc" data-gid="${p.gid}" title="Add a round or oval finger notch in the foam next to this part">Finger access${(p.fingers||[]).filter(f=>f.shape).length?' ('+(p.fingers||[]).filter(f=>f.shape).length+')':''}</button>${g.length>1?` <span class="badge">× ${g.length}</span>`:''} <span class="hint">${sizeOf(p)}</span></div><span class="hdrctl"><span class="hc"><span class="hint">Place</span><div class="seg"><button data-place="base" aria-pressed="${(p.side||'base')==='base'}">Base</button><button data-place="lid" aria-pressed="${p.side==='lid'}">Lid</button></div></span><span class="hc"><span class="hint">Copies</span><input type="number" min="1" max="20" step="1" data-qty value="${g.length}" title="How many of this part (1 to 20)"></span></span><button class="btn sm tog${open?' on':''}" data-a="toggle" title="${open?'Close the options':'Set orientation, duplicates and allowances'}">${open?'▲ Hide':'▼ Show details'}</button><button class="btn ghost sm" data-a="del" title="Remove this part">✕</button></div>${open?body(p,g):''}</div>`;}).join(''):'<p class="hint">No parts yet. Use the buttons above to add your first part.</p>'}</div>`;}
+  <div class="plist">${gs.length?gs.map(g=>{const p=g[0],open=S.open.has(p.gid),nf=allowedTs(p).length;return `<div class="prow2" data-gid="${p.gid}"><div class="phead" data-a="toggle"><img class="pthumb" src="${thumb(p)}" alt="${esc(p.name)}" width="56" height="56"><div class="pname"><b>${esc(p.name)}</b>${p.kind==='photo'?' <span class="badge">'+(p.photo&&p.photo.source==='sketch'?'Sketch':'From photo: estimate')+'</span>'+(p.photo&&p.photo.edit?` <button class="btn sm" data-a="editphoto" data-gid="${p.gid}" title="Open the outline again and fix it">Edit outline</button>`:''):''} <button class="btn sm" data-a="fingeracc" data-gid="${p.gid}" style="border-color:var(--accent,#F05325);color:var(--accent,#F05325);font-weight:700" title="Add a round, oval or rectangle finger notch in the foam next to this part, so a finger can reach under it">Finger access${(p.fingers||[]).filter(f=>f.shape).length?' ('+(p.fingers||[]).filter(f=>f.shape).length+')':''}</button>${g.length>1?` <span class="badge">× ${g.length}</span>`:''} <span class="hint">${sizeOf(p)}</span></div><span class="hdrctl"><span class="hc"><span class="hint">Place</span><div class="seg"><button data-place="base" aria-pressed="${(p.side||'base')==='base'}">Base</button><button data-place="lid" aria-pressed="${p.side==='lid'}">Lid</button></div></span><span class="hc"><span class="hint">Copies</span><input type="number" min="1" max="20" step="1" data-qty value="${g.length}" title="How many of this part (1 to 20)"></span></span><button class="btn sm tog${open?' on':''}" data-a="toggle" title="${open?'Close the options':'Set orientation, duplicates and allowances'}">${open?'▲ Hide':'▼ Show details'}</button><button class="btn ghost sm" data-a="del" title="Remove this part">✕</button></div>${open?body(p,g):''}</div>`;}).join(''):'<p class="hint">No parts yet. Use the buttons above to add your first part.</p>'}</div>`;}
 function startPrev(p){const T=allowedTs(p)[0],R=mmul(TM[T],p.R0),key='_sp'+rkey(R);if(p[key])return p[key];
   const o=orientPos(p.sample||p.pos,R,1),m=o.pos,ex=o.ext,c=0.8660254,s=0.5,B=[ex[0]+44,ex[1]+44,Math.max(14,ex[2]*0.6)],off=[22,22,B[2]],P=(x,y,z)=>[(y-x)*c,-(x+y)*s-z];
   const faces=[[[[0,0,B[2]],[B[0],0,B[2]],[B[0],B[1],B[2]],[0,B[1],B[2]]],'#8a8380'],[[[0,0,0],[0,B[1],0],[0,B[1],B[2]],[0,0,B[2]]],'#4a4543'],[[[0,0,0],[B[0],0,0],[B[0],0,B[2]],[0,0,B[2]]],'#5f5956']];
@@ -11571,63 +11606,73 @@ function wire4(){
 let fs=null,froot=null;
 const fgMin=()=>2*(S.set.toolR||4)+0.4;
 function fgCavity(p){const c=getOriented(p,getR(p));return getCavity(p,c,c.o.ext[2],0);}
-function fgToCurrent(f,p){let ox=f.ox,oy=f.oy,rot=f.rot||0;const k=(((Math.round((p.ang.z-(f.ang0||0))/90))%4)+4)%4;for(let i=0;i<k;i++){const t=ox;ox=-oy;oy=t;rot+=90;}return {shape:f.shape,ox,oy,a:f.a,b:f.b,rot};}
+function fgToCurrent(f,p){let ox=f.ox,oy=f.oy,rot=f.rot||0;const k=(((Math.round((p.ang.z-(f.ang0||0))/90))%4)+4)%4;for(let i=0;i<k;i++){const t=ox;ox=-oy;oy=t;rot+=90;}return {shape:f.shape,ox,oy,a:f.a,b:f.b,rot,rad:f.rad,dep:f.dep};}
+function fgAxis(cav){let n=0,sx=0,sy=0,sxx=0,syy=0,sxy=0;for(let j=0;j<cav.h;j++)for(let i=0;i<cav.w;i++)if(cav.region[j*cav.w+i]){n++;sx+=i;sy+=j;sxx+=i*i;syy+=j*j;sxy+=i*j;}if(n<10)return 0;const mx=sx/n,my=sy/n;let a=0.5*Math.atan2(2*(sxy/n-mx*my),(sxx/n-mx*mx)-(syy/n-my*my))*180/Math.PI;a=Math.round(a*2)/2;const k=Math.round(a/90)*90;if(Math.abs(a-k)<2)a=k;return ((a%180)+180)%180;}
 function closeFinger(){if(froot){froot.remove();froot=null;}fs=null;}
 function openFinger(gid){const p=S.parts.find(q=>String(q.gid)===String(gid));if(!p)return;css();closeFinger();
   const cav=fgCavity(p),b=cav.bbox,cx=(b[0]+b[2]+1)/2,cy=(b[1]+b[3]+1)/2,regCv=document.createElement('canvas');regCv.width=cav.w;regCv.height=cav.h;
   {const g=regCv.getContext('2d'),id=g.createImageData(cav.w,cav.h);for(let i=0;i<cav.w*cav.h;i++)if(cav.region[i]){id.data[i*4]=240;id.data[i*4+1]=118;id.data[i*4+2]=66;id.data[i*4+3]=255;}g.putImageData(id,0,0);}
   fs={p,cav,cx,cy,bw:b[2]-b[0]+1,bh:b[3]-b[1]+1,regCv,sel:-1,grid:true,dims:true,z:0,px:0,py:0,items:(p.fingers||[]).filter(f=>f.shape&&f.T===p.T).map(f=>fgToCurrent(f,p))};
-  if(fs.items.length)fs.sel=0;
+  fs.axis=fgAxis(cav);if(fs.items.length)fs.sel=0;
   froot=document.createElement('div');froot.className='ppov';document.body.appendChild(froot);fgRender();}
 function fgRender(){const p=fs.p;
   froot.innerHTML=`<div class="ppbox wide full"><div class="pphd"><h3>Finger access: ${esc(p.name)}</h3><button class="btn sm" id="fgX">Close</button></div>
-   <div class="ppnote" style="margin:0 0 6px">Cut a <b>round or oval notch</b> in the foam next to the part, so a finger can reach under it. The notch goes to the full depth of the cavity. <b>The part, your drawing and its STEP do not change.</b></div>
+   <div class="ppnote" style="margin:0 0 6px">Cut a <b>round, oval or rectangle notch</b> in the foam next to the part, so a finger can reach under it. A notch goes to the full depth of the cavity, or to a smaller depth you type (5 mm or more). <b>The part, your drawing and its STEP do not change.</b></div>
    <div class="ppcol3"><div>
-    <div class="pptb"><button class="btn sm primary" id="fgAddC">＋ Circle</button><button class="btn sm primary" id="fgAddO">＋ Oval</button><span class="ppgap"></span><button class="btn sm" id="fgGrid" aria-pressed="${fs.grid}">▦ Grid</button><button class="btn sm" id="fgDim" aria-pressed="${fs.dims}">↔ Sizes</button><span class="ppgap"></span><span style="white-space:nowrap"><button class="btn sm" id="fgZm">−</button> <button class="btn sm" id="fgZf">Fit</button> <button class="btn sm" id="fgZp">+</button></span></div>
+    <div class="pptb"><button class="btn sm primary" id="fgAddC">＋ Circle</button><button class="btn sm primary" id="fgAddO">＋ Oval</button><button class="btn sm primary" id="fgAddR">＋ Rectangle</button><span class="ppgap"></span><button class="btn sm" id="fgGrid" aria-pressed="${fs.grid}">▦ Grid</button><button class="btn sm" id="fgDim" aria-pressed="${fs.dims}">↔ Sizes</button><span class="ppgap"></span><span style="white-space:nowrap"><button class="btn sm" id="fgZm">−</button> <button class="btn sm" id="fgZf">Fit</button> <button class="btn sm" id="fgZp">+</button></span></div>
     <div class="ppwrap"><canvas class="ppcv" id="fgCv" style="width:100%"></canvas></div>
-    <div class="ppnote">Orange = the cavity of the part. Blue = the finger notch. Drag a notch to move it, drag its dots to change the size. Wheel = zoom, drag the empty area = move the view.</div></div>
+    <div class="ppnote">Orange = the cavity of the part. Blue = the finger notch. Drag a notch to move it, drag the white dots to change the size, drag the green dot to turn it. Wheel = zoom, drag the empty area = move the view.</div></div>
    <div id="fgPanel"></div></div>
    <div class="ppft"><button class="btn" id="fgCancel">Cancel</button><button class="btn primary" id="fgApply">Apply to the foam</button></div></div>`;
   const q=s=>froot.querySelector(s);q('#fgX').onclick=q('#fgCancel').onclick=closeFinger;
-  q('#fgAddC').onclick=()=>fgAdd('circle');q('#fgAddO').onclick=()=>fgAdd('oval');
+  q('#fgAddC').onclick=()=>fgAdd('circle');q('#fgAddO').onclick=()=>fgAdd('oval');q('#fgAddR').onclick=()=>fgAdd('rect');
   q('#fgGrid').onclick=e=>{fs.grid=!fs.grid;e.currentTarget.setAttribute('aria-pressed',fs.grid);fgDraw();};q('#fgDim').onclick=e=>{fs.dims=!fs.dims;e.currentTarget.setAttribute('aria-pressed',fs.dims);fgDraw();};
   q('#fgZp').onclick=()=>{fs.z*=1.3;fgDraw();};q('#fgZm').onclick=()=>{fs.z/=1.3;fgDraw();};q('#fgZf').onclick=()=>{fgFit();fgDraw();};
   q('#fgApply').onclick=fgApply;
   const cv=q('#fgCv'),dpr=Math.min(2,window.devicePixelRatio||1),wrap=cv.parentElement,w=wrap.clientWidth||600,h=(wrap.clientHeight>260?wrap.clientHeight:Math.round(window.innerHeight*0.6));cv.style.width=w+'px';cv.style.height=h+'px';cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
   if(!fs.z)fgFit();fgBind(cv,dpr);fgPanel();fgDraw();}
 function fgFit(){const cv=froot.querySelector('#fgCv'),d=cv.width/cv.clientWidth,W=cv.clientWidth,H=cv.clientHeight;fs.z=Math.min(W/(fs.bw+70),H/(fs.bh+70));fs.px=0;fs.py=0;}
-function fgAdd(shape){const n=fs.items.length,ox=((n%3)-1)*24,it=shape==='circle'?{shape,ox,oy:-fs.bh/2,a:8,b:8,rot:0}:{shape,ox,oy:-fs.bh/2,a:13,b:7,rot:0};fs.items.push(it);fs.sel=fs.items.length-1;fgPanel();fgDraw();}
-function fgPanel(){const el=froot.querySelector('#fgPanel'),it=fs.items[fs.sel],mn=fgMin();
-  const lst=fs.items.map((f,i)=>`<button class="btn sm${i===fs.sel?' primary':''}" data-fi="${i}" style="margin:2px">${f.shape==='circle'?'Circle Ø'+f1(2*f.a):'Oval '+f1(2*f.a)+' × '+f1(2*f.b)}</button>`).join('');
-  let sel='';if(it){const circ=it.shape==='circle';
+function fgAdd(shape){const n=fs.items.length,ox=((n%3)-1)*24,ax=fs.axis||0;let it;
+  if(shape==='circle')it={shape,ox,oy:-fs.bh/2,a:8,b:8,rot:0,dep:0};else if(shape==='rect')it={shape,ox,oy:-fs.bh/2,a:14,b:8,rot:ax,rad:4,dep:0};else it={shape,ox,oy:-fs.bh/2,a:13,b:7,rot:0,dep:0};
+  fs.items.push(it);fs.sel=fs.items.length-1;fgPanel();fgDraw();}
+function fgPanel(){const el=froot.querySelector('#fgPanel'),it=fs.items[fs.sel],mn=fgMin(),full=Math.round(fs.cav.maxDepth*10)/10,rmin=S.set.toolR||4;
+  const nm=f=>f.shape==='circle'?'Circle Ø'+f1(2*f.a):(f.shape==='rect'?'Rectangle ':'Oval ')+f1(2*f.a)+' × '+f1(2*f.b);
+  const lst=fs.items.map((f,i)=>`<button class="btn sm${i===fs.sel?' primary':''}" data-fi="${i}" style="margin:2px">${nm(f)}${f.dep>0?' · '+f1(f.dep)+' deep':''}</button>`).join('');
+  let sel='';if(it){const circ=it.shape==='circle',rect=it.shape==='rect',dv=it.dep>0?it.dep:full;
     sel=`<div class="ppmsg ok" style="background:#eef3f7;margin-top:8px"><b>Selected notch</b>
-     <div class="ppflex" style="margin:6px 0"><div class="seg" id="fgShape"><button data-sh="circle" aria-pressed="${circ}">Circle</button><button data-sh="oval" aria-pressed="${!circ}">Oval</button></div></div>
-     ${circ?`<div class="ppfield"><span>Diameter (mm)</span><input id="fgD" type="number" step="0.5" min="${mn}" value="${f1(2*it.a)}"></div>`:`<div class="ppflex" style="margin:4px 0"><label style="flex:1;font-size:12px">Length (mm)<input id="fgL" type="number" step="0.5" min="${mn}" value="${f1(2*it.a)}" style="width:100%"></label><label style="flex:1;font-size:12px">Width (mm)<input id="fgW" type="number" step="0.5" min="${mn}" value="${f1(2*it.b)}" style="width:100%"></label></div><div class="ppfield"><span>Angle (°)</span><input id="fgA" type="number" step="5" value="${f1(it.rot%180)}"></div>`}
+     <div class="ppflex" style="margin:6px 0"><div class="seg" id="fgShape"><button data-sh="circle" aria-pressed="${circ}">Circle</button><button data-sh="oval" aria-pressed="${it.shape==='oval'}">Oval</button><button data-sh="rect" aria-pressed="${rect}">Rectangle</button></div></div>
+     ${circ?`<div class="ppfield"><span>Diameter (mm)</span><input id="fgD" type="number" step="0.5" min="${mn}" value="${f1(2*it.a)}"></div>`:`<div class="ppflex" style="margin:4px 0"><label style="flex:1;font-size:12px">Length (mm)<input id="fgL" type="number" step="0.5" min="${mn}" value="${f1(2*it.a)}" style="width:100%"></label><label style="flex:1;font-size:12px">Width (mm)<input id="fgW" type="number" step="0.5" min="${mn}" value="${f1(2*it.b)}" style="width:100%"></label></div>${rect?`<div class="ppfield"><span>Fillet radius (mm, min ${f1(rmin)})</span><input id="fgRd" type="number" step="0.5" min="${rmin}" value="${f1(it.rad||rmin)}"></div>`:''}<div class="ppfield"><span>Angle (°)</span><input id="fgA" type="number" step="1" value="${f1(it.rot%180)}"></div><div class="ppflex" style="margin:2px 0 6px"><button class="btn sm" id="fgAlign" title="Turn the notch to follow the direction of the cavity">Align to the part</button><button class="btn sm" id="fgR90">Turn 90°</button></div>`}
+     <div class="ppfield"><span>Depth (mm, 5 to ${f1(full)})</span><input id="fgDp" type="number" step="0.5" min="5" max="${full}" value="${f1(dv)}"></div><div class="ppflex" style="margin:2px 0 6px"><button class="btn sm" id="fgDpF">Full depth (${f1(full)} mm)</button></div>
      <div class="ppflex" style="margin:4px 0"><label style="flex:1;font-size:12px">X from the part centre (mm)<input id="fgX0" type="number" step="0.5" value="${f1(it.ox)}" style="width:100%"></label><label style="flex:1;font-size:12px">Y (mm)<input id="fgY0" type="number" step="0.5" value="${f1(it.oy)}" style="width:100%"></label></div>
      <div class="ppnote" style="margin:4px 0">Put the centre on the edge of the cavity:</div><div class="ppflex" style="margin:0 0 6px"><button class="btn sm" data-side="left">Left</button><button class="btn sm" data-side="right">Right</button><button class="btn sm" data-side="top">Top</button><button class="btn sm" data-side="bottom">Bottom</button></div>
      <button class="btn sm" id="fgDel" style="color:#b91c1c">Delete this notch</button></div>`;}
-  el.innerHTML=`<div class="ppmsg ok" style="background:#f6f2ea"><b>Finger notches</b> (${fs.items.length})<div style="margin-top:4px">${lst||'<div class="ppnote">No notch yet. Press <b>＋ Circle</b> or <b>＋ Oval</b>.</div>'}</div></div>${sel}<div class="ppnote" style="margin-top:8px">Smallest width: <b>${f1(mn)} mm</b>, because the CNC tool is Ø${f1(2*(S.set.toolR||4))}.</div>`;
+  el.innerHTML=`<div class="ppmsg ok" style="background:#f6f2ea"><b>Finger notches</b> (${fs.items.length})<div style="margin-top:4px">${lst||'<div class="ppnote">No notch yet. Press <b>＋ Circle</b>, <b>＋ Oval</b> or <b>＋ Rectangle</b>.</div>'}</div></div>${sel}<div class="ppnote" style="margin-top:8px">Smallest width: <b>${f1(mn)} mm</b> and smallest fillet: <b>R${f1(rmin)}</b>, because the CNC tool is Ø${f1(2*rmin)}.</div>`;
   el.onclick=e=>{const b=e.target.closest('[data-fi]');if(b){fs.sel=+b.dataset.fi;fgPanel();fgDraw();return;}
-    const sh=e.target.closest('[data-sh]');if(sh&&it){if(sh.dataset.sh==='circle'){const r=Math.max(it.a,it.b);it.shape='circle';it.a=it.b=r;it.rot=0;}else{it.shape='oval';it.a=it.a*1.5;}fgPanel();fgDraw();return;}
+    const sh=e.target.closest('[data-sh]');if(sh&&it){const k=sh.dataset.sh;if(k==='circle'){const r=Math.max(it.a,it.b);it.shape='circle';it.a=it.b=r;it.rot=0;}else if(k==='rect'){if(it.shape==='circle'){it.a=it.a*1.5;}it.shape='rect';it.rad=Math.max(rmin,Math.min(it.rad||rmin,it.a,it.b));if(it.rot===0)it.rot=fs.axis||0;}else{if(it.shape==='circle')it.a=it.a*1.5;it.shape='oval';}fgPanel();fgDraw();return;}
     const sd=e.target.closest('[data-side]');if(sd&&it){const s=sd.dataset.side;if(s==='left'){it.ox=-fs.bw/2;it.oy=0;}if(s==='right'){it.ox=fs.bw/2;it.oy=0;}if(s==='top'){it.ox=0;it.oy=-fs.bh/2;}if(s==='bottom'){it.ox=0;it.oy=fs.bh/2;}fgPanel();fgDraw();return;}
+    if(e.target.id==='fgAlign'&&it){it.rot=fs.axis||0;fgPanel();fgDraw();return;}
+    if(e.target.id==='fgR90'&&it){it.rot=(it.rot+90)%360;fgPanel();fgDraw();return;}
+    if(e.target.id==='fgDpF'&&it){it.dep=0;fgPanel();fgDraw();return;}
     if(e.target.id==='fgDel'&&it){fs.items.splice(fs.sel,1);fs.sel=fs.items.length?0:-1;fgPanel();fgDraw();}};
   const num=(id,fn)=>{const x=el.querySelector(id);if(x)x.oninput=ev=>{const v=parseFloat(ev.target.value);if(!isNaN(v)){fn(v);fgDraw();}};if(x)x.onchange=ev=>{const v=parseFloat(ev.target.value);if(!isNaN(v)){fn(v);fgPanel();fgDraw();}};};
-  if(it){num('#fgD',v=>{const r=Math.max(mn,v)/2;it.a=it.b=r;});num('#fgL',v=>{it.a=Math.max(mn,v)/2;});num('#fgW',v=>{it.b=Math.max(mn,v)/2;});num('#fgA',v=>{it.rot=v;});num('#fgX0',v=>{it.ox=v;});num('#fgY0',v=>{it.oy=v;});}}
-function fgSync(){const el=froot.querySelector('#fgPanel'),it=fs.items[fs.sel];if(!it)return;const set=(id,v)=>{const x=el.querySelector(id);if(x&&document.activeElement!==x)x.value=f1(v);};set('#fgD',2*it.a);set('#fgL',2*it.a);set('#fgW',2*it.b);set('#fgA',it.rot%180);set('#fgX0',it.ox);set('#fgY0',it.oy);}
+  const fix=()=>{if(it&&it.shape==='rect')it.rad=Math.max(rmin,Math.min(it.rad||rmin,it.a,it.b));};
+  if(it){num('#fgD',v=>{const r=Math.max(mn,v)/2;it.a=it.b=r;});num('#fgL',v=>{it.a=Math.max(mn,v)/2;fix();});num('#fgW',v=>{it.b=Math.max(mn,v)/2;fix();});num('#fgRd',v=>{it.rad=Math.max(rmin,Math.min(v,it.a,it.b));});num('#fgA',v=>{it.rot=v;});num('#fgX0',v=>{it.ox=v;});num('#fgY0',v=>{it.oy=v;});num('#fgDp',v=>{it.dep=v>=full-0.05?0:Math.max(5,Math.min(full,v));});}}
+function fgSync(){const el=froot.querySelector('#fgPanel'),it=fs.items[fs.sel];if(!it)return;const set=(id,v)=>{const x=el.querySelector(id);if(x&&document.activeElement!==x)x.value=f1(v);};set('#fgD',2*it.a);set('#fgL',2*it.a);set('#fgW',2*it.b);set('#fgA',it.rot%180);set('#fgX0',it.ox);set('#fgY0',it.oy);set('#fgRd',it.rad||4);}
 function fgBind(cv,dpr){let mode=null,grab=null,pan=null;const pos=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width/dpr,(e.clientY-r.top)*cv.height/r.height/dpr];};
   const W=()=>cv.clientWidth,H=()=>cv.clientHeight,toMm=(x,y)=>[(x-W()/2-fs.px)/fs.z,(y-H()/2-fs.py)/fs.z],toS=(mx,my)=>[W()/2+fs.px+mx*fs.z,H()/2+fs.py+my*fs.z];
   const hnd=it=>{const c=Math.cos(it.rot*Math.PI/180),s=Math.sin(it.rot*Math.PI/180);return {A:[it.ox+it.a*c,it.oy+it.a*s],B:[it.ox-it.b*s,it.oy+it.b*c]};};
   cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);const [x,y]=pos(e),m=toMm(x,y),it=fs.items[fs.sel];
-    if(it){const h=hnd(it),sa=toS(h.A[0],h.A[1]),sb=toS(h.B[0],h.B[1]);if(Math.hypot(sa[0]-x,sa[1]-y)<14){mode='ra';return;}if(it.shape==='oval'&&Math.hypot(sb[0]-x,sb[1]-y)<14){mode='rb';return;}}
-    for(let i=fs.items.length-1;i>=0;i--){const f=fs.items[i],c=Math.cos(f.rot*Math.PI/180),s=Math.sin(f.rot*Math.PI/180),dx=m[0]-f.ox,dy=m[1]-f.oy,u=dx*c+dy*s,v=-dx*s+dy*c;if((u*u)/(f.a*f.a)+(v*v)/(f.b*f.b)<=1){fs.sel=i;mode='move';grab=[m[0]-f.ox,m[1]-f.oy];fgPanel();fgDraw();return;}}
+    if(it){const h=hnd(it),sa=toS(h.A[0],h.A[1]),sb=toS(h.B[0],h.B[1]);const cr=Math.cos(it.rot*Math.PI/180),sr=Math.sin(it.rot*Math.PI/180);if(it.shape!=='circle'&&Math.hypot(sa[0]+cr*30-x,sa[1]+sr*30-y)<14){mode='rot';return;}if(Math.hypot(sa[0]-x,sa[1]-y)<14){mode='ra';return;}if(it.shape!=='circle'&&Math.hypot(sb[0]-x,sb[1]-y)<14){mode='rb';return;}}
+    for(let i=fs.items.length-1;i>=0;i--){const f=fs.items[i],c=Math.cos(f.rot*Math.PI/180),s=Math.sin(f.rot*Math.PI/180),dx=m[0]-f.ox,dy=m[1]-f.oy,u=dx*c+dy*s,v=-dx*s+dy*c;if(f.shape==='rect'?(Math.abs(u)<=f.a&&Math.abs(v)<=f.b):(u*u)/(f.a*f.a)+(v*v)/(f.b*f.b)<=1){fs.sel=i;mode='move';grab=[m[0]-f.ox,m[1]-f.oy];fgPanel();fgDraw();return;}}
     fs.sel=-1;mode='pan';pan=[x-fs.px,y-fs.py];fgPanel();fgDraw();};
   cv.onpointermove=e=>{if(!mode)return;const [x,y]=pos(e),m=toMm(x,y),it=fs.items[fs.sel],mn=fgMin()/2;
     if(mode==='pan'){fs.px=x-pan[0];fs.py=y-pan[1];fgDraw();return;}if(!it)return;
     if(mode==='move'){it.ox=Math.round((m[0]-grab[0])*2)/2;it.oy=Math.round((m[1]-grab[1])*2)/2;}
+    else if(mode==='rot'){let r=Math.round(Math.atan2(m[1]-it.oy,m[0]-it.ox)*180/Math.PI*2)/2;for(const k of [0,90,180,-90,-180])if(Math.abs(r-k)<3)r=k;it.rot=((r%360)+360)%360;}
     else{const c=Math.cos(it.rot*Math.PI/180),s=Math.sin(it.rot*Math.PI/180),dx=m[0]-it.ox,dy=m[1]-it.oy;
       if(mode==='ra'){const r=it.shape==='circle'?Math.hypot(dx,dy):dx*c+dy*s;it.a=Math.max(mn,Math.round(r*2)/2);if(it.shape==='circle')it.b=it.a;}
       if(mode==='rb'){const r=-dx*s+dy*c;it.b=Math.max(mn,Math.round(r*2)/2);}}
-    fgSync();fgDraw();};
+    if(it.shape==='rect')it.rad=Math.max(S.set.toolR||4,Math.min(it.rad||4,it.a,it.b));fgSync();fgDraw();};
   cv.onpointerup=cv.onpointercancel=()=>{mode=null;fgPanel();};
   cv.addEventListener('wheel',e=>{e.preventDefault();const [x,y]=pos(e),m=toMm(x,y),f=e.deltaY<0?1.15:1/1.15;fs.z=Math.max(0.3,Math.min(40,fs.z*f));fs.px=x-W()/2-m[0]*fs.z;fs.py=y-H()/2-m[1]*fs.z;fgDraw();},{passive:false});}
 function fgDraw(){const cv=froot&&froot.querySelector('#fgCv');if(!cv||!fs)return;const dpr=cv.width/cv.clientWidth,g=cv.getContext('2d'),W=cv.clientWidth,H=cv.clientHeight,z=fs.z;g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);g.fillStyle='#e4dfd2';g.fillRect(0,0,W,H);
@@ -11637,12 +11682,13 @@ function fgDraw(){const cv=froot&&froot.querySelector('#fgCv');if(!cv||!fs)retur
   g.imageSmoothingEnabled=false;g.globalAlpha=0.6;g.drawImage(fs.regCv,X(-fs.cx),Y(-fs.cy),fs.cav.w*z,fs.cav.h*z);g.globalAlpha=1;
   g.strokeStyle='#c2410c';g.lineWidth=1.5;g.setLineDash([6,4]);g.strokeRect(X(-fs.bw/2),Y(-fs.bh/2),fs.bw*z,fs.bh*z);g.setLineDash([]);
   if(fs.dims){g.font='bold 12px sans-serif';g.fillStyle='#7c2d12';g.textAlign='center';g.fillText(f1(fs.bw)+' mm',X(0),Y(-fs.bh/2)-6);g.save();g.translate(X(fs.bw/2)+14,Y(0));g.rotate(Math.PI/2);g.fillText(f1(fs.bh)+' mm',0,0);g.restore();}
-  fs.items.forEach((f,i)=>{const on=i===fs.sel,c=Math.cos(f.rot*Math.PI/180),s=Math.sin(f.rot*Math.PI/180);g.beginPath();for(let k=0;k<=72;k++){const t=2*Math.PI*k/72,u=f.a*Math.cos(t),v=f.b*Math.sin(t),px=X(f.ox+u*c-v*s),py=Y(f.oy+u*s+v*c);k?g.lineTo(px,py):g.moveTo(px,py);}g.closePath();g.fillStyle=on?'rgba(37,99,235,.35)':'rgba(37,99,235,.22)';g.fill();g.strokeStyle='#1d4ed8';g.lineWidth=on?3:2;g.stroke();
-    if(fs.dims){g.font='bold 12px sans-serif';const txt=f.shape==='circle'?'Ø'+f1(2*f.a)+' mm':f1(2*f.a)+' × '+f1(2*f.b)+' mm',tw=g.measureText(txt).width+10,cx=X(f.ox),cy=Y(f.oy);g.fillStyle='rgba(255,255,255,.92)';g.fillRect(cx-tw/2,cy-9,tw,18);g.fillStyle='#1d4ed8';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,cx,cy);}
-    if(on){const A=[X(f.ox+f.a*c),Y(f.oy+f.a*s)],B=[X(f.ox-f.b*s),Y(f.oy+f.b*c)];for(const q of (f.shape==='circle'?[A]:[A,B])){g.beginPath();g.arc(q[0],q[1],7,0,7);g.fillStyle='#fff';g.fill();g.strokeStyle='#1d4ed8';g.lineWidth=2.5;g.stroke();}}});}
-function fgApply(){const p=fs.p,arr=fs.items.map(it=>({shape:it.shape,ox:it.ox,oy:it.oy,a:it.a,b:it.b,rot:it.rot,ang0:p.ang.z,T:p.T})),keep=(p.fingers||[]).filter(f=>!f.shape);
+  fs.items.forEach((f,i)=>{const on=i===fs.sel,c=Math.cos(f.rot*Math.PI/180),s=Math.sin(f.rot*Math.PI/180);g.beginPath();if(f.shape==='rect'){rrPoly({cx:f.ox,cy:f.oy,a:f.a,b:f.b,rot:f.rot,rad:f.rad||4}).forEach((q,k)=>{k?g.lineTo(X(q[0]),Y(q[1])):g.moveTo(X(q[0]),Y(q[1]));});}else{for(let k=0;k<=72;k++){const t=2*Math.PI*k/72,u=f.a*Math.cos(t),v=f.b*Math.sin(t),px=X(f.ox+u*c-v*s),py=Y(f.oy+u*s+v*c);k?g.lineTo(px,py):g.moveTo(px,py);}}g.closePath();g.fillStyle=on?'rgba(37,99,235,.35)':'rgba(37,99,235,.22)';g.fill();g.strokeStyle='#1d4ed8';g.lineWidth=on?3:2;g.stroke();
+    if(fs.dims){g.font='bold 12px sans-serif';const txt=(f.shape==='circle'?'Ø'+f1(2*f.a)+' mm':f1(2*f.a)+' × '+f1(2*f.b)+' mm'+(f.shape==='rect'?'  R'+f1(f.rad||4):''))+(f.dep>0?'  ·  '+f1(f.dep)+' deep':''),tw=g.measureText(txt).width+10,cx=X(f.ox),cy=Y(f.oy);g.fillStyle='rgba(255,255,255,.92)';g.fillRect(cx-tw/2,cy-9,tw,18);g.fillStyle='#1d4ed8';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,cx,cy);}
+    if(on){const A=[X(f.ox+f.a*c),Y(f.oy+f.a*s)],B=[X(f.ox-f.b*s),Y(f.oy+f.b*c)];for(const q of (f.shape==='circle'?[A]:[A,B])){g.beginPath();g.arc(q[0],q[1],7,0,7);g.fillStyle='#fff';g.fill();g.strokeStyle='#1d4ed8';g.lineWidth=2.5;g.stroke();}
+    if(f.shape!=='circle'){const R=[A[0]+c*30,A[1]+s*30];g.beginPath();g.moveTo(A[0],A[1]);g.lineTo(R[0],R[1]);g.strokeStyle='#15803d';g.lineWidth=2;g.stroke();g.beginPath();g.arc(R[0],R[1],8,0,7);g.fillStyle='#16a34a';g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();g.fillStyle='#fff';g.font='bold 11px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('⟳',R[0],R[1]+1);}}});}
+function fgApply(){const p=fs.p,arr=fs.items.map(it=>({shape:it.shape,ox:it.ox,oy:it.oy,a:it.a,b:it.b,rot:it.rot,rad:it.shape==='rect'?Math.max(S.set.toolR||4,Math.min(it.rad||4,it.a,it.b)):undefined,dep:it.dep>0?it.dep:0,ang0:p.ang.z,T:p.T})),keep=(p.fingers||[]).filter(f=>!f.shape);
   if(!p.fingers)p.fingers=[];p.fingers.splice(0,p.fingers.length,...keep,...arr);for(const q of S.parts)if(q.gid===p.gid)q.fingers=p.fingers;
-  closeFinger();S.ladder=null;S.custom=null;if(S.vecC)S.vecC.clear();renderAll();toast(arr.length?'Finger notches saved ('+arr.length+'). Check them in the layout.':'Finger notches removed.');}
+  closeFinger();S.ladder=null;S.custom=null;if(S.vecC)S.vecC.clear();renderAll();toast(arr.length?'Finger notches saved ('+arr.length+'). They show in the part preview and in the layout.':'Finger notches removed.');}
 
 function doTap(x,y,noSnap){if(!noSnap)snap();st.tap=[x,y];const r=segment(x,y);if(r&&st.trim===true){const t=trimShadow(r.mask);if(t){r.mask=t.mask;r.trimmed=t.removedArea;}}
   if(!r){st.seg=null;st.loop=null;st.polyPx=null;st.poly=null;st.meas=null;st.tool='detect';render();const m=$q('#ppHint');if(m)m.textContent='Could not find the part there. Tap the middle of the part, or set Detection to More.';return;}
