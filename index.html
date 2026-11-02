@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V4.0 — Shell-Case</title>
+<title>Foam Insert Tool V4.1 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V4.0 · 2 Nov 2026&#10;&#10;V4.0: The cavity corner keeps the drawn radius. The sides move out by the clearance,&#10;the corner is rebuilt with (radius - clearance) but never below the tool radius.&#10;Example: drawn R4 and clearance 1.0 = cavity corner R4.0 (not R5.0). Also in the 3D view,&#10;the drawing, the DXF and the STEP.&#10;&#10;V3.9: STEP of drawn parts follows the drawing (exact outline, exact arcs)&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review with show/hide&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.0</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V4.1 · 2 Nov 2026&#10;&#10;V4.1: Simpler. The Mirror box is removed (the Mirror button stays). The length window is Length, Angle and OK: the red end moves, the green start stays.&#10;&#10;V4.0: The cavity corner keeps the drawn radius. The sides move out by the clearance,&#10;the corner is rebuilt with (radius - clearance) but never below the tool radius.&#10;Example: drawn R4 and clearance 1.0 = cavity corner R4.0 (not R5.0). Also in the 3D view,&#10;the drawing, the DXF and the STEP.&#10;&#10;V3.9: STEP of drawn parts follows the drawing (exact outline, exact arcs)&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review with show/hide&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.1</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -11467,7 +11467,7 @@ function openRadPop(i){closePops();const P=st.polyPx;if(!P||!P[i])return;st.selV
   upd();setTimeout(()=>{v.focus();v.select();},30);}
 /* type the length of a straight line */
 
-const mirBox=()=>st.mir?`<div class="ppmsg ok" style="background:#eef3f7;margin-top:8px"><b>⇋ Mirror is ON</b><div class="ppnote">Fix one half. The other half follows, so you see the result on the photo. Drag the grey handles at the ends of the dashed line to put the mirror line in the middle of the part.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppMirL">Edit the left half</button><button class="btn sm" id="ppMirR">Edit the right half</button></div><button class="btn sm" id="ppMirOff">Turn Mirror off</button></div>`:`<div class="ppnote" style="margin-top:8px">The part is symmetrical? Press <b>⇋ Mirror</b> and fix only half of it.</div>`;
+const mirBox=()=>'';const mirBoxOld=()=>st.mir?`<div class="ppmsg ok" style="background:#eef3f7;margin-top:8px"><b>⇋ Mirror is ON</b><div class="ppnote">Fix one half. The other half follows, so you see the result on the photo. Drag the grey handles at the ends of the dashed line to put the mirror line in the middle of the part.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppMirL">Edit the left half</button><button class="btn sm" id="ppMirR">Edit the right half</button></div><button class="btn sm" id="ppMirOff">Turn Mirror off</button></div>`:`<div class="ppnote" style="margin-top:8px">The part is symmetrical? Press <b>⇋ Mirror</b> and fix only half of it.</div>`;
 function roundPanel(){const mn=minR();
   if(st.tool==='curve')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Curve</b><div class="ppnote">• <b>Press on a line</b> between two points and <b>pull</b> it. The curve follows your finger or mouse.<br>• Drag the <b style="color:#2b7cff">blue dot</b> to change the shape (it does not have to be symmetric).<br>• <b>Double-click</b> a curved line to make it straight again.<br>• The points stay where they are.</div></div>`+mirBox();
   if(st.tool==='radius')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Radius</b><div class="ppnote">• <b>Click a point</b> to set its radius.<br>• <b>Inside corners</b> of the cavity (where the tool cannot reach) need <b>R${f1(mn)}</b> or more.<br>• <b>Outside corners</b> can stay sharp (90°).</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all inside corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>`+mirBox();
@@ -11514,12 +11514,12 @@ function closePops(){['ppRadPop','ppDimPop'].forEach(id=>{const e=$q('#'+id);if(
 function openLenPop(i){closePops();const P=st.polyPx,n=P.length,p=P[i];if(!p||hasCurve(p))return;st.lenSel=i;draw3();const g=G(),r=g.cv.getBoundingClientRect(),mm=segMid(P,i),qq=g.toS(mm[0],mm[1]),j=(i+1)%n;
   const pop=document.createElement('div');pop.id='ppDimPop';pop.className='ppradpop';pop.style.width='340px';
   pop.innerHTML=`<button class="btn sm" id="ppLnX" style="float:right" title="Close">✕</button><b>Line ${i+1}–${j+1}</b>
-   <div class="ppnote" style="margin:4px 0 8px"><span style="color:#16a34a;font-weight:700">● START = point ${i+1} (green)</span><br><span style="color:#dc2626;font-weight:700">● END = point ${j+1} (red)</span><br>Both points are marked on the drawing.</div>
+   <div class="ppnote" style="margin:4px 0 8px">Type the new length. The <span style="color:#dc2626;font-weight:700">red end</span> moves, the <span style="color:#16a34a;font-weight:700">green start</span> stays.</div>
    <div class="ppflex" style="margin:0"><label style="flex:1;font-size:12px">Length (mm)<input id="ppLnV" type="number" step="0.1" style="width:100%"></label><label style="flex:1;font-size:12px">Angle (°)<input id="ppLnA" type="number" step="0.1" min="0" max="90" style="width:100%"></label></div>
    <div class="ppnote" style="margin:4px 0">Angle: 0° is horizontal, 90° is vertical. The line keeps its direction.</div>
-   <div class="ppflex" style="margin:2px 0 6px"><button class="btn sm" id="ppAg0">0°</button><button class="btn sm" id="ppAg45">45°</button><button class="btn sm" id="ppAg90">90°</button></div>
-   <div class="ppnote" style="margin:4px 0"><b>Which point should move?</b> The other one stays.</div>
-   <div class="ppflex" style="margin:0"><button class="btn sm" id="ppLnS" style="background:#16a34a;color:#fff;border-color:#16a34a">Move the START point</button><button class="btn sm" id="ppLnE" style="background:#dc2626;color:#fff;border-color:#dc2626">Move the END point</button></div>
+   
+   
+   <div class="ppflex" style="margin:0"><button class="btn primary sm" id="ppLnOk">OK</button></div>
    <div class="ppnote" id="ppLnMsg" style="margin:6px 0"></div>`;
   root.appendChild(pop);popPos(pop,r.left+qq[0]/g.k,r.top+qq[1]/g.k);
   const vL=pop.querySelector('#ppLnV'),vA=pop.querySelector('#ppLnA'),msg=pop.querySelector('#ppLnMsg'),cl=v=>Math.max(0,Math.min(v,1e9));
@@ -11528,9 +11528,9 @@ function openLenPop(i){closePops();const P=st.polyPx,n=P.length,p=P[i];if(!p||ha
     const a=P[i],b=P[j],ka=st.k||1,kc=st.kcd>0?st.kcd:ka,dx=(b[0]-a[0])*ka/PPM,dy=(b[1]-a[1])*kc/PPM,sx=dx<0?-1:1,sy=dy>0?1:-1,th=A*Math.PI/180,dxp=sx*L*Math.cos(th)/ka*PPM,dyp=sy*L*Math.sin(th)/kc*PPM;snap();
     if(which==='end'){b[0]=Math.max(0,Math.min(st.ww,a[0]+dxp));b[1]=Math.max(0,Math.min(st.wh,a[1]+dyp));if(st.mir)mirrorSync(j);}else{a[0]=Math.max(0,Math.min(st.ww,b[0]-dxp));a[1]=Math.max(0,Math.min(st.wh,b[1]-dyp));if(st.mir)mirrorSync(i);}
     syncPoly();draw3();live();msg.textContent='Done. Length '+f1(lenMm(P[i],P[j]))+' mm, angle '+f1(angMm(P[i],P[j]))+'°.';fill();};
-  pop.querySelector('#ppLnS').onclick=()=>apply('start');pop.querySelector('#ppLnE').onclick=()=>apply('end');pop.querySelector('#ppLnX').onclick=closePops;
-  [['#ppAg0',0],['#ppAg45',45],['#ppAg90',90]].forEach(([id,v])=>{pop.querySelector(id).onclick=()=>{vA.value=v;};});
-  [vL,vA].forEach(x=>{x.onkeydown=ev=>{if(ev.key==='Enter')apply('end');};});
+  pop.querySelector('#ppLnOk').onclick=()=>{apply('end');if(/^Done/.test(msg.textContent))closePops();};pop.querySelector('#ppLnX').onclick=closePops;
+  
+  [vL,vA].forEach(x=>{x.onkeydown=ev=>{if(ev.key==='Enter'){apply('end');if(/^Done/.test(msg.textContent))closePops();}};});
   setTimeout(()=>{vL.focus();vL.select();},30);}
 /* the final check: the outline on the photo with the sizes, and show or hide each */
 function drawReview(){const cv=$q('#ppRev');if(!cv||!st.polyPx)return;const W=cv.width,Hh=cv.height,g=cv.getContext('2d');g.clearRect(0,0,W,Hh);g.fillStyle='#f6f3ec';g.fillRect(0,0,W,Hh);
@@ -11665,7 +11665,7 @@ function live(){if(!root||!st||st.step!==3)return;const m=st.meas,sz=$q('#ppSize
   const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;const df=$q('#ppDiff');if(df)df.innerHTML=cs.html;
   const nb=$q('#ppNext');if(nb)nb.disabled=!(m&&cs.okAB);
   const u=$q('#ppUndo'),r=$q('#ppRedo');if(u)u.disabled=!st.undo.length;if(r)r.disabled=!st.redo.length;const dsel=$q('#ppDelSel');if(dsel)dsel.disabled=!(st.polyPx&&st.selV>=0&&st.polyPx.length>3);
-  const h=$q('#ppHint');if(h&&!/Could not/.test(h.textContent))h.textContent=(st.seg&&st.seg.trimmed&&st.tool==='detect'?'Shadow cut away automatically. ':'')+(st.tool==='detect'&&st.polyPx?'Is this the part? If not, tap another spot. ':'')+HINTS[st.tool]+(st.vw&&st.vw.k>1.05?'  Zoom x'+f1(st.vw.k)+'.':'  Scroll or pinch to zoom.');}
+  const h=$q('#ppHint');if(h&&!/Could not/.test(h.textContent))h.textContent=(st.seg&&st.seg.trimmed&&st.tool==='detect'?'Shadow cut away automatically. ':'')+(st.tool==='detect'&&st.polyPx?'Is this the part? If not, tap another spot. ':'')+HINTS[st.tool]+(st.mir?'  Mirror is ON: fix one half, the other half follows. Press Mirror again to turn it off.':'')+(st.vw&&st.vw.k>1.05?'  Zoom x'+f1(st.vw.k)+'.':'  Scroll or pinch to zoom.');}
 function draw3(){const cv=$q('#ppWarp');if(!cv||!st.vw)return;const g=G(),c=cv.getContext('2d'),d=g.k,img=st.wcHi||st.wc;
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#e8e3d8';c.fillRect(0,0,g.W,g.H);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   const o=g.toS(0,0);
