@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V3.9 — Shell-Case</title>
+<title>Foam Insert Tool V4.0 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V3.9 · 2 Nov 2026&#10;&#10;V3.9: STEP export of drawn parts follows the drawing: the cavity comes from the exact outline&#10;(no pixel picture, no smoothing). Corners are exact tangent arcs (R drawn + clearance,&#10;for example R4 + 1 = R5.0, each 90.0 deg), straight sides are one straight edge, a curve&#10;is one arc. Same fix for the start point of the outline.&#10;&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review with show/hide&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V3.9</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V4.0 · 2 Nov 2026&#10;&#10;V4.0: The cavity corner keeps the drawn radius. The sides move out by the clearance,&#10;the corner is rebuilt with (radius - clearance) but never below the tool radius.&#10;Example: drawn R4 and clearance 1.0 = cavity corner R4.0 (not R5.0). Also in the 3D view,&#10;the drawing, the DXF and the STEP.&#10;&#10;V3.9: STEP of drawn parts follows the drawing (exact outline, exact arcs)&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review with show/hide&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.0</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -9602,20 +9602,21 @@ function fitSafe(ring){let P=ring.slice();if(areaOf(P)<0)P.reverse();const a0=Ma
   for(const [l,a] of FIT_SETS){const pr=fitCanon(P,l,a);last=pr;const d=denseOf(pr,0.15),sp=CL.Clipper.SimplifyPolygon(toCL(d),CL.PolyFillType.pftNonZero),drift=Math.abs(Math.abs(areaOf(d))-a0);
     if(sp.length===1&&drift<=Math.max(0.5,0.002*a0))return pr;}
   return last;}
-function refinePrims(pr){const n=pr.length;if(n<3)return pr;const q=pr.map(e=>({...e,p0:e.p0.slice(),p1:e.p1.slice()}));
+function refinePrims(pr,shrink){const n=pr.length;if(n<3)return pr;const q=pr.map(e=>({...e,p0:e.p0.slice(),p1:e.p1.slice()}));
   const dirOf=e=>{const dx=e.p1[0]-e.p0[0],dy=e.p1[1]-e.p0[1],l=Math.hypot(dx,dy)||1e-9;return [dx/l,dy/l,l];};
   for(let i=0;i<n;i++){const a=q[(i-1+n)%n],c=q[i],b=q[(i+1)%n];if(c.t!=='A'||a.t!=='L'||b.t!=='L')continue;
     const d1=dirOf(a),d2=dirOf(b),cr=d1[0]*d2[1]-d1[1]*d2[0],dt=d1[0]*d2[0]+d1[1]*d2[1],al=Math.atan2(Math.abs(cr),dt);
     if(al<8*Math.PI/180||al>172*Math.PI/180||(cr>0)!==c.ccw)continue;
-    let r=c.r;const rs=Math.round(r*10)/10;if(Math.abs(r-rs)<0.06)r=rs;
+    let r=c.r;const rs=Math.round(r*10)/10;if(Math.abs(r-rs)<0.06)r=rs;let sh=false;if(shrink&&c.ccw){const rn=Math.max(r-shrink,S.set.toolR);if(rn<r-0.01){r=rn;sh=true;}}
     const det=-d1[0]*d2[1]+d1[1]*d2[0];if(Math.abs(det)<1e-9)continue;
     const rx=b.p0[0]-a.p0[0],ry=b.p0[1]-a.p0[1],s=(-rx*d2[1]+ry*d2[0])/det,V=[a.p0[0]+d1[0]*s,a.p0[1]+d1[1]*s],t=r*Math.tan(al/2);
     const w=(b.p0[0]-V[0])*d2[0]+(b.p0[1]-V[1])*d2[1];if(s-t<0.05||t>w+d2[2]-0.05)continue;
     const T1=[V[0]-d1[0]*t,V[1]-d1[1]*t],T2=[V[0]+d2[0]*t,V[1]+d2[1]*t];
-    if(Math.hypot(T1[0]-c.p0[0],T1[1]-c.p0[1])>0.35||Math.hypot(T2[0]-c.p1[0],T2[1]-c.p1[1])>0.35)continue;
+    const tg=(pt,cc,cw)=>{const rx=pt[0]-cc[0],ry=pt[1]-cc[1],l=Math.hypot(rx,ry)||1;return cw?[-ry/l,rx/l]:[ry/l,-rx/l];},an=(u,v)=>Math.acos(Math.max(-1,Math.min(1,u[0]*v[0]+u[1]*v[1])))*180/Math.PI;
+    if(an(tg(c.p0,c.c,c.ccw),d1)>16||an(tg(c.p1,c.c,c.ccw),d2)>16)continue;const dev=1.2+(sh?shrink*Math.tan(al/2):0);if(Math.hypot(T1[0]-c.p0[0],T1[1]-c.p0[1])>dev||Math.hypot(T2[0]-c.p1[0],T2[1]-c.p1[1])>dev)continue;
     const nx=cr>0?-d1[1]:d1[1],ny=cr>0?d1[0]:-d1[0];
     a.p1=T1;c.p0=T1.slice();c.p1=T2;c.c=[T1[0]+nx*r,T1[1]+ny*r];c.r=r;b.p0=T2.slice();}
-  for(const c of q){if(c.t!=='A')continue;const rs=Math.round(c.r*10)/10,ch=Math.hypot(c.p1[0]-c.p0[0],c.p1[1]-c.p0[1]);if(Math.abs(c.r-rs)<0.06&&rs*2>ch+1e-6)c.r=rs;}
+  for(const c of q){if(c.t!=='A')continue;if(Math.abs(c.r-S.set.toolR)<0.2)c.r=S.set.toolR;const rs=Math.round(c.r*10)/10,ch=Math.hypot(c.p1[0]-c.p0[0],c.p1[1]-c.p0[1]);if(Math.abs(c.r-rs)<0.06&&rs*2>ch+1e-6)c.r=rs;}
   return q;}
 const revPrim=p=>p.t==='L'?{t:'L',p0:p.p1,p1:p.p0}:{t:'A',p0:p.p1,p1:p.p0,c:p.c,r:p.r,ccw:!p.ccw};
 const _fc=new Map();function primsOf(ring,ccw){const key=ring.map(p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000)).sort().join(';');let c=_fc.get(key);if(!c){c=refinePrims(fitSafe(ring));_fc.set(key,c);if(_fc.size>400)_fc.delete(_fc.keys().next().value);}
@@ -9983,6 +9984,11 @@ function vecPart(q){const p=q.p,c=q.c,H=q.H,s=q.s,c0=p.c0!=null?p.c0:S.set.c0,c1
   r={levels:lv.levels.map((d,j)=>({depth:d,paths:T[j]})),tc};S.vecC.set(key,r);if(S.vecC.size>80)S.vecC.delete(S.vecC.keys().next().value);return r;}
 const shiftP=(paths,dx,dy)=>paths.map(pa=>pa.map(pt=>({X:pt.X+Math.round(dx*SC),Y:pt.Y+Math.round(dy*SC)})));
 const cleanP=(paths,minOut,minHole)=>paths.filter(pa=>{const a=CL.Clipper.Area(pa)/(SC*SC);return a>=0?a>=minOut:-a>=minHole;});
+function keepCornerR(paths,c){if(!(c>0.05)||S.set.keepR===false)return paths;const out=[];
+  for(const pa of paths){if(CL.Clipper.Area(pa)<=0){out.push(pa);continue;}const ring=fromCL(pa);if(ring.length<8){out.push(pa);continue;}
+    let pr;try{pr=refinePrims(fitSafe(ring),c);}catch(e){out.push(pa);continue;}const dense=[];for(const e of pr){if(e.t==='L'){dense.push(e.p0);continue;}const a0=Math.atan2(e.p0[1]-e.c[1],e.p0[0]-e.c[0]),a1=Math.atan2(e.p1[1]-e.c[1],e.p1[0]-e.c[0]);let d=a1-a0;if(e.ccw){while(d<=0)d+=2*Math.PI;}else{while(d>=0)d-=2*Math.PI;}const stp=Math.min(0.12,Math.max(0.045,2*Math.acos(Math.max(0,1-0.03/e.r)))),m=Math.max(3,Math.ceil(Math.abs(d)/stp));for(let k=0;k<m;k++){const a=a0+d*k/m;dense.push([e.c[0]+e.r*Math.cos(a),e.c[1]+e.r*Math.sin(a)]);}}
+    if(dense.length<3){out.push(pa);continue;}out.push(toCL(dense));}
+  return out.length?unionP(out,[]):out;}
 function composeVec(L2){
   const f=L2.f,outer=[toCL(normRing(ringOf(f),true))],parts=[];
   for(const q of L2.per){const v=vecPart(q);let levels=v.levels.map(l=>({depth:l.depth,paths:shiftP(l.paths,q.x,q.y)}));
@@ -9992,7 +9998,7 @@ function composeVec(L2){
   const raw=[...new Set(parts.flatMap(p=>p.levels.map(l=>Math.round(l.depth*100))))].sort((a,b)=>a-b).map(v=>v/100),depths=[],lowD=[];
   for(const d of raw){if(depths.length&&d-lowD[lowD.length-1]<0.25){depths[depths.length-1]=d;}else{depths.push(d);lowD.push(d);}}
   let regs=lowD.map(d=>{let R=[];for(const p of parts){const l=p.levels.find(x=>x.depth>=d-1e-6);if(l)R=R.length?unionP(R,l.paths):l.paths;}return R;});
-  const clip=offsetP(outer,-0.8,0.05);regs=regs.map(r=>cleanP(interP(r,clip),20,40));
+  const clip=offsetP(outer,-0.8,0.05);regs=regs.map(r=>cleanP(interP(r,clip),20,40));if(regs.length===1)regs=[keepCornerR(regs[0],S.set.c0)];
   const levels=depths.map((d,j)=>({depth:d,paths:regs[j]})).filter(l=>l.paths.length);
   return {outer,levels,tc:parts.flatMap(p=>p.tc),Hf:L2.Hf};}
 
