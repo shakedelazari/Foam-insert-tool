@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Foam Insert Tool V4.7 — Shell-Case</title>
+<title>Foam Insert Tool V4.14 — Shell-Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -490,7 +490,7 @@ body{overflow:hidden}
 </clipPath>
 </defs>
 </svg>
-</div><h1>Foam Insert Tool <span id="vBadge" title="V4.7 · 3 Nov 2026&#10;&#10;V4.7: The Custom sheet option is removed (A4, Letter, A3 only).&#10;&#10;V4.6: Straighten screen: Move grid / Lock grid, Part origin, Grid reset.&#10;&#10;V4.5: Photo flow: Straighten the photo is the first screen after the corners, then Sizes, then Outline. Much less text on the photo pages.&#10;&#10;V4.4: Separate Notches tool next to Finger access (own list, own colour, own count). Sharp corners of a drawn part get a small round relief (about 1 mm) instead of big wings at the sides.&#10;&#10;V4.3: Finger access window shows the part the same way up as the preview and the layout (up is up). New rectangle starts at 0 degrees.&#10;&#10;V4.2: Finger access: notches show in the first preview (Top, Front, Side). New Rectangle notch with fillet (min R4), turn handle and Align to the part. Every notch can have its own depth (5 mm up to the cavity depth). Before leaving the Parts step the tool asks: Do you need finger access?&#10;&#10;V4.1: simpler Mirror and length window&#10;V4.0: cavity corner keeps the drawn radius&#10;V3.9: STEP of drawn parts follows the drawing&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.7</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
+</div><h1>Foam Insert Tool <span id="vBadge" title="V4.14 · 4 Nov 2026&#10;&#10;V4.14: No side bar on the photo and sketch pages: a small floating stack on the work area (drag it). Pop-up windows float on a free corner, away from the point you edit, and can be dragged.&#10;&#10;V4.13: Length window: Swap button changes start and end (the green and red marks on the drawing swap too).&#10;&#10;V4.12: STEP keeps true circles, arcs and lines also with shallow finger access or notches in layouts with several depths (shared boundaries are cut once).&#10;&#10;V4.11: Less text on all pages: icons with a few words (Add parts, Compare, Layout, Export, finger access).&#10;&#10;V4.10: Fix: the Straighten screen no longer flickers or jumps.&#10;&#10;V4.9: A–A and B–B have a lock (Straight): A–A stays horizontal, B–B stays vertical.&#10;&#10;V4.8: The Straighten panel is a pop-up on the photo. The Part origin button is removed.&#10;&#10;V4.7: The Custom sheet option is removed (A4, Letter, A3 only).&#10;&#10;V4.6: Straighten screen: Move grid / Lock grid, Part origin, Grid reset.&#10;&#10;V4.5: Photo flow: Straighten the photo is the first screen after the corners, then Sizes, then Outline. Much less text on the photo pages.&#10;&#10;V4.4: Separate Notches tool next to Finger access (own list, own colour, own count). Sharp corners of a drawn part get a small round relief (about 1 mm) instead of big wings at the sides.&#10;&#10;V4.3: Finger access window shows the part the same way up as the preview and the layout (up is up). New rectangle starts at 0 degrees.&#10;&#10;V4.2: Finger access: notches show in the first preview (Top, Front, Side). New Rectangle notch with fillet (min R4), turn handle and Align to the part. Every notch can have its own depth (5 mm up to the cavity depth). Before leaving the Parts step the tool asks: Do you need finger access?&#10;&#10;V4.1: simpler Mirror and length window&#10;V4.0: cavity corner keeps the drawn radius&#10;V3.9: STEP of drawn parts follows the drawing&#10;V3.8: Finger access (round and oval notches)&#10;V3.7: Start/End marks, angle, review&#10;V3.6: free curves, radius tool, sketch without photo&#10;V3.4: edit part later, mirror&#10;V3.0: Phone layout&#10;V2.4: Add from a photo&#10;V2.0: Lid, grid, layouts, save/open, drawing" style="cursor:help;border-bottom:2px dotted var(--acc,#c05832)">V4.14</span></h1><div class="proj"><label class="projname" title="Project name">✎<input type="text" id="projName" aria-label="Project name" value="NEUROLINK PROJECT TEST"></label></div><span class="offline-tag" style="margin-left:auto">Prototype V2 · STEP only</span><button class="btn sm" id="themeBtn" title="Light / dark">☾</button></header>
 <nav class="stepbar" id="stepBar"></nav>
 <main style="min-height:0;display:grid;grid-template-rows:minmax(0,1fr)">
 <section id="screen"></section>
@@ -9390,7 +9390,7 @@ function cubeClick(e){const r=$('#viewCube').getBoundingClientRect(),x=e.clientX
 /* ---------- views, events, init ---------- */
 function setView(v){S.view=v;S.active=v==='split'?'top':v;$('#stage').dataset.view=v;if(v==='3d'||v==='split'){S.fit3=S.fit3||false;S.dirty3=true;}renderToolbar();draw();setTimeout(()=>{resize3D();drawPanes();},60);}
 function draw(){$('#stage').dataset.view=S.view;if(S.view==='3d'||S.view==='split'){if(S.dirty3)build3D();else camUpdate();}drawPanes();updZoom();$('#viewCube').hidden=!(S.view==='3d'||S.view==='split')||!T3.ready;if(T3.ready)drawCube();
-  $('#stageNote').textContent=S.cmp.on?'Compare: view only. Tick foams in the list on the right.':S.parts.length?'Drag a part to move it · scroll to zoom · right-click a part for options':'Add parts on the left to start.';}
+  $('#stageNote').textContent=S.cmp.on?'👁 View only. Tick foams on the right.':S.parts.length?'✥ Drag · 🔍 Scroll · ⋯ Right-click':'Add parts on the left to start.';}
 function applyRot(p,k,val){reorient(p,q=>{q.ang[k]=((val%360)+360)%360;});}
 function init(){
   setCase('custom');recalc();renderPrefs();renderAll();
@@ -9574,6 +9574,49 @@ function circleLS(pts){let sx=0,sy=0,sxx=0,syy=0,sxy=0,sxz=0,syz=0,sz=0;const n=
   const A=sxx,B=sxy,C=syy,D=0.5*(sxz+0),E=0.5*syz;const det=A*C-B*B;if(Math.abs(det)<1e-12)return null;
   const a=(sxz/2*C-syz/2*B)/det,b=(A*syz/2-B*sxz/2)/det;const cx=a+mx,cy=b+my;let r=0;for(const p of pts)r+=Math.hypot(p[0]-cx,p[1]-cy);return {cx,cy,r:r/n};}
 let FIT_BP=null,FIT_BPL=[];
+let REC=null,CHAIN_LIB=null;
+function fitChain(Z,tolL,tolA){const n=Z.length-1,G=k=>Z[k];
+  const lineOK=(s,e)=>{const a=G(s),b=G(e),dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1e-9;for(let k=s+1;k<e;k++){const p=G(k);if(Math.abs((p[0]-a[0])*dy-(p[1]-a[1])*dx)/l>tolL)return false;}return true;};
+  const arcFit=(s,e)=>{const pts=[];for(let k=s;k<=e;k++)pts.push(G(k));if(pts.length<4)return null;
+    const a=pts[0],b=pts[pts.length-1],mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);if(L<1e-6)return null;const nx=-dy/L,ny=dx/L,half=L/2;
+    const free=circleLS(pts),t0=free?((free.cx-mx)*nx+(free.cy-my)*ny):0;
+    const cost=t=>{const cx=mx+nx*t,cy=my+ny*t,r=Math.hypot(half,t);let q=0;for(let k=1;k<pts.length-1;k++){const d=Math.hypot(pts[k][0]-cx,pts[k][1]-cy)-r;q+=d*d;}return q;};
+    let lo=t0-Math.max(2,Math.abs(t0)*0.6),hi=t0+Math.max(2,Math.abs(t0)*0.6);
+    for(let it=0;it<40;it++){const m1=lo+(hi-lo)/3,m2=hi-(hi-lo)/3;if(cost(m1)<cost(m2))hi=m2;else lo=m1;}
+    const t=(lo+hi)/2,cx=mx+nx*t,cy=my+ny*t,r=Math.hypot(half,t);if(r<0.4||r>FT.R)return null;
+    for(const p of pts)if(Math.abs(Math.hypot(p[0]-cx,p[1]-cy)-r)>tolA)return null;
+    for(let k=0;k<pts.length-1;k++){const ch=Math.hypot(pts[k+1][0]-pts[k][0],pts[k+1][1]-pts[k][1]),sag=r-Math.sqrt(Math.max(0,r*r-ch*ch/4));if(sag>tolA*0.8)return null;}
+    let sgn=0,sweep=0;for(let k=1;k<pts.length-1;k++){const u=[pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]],v=[pts[k+1][0]-pts[k][0],pts[k+1][1]-pts[k][1]],cr=u[0]*v[1]-u[1]*v[0];if(Math.abs(cr)<1e-9)return null;const sg=cr>0?1:-1;if(sgn&&sg!==sgn)return null;sgn=sg;}
+    let prev=Math.atan2(pts[0][1]-cy,pts[0][0]-cx);for(let k=1;k<pts.length;k++){const an=Math.atan2(pts[k][1]-cy,pts[k][0]-cx);let d=an-prev;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;if(d*sgn<=0)return null;sweep+=Math.abs(d);prev=an;}
+    if(sweep>6.0||sweep<0.1)return null;return {cx,cy,r,ccw:sgn>0,sweep};};
+  const prims=[];let s=0;
+  while(s<n){let eL=s+1;while(eL+1<=n&&lineOK(s,eL+1))eL++;
+    let eA=0,info=null;if(s+3<=n){let e=s+3;while(e<=n){const f=arcFit(s,e);if(!f)break;info=f;eA=e;e++;}}
+    if(info&&eA>eL){prims.push({t:'A',p0:G(s).slice(),p1:G(eA).slice(),c:[info.cx,info.cy],r:info.r,ccw:info.ccw});s=eA;}else{prims.push({t:'L',p0:G(s).slice(),p1:G(eL).slice()});s=eL;}}
+  return prims;}
+/* shared boundaries: every curve that two faces share is cut once and both faces use the same lines and arcs */
+function buildChainLib(rings){const K=p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000),rk=r=>r.map(K).sort().join(';');
+  const U=new Map();for(const r of rings){const k=rk(r);if(!U.has(k))U.set(k,r);}
+  const keys=[...U.keys()],R=keys.map(k=>U.get(k)),cell=2,grid=new Map(),seen=new Set(),tol=0.003;
+  for(const r of R)for(const p of r){const k=K(p);if(seen.has(k))continue;seen.add(k);const g=Math.floor(p[0]/cell)+','+Math.floor(p[1]/cell);let a=grid.get(g);if(!a){a=[];grid.set(g,a);}a.push(p);}
+  const RR=R.map(r=>{const out=[],n=r.length;for(let i=0;i<n;i++){const a=r[i],b=r[(i+1)%n];out.push(a);const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(L2<1e-9)continue;
+      const x0=Math.min(a[0],b[0])-tol,x1=Math.max(a[0],b[0])+tol,y0=Math.min(a[1],b[1])-tol,y1=Math.max(a[1],b[1])+tol,ins=[];
+      for(let gx=Math.floor(x0/cell);gx<=Math.floor(x1/cell);gx++)for(let gy=Math.floor(y0/cell);gy<=Math.floor(y1/cell);gy++){const arr=grid.get(gx+','+gy);if(!arr)continue;
+        for(const p of arr){const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;if(t<=0||t>=1)continue;const px=a[0]+t*dx-p[0],py=a[1]+t*dy-p[1];if(px*px+py*py>tol*tol)continue;if(Math.hypot(p[0]-a[0],p[1]-a[1])<tol||Math.hypot(p[0]-b[0],p[1]-b[1])<tol)continue;ins.push([t,p]);}}
+      ins.sort((u,v)=>u[0]-v[0]);for(const q of ins)out.push(q[1]);}
+    const o2=[];for(const p of out){if(!o2.length||K(p)!==K(o2[o2.length-1]))o2.push(p);}if(o2.length>1&&K(o2[0])===K(o2[o2.length-1]))o2.pop();return o2;});
+  const sg=new Map(),segKey=(a,b)=>a<b?a+'|'+b:b+'|'+a;
+  RR.forEach((r,ri)=>{const n=r.length;for(let i=0;i<n;i++){const k=segKey(K(r[i]),K(r[(i+1)%n]));let x=sg.get(k);if(!x){x=[];sg.set(k,x);}if(x[x.length-1]!==ri)x.push(ri);}});
+  const chains=new Map(),lib=new Map();
+  RR.forEach((r,ri)=>{const n=r.length,sig=[];for(let i=0;i<n;i++)sig.push(sg.get(segKey(K(r[i]),K(r[(i+1)%n]))).join(','));
+    const bps=[];for(let i=0;i<n;i++)if(sig[(i-1+n)%n]!==sig[i])bps.push(i);if(!bps.length)return;
+    let all=[];
+    for(let q=0;q<bps.length;q++){const st=bps[q],en=bps[(q+1)%bps.length],pts=[];let i=st;pts.push(r[i]);do{i=(i+1)%n;pts.push(r[i]);}while(i!==en);
+      const fk=pts.map(K).join('>'),rv=pts.slice().reverse().map(K).join('>'),ck=fk<rv?fk:rv;let c=chains.get(ck);
+      if(!c){const pr0=fitChain(pts,FIT_SETS[0][0],FIT_SETS[0][1]);for(const e of pr0){if(e.t!=='A')continue;const rs=Math.round(e.r*10)/10;if(Math.abs(e.r-rs)<0.06&&rs!==e.r){const dx=e.p1[0]-e.p0[0],dy=e.p1[1]-e.p0[1],L=Math.hypot(dx,dy);if(L<2*rs){const h=Math.sqrt(Math.max(0,rs*rs-L*L/4)),mx=(e.p0[0]+e.p1[0])/2,my=(e.p0[1]+e.p1[1])/2,nx=-dy/L,ny=dx/L,sg=Math.sign((e.c[0]-mx)*nx+(e.c[1]-my)*ny)||1;e.c=[mx+nx*sg*h,my+ny*sg*h];e.r=rs;}}}c={fk,prims:pr0};chains.set(ck,c);}
+      const pr=(c.fk===fk?c.prims.map(e=>({...e,p0:e.p0.slice(),p1:e.p1.slice()})):c.prims.slice().reverse().map(revPrim)).filter(e=>K(e.p0)!==K(e.p1));all=all.concat(pr);}
+    lib.set(keys[ri],areaOf(RR[ri])>=0?all:all.slice().reverse().map(revPrim));});
+  return lib;}
 function fitCanon(ring,tolL,tolA){
   tolL=tolL||FT.L;tolA=tolA||FT.A;let P=ring.slice();if(areaOf(P)<0)P.reverse();
   const n=P.length;let s0=0,bt=-1;for(let i=0;i<n;i++){const t=turnAt(P,i);if(t>bt+1e-9||(Math.abs(t-bt)<=1e-9&&(P[i][0]<P[s0][0]-1e-9||(Math.abs(P[i][0]-P[s0][0])<=1e-9&&P[i][1]<P[s0][1])))){bt=t;s0=i;}}
@@ -9625,7 +9668,9 @@ function insBP(ring){if(!FIT_BP)return ring;const out=[],n=ring.length,tol=0.004
     for(const p of FIT_BPL){const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;if(t<=0||t>=1)continue;const px=a[0]+t*dx-p[0],py=a[1]+t*dy-p[1];if(px*px+py*py>tol*tol)continue;if(Math.hypot(p[0]-a[0],p[1]-a[1])<tol||Math.hypot(p[0]-b[0],p[1]-b[1])<tol)continue;ins.push([t,p]);}
     ins.sort((u,v)=>u[0]-v[0]);for(const q of ins)out.push([q[1][0],q[1][1]]);}
   return out;}
-const _fc=new Map();function primsOf(ring,ccw){const key=ring.map(p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000)).sort().join(';');let c=_fc.get(key);if(!c){c=refinePrims(fitSafe(insBP(ring)));_fc.set(key,c);if(_fc.size>400)_fc.delete(_fc.keys().next().value);}
+const _fc=new Map();function primsOf(ring,ccw){const key=ring.map(p=>Math.round(p[0]*1000)+','+Math.round(p[1]*1000)).sort().join(';');if(REC&&!REC.has(key))REC.set(key,ring);
+  if(CHAIN_LIB){const L=CHAIN_LIB.get(key);if(L)return ccw?L.map(e=>({...e,p0:e.p0.slice(),p1:e.p1.slice()})):L.slice().reverse().map(revPrim);}
+  let c=_fc.get(key);if(!c){c=refinePrims(fitSafe(insBP(ring)));_fc.set(key,c);if(_fc.size>400)_fc.delete(_fc.keys().next().value);}
   return ccw?c:c.slice().reverse().map(revPrim);}
 function snapPrims(pr){const R=v=>Math.round(v*1000)/1000;const q=pr.map(e=>({...e,p0:[R(e.p0[0]),R(e.p0[1])],p1:[R(e.p1[0]),R(e.p1[1])]}));
   for(let i=0;i<q.length;i++)q[i].p0=q[(i+q.length-1)%q.length].p1;
@@ -9639,8 +9684,10 @@ function bpBuild(outerPaths,levels){const pts=new Map(),rs=[];
   for(const lv of levels)for(const o of polyTree(lv.paths,[],CL.ClipType.ctUnion))rs.push(o.outer,...o.holes);
   for(const r of rs){try{for(const e of fitSafe(r))for(const p of [e.p0,e.p1])pts.set(Math.round(p[0]*1000)+','+Math.round(p[1]*1000),p);}catch(e){}}
   FIT_BP=new Set(pts.keys());FIT_BPL=[...pts.values()];}
-function stepSolidArcs(...a){let r=null,err=null;try{r=stepSolidArcs0(...a);}catch(e){err=e;}
-  if(r&&!r.badEdges)return r;
+function stepSolidArcs(...a){let r=null,err=null;REC=new Map();try{r=stepSolidArcs0(...a);}catch(e){err=e;}
+  const rec=REC;REC=null;if(r&&!r.badEdges)return r;
+  if(rec&&rec.size){_fc.clear();try{CHAIN_LIB=buildChainLib([...rec.values()]);r=stepSolidArcs0(...a);err=null;}catch(e){err=e;r=null;}finally{CHAIN_LIB=null;_fc.clear();}
+    if(r&&!r.badEdges)return r;}
   if(a[2]&&a[2].length>1){_fc.clear();try{bpBuild(a[1],a[2]);r=stepSolidArcs0(...a);}catch(e){err=e;r=null;}finally{FIT_BP=null;FIT_BPL=[];_fc.clear();}
     if(r&&!r.badEdges)return r;}
   if(!r&&err)throw err;return r;}
@@ -9947,7 +9994,7 @@ async function autoPack(){
       let cells=0;for(const v of fm.m)cells+=v;let area=0;const draw=[];
       if(r.ok)for(const q of r.placed){const rr=items.find(i=>i.id===q.id).rots[q.k];draw.push({region:rr.region,w:rr.w,h:rr.h,x:q.x,y:q.y,id:q.id});for(const v of rr.region)area+=v;
         need=Math.max(need,Math.max(0,rr.H-avail));}
-      ladder.push({c:cs,fit:r.ok&&lidRes.ok,stick:need,okStick:okAll,noFitDraw:null,lidOK:lidRes.ok,lidDraw:lidRes.draw,placed:r.placed,options:opts,optDraw:opts.map(pl=>pl.map(q=>{const rr=items.find(i=>i.id===q.id).rots[q.k];return {region:rr.region,w:rr.w,h:rr.h,x:q.x,y:q.y,id:q.id};})),draw,fill:cells?area/cells:0,status:!(r.ok&&lidRes.ok)?'nofit':need>0?'tight':'fits',reason:!okAll?'Too tall. Raise the part position or choose a bigger foam':'Parts do not fit'});
+      ladder.push({c:cs,fit:r.ok&&lidRes.ok,stick:need,okStick:okAll,noFitDraw:null,lidOK:lidRes.ok,lidDraw:lidRes.draw,placed:r.placed,options:opts,optDraw:opts.map(pl=>pl.map(q=>{const rr=items.find(i=>i.id===q.id).rots[q.k];return {region:rr.region,w:rr.w,h:rr.h,x:q.x,y:q.y,id:q.id};})),draw,fill:cells?area/cells:0,status:!(r.ok&&lidRes.ok)?'nofit':need>0?'tight':'fits',reason:!okAll?'⚠ Too tall':'Parts do not fit'});
       if(!r.ok){const fmf2=getFMf(foamDefOf(cs)),al2=allowedMask(fmf2,0);
         const pr2=await packParts(its.map(i=>({id:i.id,rots:i.rots})),fmf2.w,fmf2.h,al2,0,[]);
         if(pr2.ok){const pl2=centerPlaced(items,pr2.placed,fmf2.w,fmf2.h,al2,fmf2.w,fmf2.h);
@@ -10158,7 +10205,7 @@ async function addFiles(files){
   for(const file of [...files]){const n=file.name,low=n.toLowerCase();
     try{let pos,kind='step';
       if(/\.(step|stp)$/.test(low)){pos=await readStepFile(await file.arrayBuffer());}
-      else if(/\.stl$/.test(low)){pos=parseSTL(await file.arrayBuffer());kind='stl';toast('STL is for testing only. Please use STEP for real work.');}
+      else if(/\.stl$/.test(low)){pos=parseSTL(await file.arrayBuffer());kind='stl';toast('STL = test only. Use STEP.');}
       else throw new Error('Only STEP files are supported.');
       if(pos.length<9)throw new Error('No triangles found.');
       const st=meshStats(pos),n2=pos.length/9,step=Math.max(1,Math.ceil(n2/6000)),sample=new Float32Array(Math.ceil(n2/step)*9);let k=0;
@@ -10180,7 +10227,7 @@ async function go(n){
 function fgAskShow(){const ids=[...new Set(S.parts.map(p=>p.gid))],key=ids.join(',');if(S.fgAskKey===key)return false;
   const gs=ids.map(g=>S.parts.find(p=>p.gid===g)),without=gs.filter(p=>!(p.fingers||[]).some(f=>f.shape&&(f.kind||'finger')==='finger'));if(!without.length)return false;S.fgAskKey=key;
   const ov=document.createElement('div');ov.id='fgAsk';ov.style.cssText='position:fixed;inset:0;z-index:300;background:rgba(20,20,25,.55);display:flex;align-items:center;justify-content:center;padding:14px';
-  ov.innerHTML=`<div style="background:var(--panel,#fff);color:var(--ink,#222);border-radius:14px;max-width:540px;width:100%;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35);max-height:90vh;overflow:auto" role="dialog" aria-modal="true"><h3 style="margin:0 0 8px;font-size:20px">Do you need finger access?</h3><p style="margin:0 0 12px;font-size:14.5px;line-height:1.5">For easy operation, a <b>finger access</b> lets a finger reach under the part to lift it out. Use the <b>Finger access</b> tool of the part: round, oval or rectangle notches, full depth or a depth you choose.</p><div>${gs.map(p=>{const n=(p.fingers||[]).filter(f=>f.shape&&(f.kind||'finger')==='finger').length;return `<div style="display:flex;align-items:center;gap:10px;margin:7px 0;padding:8px 10px;border:1px solid var(--line,#ddd);border-radius:10px"><span style="flex:1;font-weight:600">${esc(p.name)}${n?` <span class="hint" style="font-weight:400">(${n} notch${n>1?'es':''} added)</span>`:''}</span><button class="btn primary sm" data-fgask="${p.gid}">Finger access</button></div>`;}).join('')}</div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button class="btn" id="fgAskStay">Stay here</button><button class="btn" id="fgAskNo">No, continue</button></div></div>`;
+  ov.innerHTML=`<div style="background:var(--panel,#fff);color:var(--ink,#222);border-radius:14px;max-width:540px;width:100%;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35);max-height:90vh;overflow:auto" role="dialog" aria-modal="true"><h3 style="margin:0 0 8px;font-size:20px">Finger access?</h3><p style="margin:0 0 12px;font-size:14.5px;line-height:1.5">☝ A notch lets a finger lift the part out.</p><div>${gs.map(p=>{const n=(p.fingers||[]).filter(f=>f.shape&&(f.kind||'finger')==='finger').length;return `<div style="display:flex;align-items:center;gap:10px;margin:7px 0;padding:8px 10px;border:1px solid var(--line,#ddd);border-radius:10px"><span style="flex:1;font-weight:600">${esc(p.name)}${n?` <span class="hint" style="font-weight:400">(${n} notch${n>1?'es':''} added)</span>`:''}</span><button class="btn primary sm" data-fgask="${p.gid}">Finger access</button></div>`;}).join('')}</div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button class="btn" id="fgAskStay">Stay here</button><button class="btn" id="fgAskNo">No, continue</button></div></div>`;
   document.body.appendChild(ov);
   ov.onclick=e=>{const b=e.target.closest('[data-fgask]');if(b){ov.remove();window.PP.finger(b.dataset.fgask);return;}
     if(e.target.id==='fgAskNo'){ov.remove();next();return;}if(e.target.id==='fgAskStay'||e.target===ov)ov.remove();};
@@ -10239,14 +10286,14 @@ function partQ(p,T){if(p.where!=='base')return null;
   const R=mmul(TM[T],p.R0),c=getOriented(p,R),H=c.o.ext[2],s=stickFor(p,T),cav=getCavity(p,c,H,s);return {p,c,H,s,x:0,y:0,cav};}
 function posSection(p,g,T){const key=g[0].gid+':'+T,open=!S.secClosed.has(key),nm=posName(T);
   const ctl=open?`<span class="hc"><span class="hint">Position</span><button class="btn sm" data-a="posdn" data-t="${T}" title="Lower the part: the cut gets deeper">▼ Lower</button><input type="number" step="1" data-f="stick" data-t="${T}" value="${fromMM(stickFor(p,T))}" title="Above (+) or below (−) the parting line, in ${uname()}"><button class="btn sm" data-a="posup" data-t="${T}" title="Raise the part: it sticks out of the foam">▲ Raise</button></span><button class="btn sm" data-a="togpart3d" title="Show or hide the part in all the views">${S.part3d?'Hide part':'Show part'}</button>`:'';
-  return `<div class="pc-sec possec"><div class="pc-head"><b>How the part sits in the foam · ${nm}</b>${ctl}<button class="btn sm" data-a="togsec" data-key="${key}">${open?'▲ Hide section':'▼ Show section'}</button></div>${open?cavBlock(p,g,T):''}</div>`;}
+  return `<div class="pc-sec possec"><div class="pc-head"><b>In the foam · ${nm}</b>${ctl}<button class="btn sm" data-a="togsec" data-key="${key}">${open?'▲ Hide section':'▼ Show section'}</button></div>${open?cavBlock(p,g,T):''}</div>`;}
 function posTiles(p){return FACES.flatMap(([k,lab,ix])=>[0,1].map(s=>{const R=mmul(TM[ix[s]],p.R0),e=orientedExt(R,p.st.ext),ok=!!p.faces[k][s],key='pt'+k+s+rkey(p.R0)+(ok?1:0);
   if(!p['_'+key])p['_'+key]=meshPreview(p.sample||p.pos,R,84,ok?'#4A9462':'#D84C55');
   return `<label class="postile${ok?'':' off'}"><img src="${p['_'+key]}" width="72" height="72" alt=""><b>${lab}${s?' flipped':''}</b><span class="tick"><input type="checkbox" data-face="${k}" data-s="${s}"${ok?' checked':''}> allowed</span></label>`;})).join('');}
 function posCtl(p){const v=p.stick||0;
   return `<div class="pc-sec"><b>Position in the foam</b><div class="posrow"><button class="btn sm" data-a="posdn" title="Lower the part: the cut gets deeper">▼ Lower</button><input type="number" step="1" data-f="stick" value="${fromMM(v)}" title="Above (+) or below (−) the parting line, in ${uname()}"><span class="hint">${uname()}</span><button class="btn sm" data-a="posup" title="Raise the part: it sticks out of the foam">▲ Raise</button></div><input type="range" min="-30" max="40" step="1" data-f="stickmm" value="${v}" class="posrange"></div>`;}
 function cavBlock(p,g,T){if(!partQ(p,T))return '<p class="hint">Preparing the views…</p>';
-  return `<div class="cavblock" data-t="${T==null?'':T}"><div class="cavviews"><figure><canvas data-cv="top" width="250" height="180"></canvas><figcaption>Top: the part in its cavity</figcaption></figure><figure><canvas data-cv="front" width="250" height="180"></canvas><figcaption>Front: the part in the foam</figcaption></figure><figure><canvas data-cv="side" width="250" height="180"></canvas><figcaption>Side: the part in the foam</figcaption></figure>${S.show3d?`<figure class="fig3d"><div class="isowrap"><canvas data-cv="iso" width="300" height="230"></canvas><div class="isotools"><span class="rotic" title="Drag the view to rotate it"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></span><button class="btn sm" data-a="togpart3d" title="Show or hide the part"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg> ${S.part3d?'Hide part':'Show part'}</button></div></div><figcaption><span>3D view</span></figcaption></figure>`:`<figure class="fig3d"><button class="btn sm" data-a="tog3d">Show 3D view</button></figure>`}</div></div>`;}
+  return `<div class="cavblock" data-t="${T==null?'':T}"><div class="cavviews"><figure><canvas data-cv="top" width="250" height="180"></canvas><figcaption>⬆ Top</figcaption></figure><figure><canvas data-cv="front" width="250" height="180"></canvas><figcaption>◧ Front</figcaption></figure><figure><canvas data-cv="side" width="250" height="180"></canvas><figcaption>◨ Side</figcaption></figure>${S.show3d?`<figure class="fig3d"><div class="isowrap"><canvas data-cv="iso" width="300" height="230"></canvas><div class="isotools"><span class="rotic" title="Drag the view to rotate it"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></span><button class="btn sm" data-a="togpart3d" title="Show or hide the part"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg> ${S.part3d?'Hide part':'Show part'}</button></div></div><figcaption><span>3D view</span></figcaption></figure>`:`<figure class="fig3d"><button class="btn sm" data-a="tog3d">Show 3D view</button></figure>`}</div></div>`;}
 function drawPartCav(){
   $$('.cavblock').forEach(bl=>{
     const row=bl.closest('[data-gid]');if(!row)return;const p=S.parts.find(x=>x.gid===+row.dataset.gid),tt=bl.dataset.t,q=p&&partQ(p,tt===''||tt==null?null:+tt);if(!q)return;
@@ -10277,10 +10324,10 @@ function drawPartCav(){
     if(S.show3d){const iv=bl.querySelector('[data-cv="iso"]');if(iv){try{setupIso(iv,isoScene(p,q,Hp));}catch(e){console.error('iso',e);}}}
   });}
 function scr1(){const gs=groups();const small=p=>p.cur&&p.cur.cav&&p.cur.cav.nr.maxComp>25;if(!S.open)S.open=new Set();
-  const body=(p,g)=>`<div class="pcard"><div class="pc-sec"><b>Allowed positions</b><div class="postiles">${posTiles(p)}</div></div>
+  const body=(p,g)=>`<div class="pcard"><div class="pc-sec"><b>Positions</b><div class="postiles">${posTiles(p)}</div></div>
     ${allowedTs(p).map(T=>posSection(p,g,T)).join('')}</div>`;
   return `<h2 class="h2s">Add your parts</h2>
-  <div class="addtiles"><button class="addt" data-a="step"><span class="plusic">+</span><span class="tt"><b>Upload a STEP file</b></span></button><button class="addt${S.form==='lib'?' pick':''}" data-a="lib"><span class="plusic">+</span><span class="tt"><b>Add a simple shape</b></span></button><button class="addt" data-a="photo"><span class="plusic">+</span><span class="tt"><b>Trace a part (photo or sketch)</b></span></button></div>
+  <div class="addtiles"><button class="addt" data-a="step"><span class="plusic">+</span><span class="tt"><b>Upload a STEP file</b></span></button><button class="addt${S.form==='lib'?' pick':''}" data-a="lib"><span class="plusic">+</span><span class="tt"><b>Add a simple shape</b></span></button><button class="addt" data-a="photo"><span class="plusic">+</span><span class="tt"><b>Photo or sketch</b></span></button></div>
   <input type="file" id="fileIn" accept=".step,.stp,.stl" multiple class="vis-hidden">
   ${S.form==='lib'?libPanel():''}
   <div class="plist">${gs.length?gs.map(g=>{const p=g[0],open=S.open.has(p.gid),nf=allowedTs(p).length;return `<div class="prow2" data-gid="${p.gid}"><div class="phead" data-a="toggle"><img class="pthumb" src="${thumb(p)}" alt="${esc(p.name)}" width="56" height="56"><div class="pname"><b>${esc(p.name)}</b>${p.kind==='photo'?' <span class="badge">'+(p.photo&&p.photo.source==='sketch'?'Sketch':'From photo: estimate')+'</span>'+(p.photo&&p.photo.edit?` <button class="btn sm" data-a="editphoto" data-gid="${p.gid}" title="Open the outline again and fix it">Edit outline</button>`:''):''} <button class="btn sm" data-a="fingeracc" data-gid="${p.gid}" style="border-color:var(--accent,#F05325);color:var(--accent,#F05325);font-weight:700" title="Cut a round, oval or rectangle notch in the foam next to this part, so a finger can reach under it">Finger access${(p.fingers||[]).filter(f=>f.shape&&(f.kind||'finger')==='finger').length?' ('+(p.fingers||[]).filter(f=>f.shape&&(f.kind||'finger')==='finger').length+')':''}</button> <button class="btn sm" data-a="notchacc" data-gid="${p.gid}" title="Cut a round, oval or rectangle notch in the cavity of this part (cable, button, side feature). Separate from Finger access">Notches${(p.fingers||[]).filter(f=>f.shape&&f.kind==='notch').length?' ('+(p.fingers||[]).filter(f=>f.shape&&f.kind==='notch').length+')':''}</button>${g.length>1?` <span class="badge">× ${g.length}</span>`:''} <span class="hint">${sizeOf(p)}</span></div><span class="hdrctl"><span class="hc"><span class="hint">Place</span><div class="seg"><button data-place="base" aria-pressed="${(p.side||'base')==='base'}">Base</button><button data-place="lid" aria-pressed="${p.side==='lid'}">Lid</button></div></span><span class="hc"><span class="hint">Copies</span><input type="number" min="1" max="20" step="1" data-qty value="${g.length}" title="How many of this part (1 to 20)"></span></span><button class="btn sm tog${open?' on':''}" data-a="toggle" title="${open?'Close the options':'Set orientation, duplicates and allowances'}">${open?'▲ Hide':'▼ Show details'}</button><button class="btn ghost sm" data-a="del" title="Remove this part">✕</button></div>${open?body(p,g):''}</div>`;}).join(''):'<p class="hint">No parts yet. Use the buttons above to add your first part.</p>'}</div>`;}
@@ -10320,22 +10367,22 @@ function isoMini(cv,ring,L,W,H,draw,w,h,lid){const dpr=2;cv.width=w*dpr;cv.heigh
   for(const d of draw){const part=S.parts.find(x=>x.id===d.id);g.fillStyle=part?part.color:'#4D80B8';g.globalAlpha=0.95;
     for(let j=0;j<d.h;j+=1){let run=-1;for(let i=0;i<=d.w;i++){const on=i<d.w&&d.region[j*d.w+i];if(on&&run<0)run=i;if(!on&&run>=0){const xa=d.x+run,xb=d.x+i,yy=d.y+j;const q1=X(xa,yy,H),q2=X(xb,yy,H),q3=X(xb,yy+1,H),q4=X(xa,yy+1,H);g.beginPath();g.moveTo(...q1);g.lineTo(...q2);g.lineTo(...q3);g.lineTo(...q4);g.closePath();g.fill();run=-1;}}}}g.globalAlpha=1;}
 const kindLabel=k=>k==='straight'?'Straight':k==='center'?'Centered':'Puzzle';
-function cardOptRow(id){const x=id==='CUSTOM'?null:S.ladder.find(z=>z.c.id===id);if(!x||!x.options||x.options.length<2)return '';const cur=(S.cardOpt&&S.cardOpt[id])||0;let h='<div class="optrow"><span class="hint">Layout options</span>',last='';
+function cardOptRow(id){const x=id==='CUSTOM'?null:S.ladder.find(z=>z.c.id===id);if(!x||!x.options||x.options.length<2)return '';const cur=(S.cardOpt&&S.cardOpt[id])||0;let h='<div class="optrow"><span class="hint">Layout</span>',last='';
   x.options.forEach((o,i)=>{if(o.kind!==last){last=o.kind;h+=`<span class="hint">${kindLabel(o.kind)}</span>`;}h+=`<button class="btn sm optb" data-copt="${id}:${i}" aria-pressed="${cur===i}" title="Show layout option ${i+1}">${i+1}</button>`;});return h+'</div>';}
 function cardDraw(x){const i=(S.cardOpt&&S.cardOpt[x.c.id])||0;return x.optDraw&&x.optDraw[i]?x.optDraw[i]:x.draw;}
 function scr3(){
-  if(S.packing||!S.ladder)return `<h2>2. Compare the best cases</h2><div class="busy"><div class="spin"></div><p>Finding the best way to pack your parts…</p></div>`;
+  if(S.packing||!S.ladder)return `<h2>2. Compare cases</h2><div class="busy"><div class="spin"></div><p>Finding the best way to pack your parts…</p></div>`;
   const best=S.ladder.find(x=>x.status!=='nofit'),cur=S.foam.mode==='sta'?S.foam.caseId:(S.chosen?'CUSTOM':'');
   const lab={fits:'Fits',tight:'Fits with allowance',nofit:'No fit'};
   const card=(id,name,dimsArr,note,status,rec)=>`<div class="cc2 ${status}${cur===id&&S.chosen?' pick':''}"><div class="cviews"><div><canvas data-mini="${id}"></canvas><span class="hint">Top view</span></div><div><canvas data-iso="${id}"></canvas><span class="hint">3D view</span></div></div>
     <div class="ctext"><div class="chead"><b>${name}</b>${rec?'<em>recommended</em>':''}<span class="pill ${status}">${lab[status]}</span></div><div class="cdim"><span class="hint">Foam size (L × W × H)</span><br><b>${dimS(dimsArr)}</b></div><div class="hint">${note}</div>
-    ${status==='nofit'?`<div class="hint" style="font-size:11px;margin:4px 0 0">Parts shown without wall gap — they do not fit</div><div class="row"><button class="btn sm" data-move="${id}" title="Open in the layout step to see how close the parts are">View anyway</button></div>`:cardOptRow(id)+`<div class="row"><button class="btn primary sm" data-case="${id}">Choose this</button><button class="btn sm" data-move="${id}" title="Open this foam in the layout step and move the parts by hand">Edit layout</button></div>`}</div></div>`;
+    ${status==='nofit'?`<div class="hint" style="font-size:11px;margin:4px 0 0">⚠ No wall gap</div><div class="row"><button class="btn sm" data-move="${id}" title="Open in the layout step to see how close the parts are">View anyway</button></div>`:cardOptRow(id)+`<div class="row"><button class="btn primary sm" data-case="${id}">Choose this</button><button class="btn sm" data-move="${id}" title="Open this foam in the layout step and move the parts by hand">Edit layout</button></div>`}</div></div>`;
   const cu=S.custom;
-  return `<h2>2. Compare the best cases</h2><p class="lead">Pick the foam to work with. On each card you can switch between layout options, or press “Edit layout” to move the parts by hand. The smallest foam that fits is recommended.</p>
-  <div class="cgrid2">${best?card(best.c.id,best.c.name,[best.c.L,best.c.W,best.c.base],best.stick>0?`A part stands ${uT(f1(best.stick)+' mm')} over the parting line`:`${f0(best.fill*100)}% of the top is cavity`,best.status,true):''}
-  ${cu?card('CUSTOM','Custom foam',[cu.L,cu.W,cu.H],`Ratio ${cu.asp.toFixed(2)} · ${f0(cu.fill*100)}% of the top is cavity${S.parts.some(p=>(p.side||'base')==='lid')?' · base parts only, lid parts are not included yet':''}`,'fits',!best):''}</div>
-  <details class="more"><summary>All STA-300 foams</summary><div class="cgrid2">${S.ladder.map(x=>card(x.c.id,x.c.name,[x.c.L,x.c.W,x.c.base],x.status==='nofit'?x.reason:(x.stick>0?`A part stands ${uT(f1(x.stick)+' mm')} over the parting line`:`${f0(x.fill*100)}% of the top is cavity`),x.status,false)).join('')}</div></details>
-  ${S.chosen?`<p class="ok">Chosen: <b>${caseLabel()}</b> ${dimS([S.foam.L,S.foam.W,S.Hf])}. Press Next.</p>`:'<p class="hint">Press “Choose this” on a card.</p>'}`;}
+  return `<h2>2. Compare cases</h2><p class="lead">👇 Pick a foam.</p>
+  <div class="cgrid2">${best?card(best.c.id,best.c.name,[best.c.L,best.c.W,best.c.base],best.stick>0?`A part stands ${uT(f1(best.stick)+' mm')} over the parting line`:`${f0(best.fill*100)}% cavity`,best.status,true):''}
+  ${cu?card('CUSTOM','Custom foam',[cu.L,cu.W,cu.H],`Ratio ${cu.asp.toFixed(2)} · ${f0(cu.fill*100)}% cavity${S.parts.some(p=>(p.side||'base')==='lid')?' · base parts only, lid parts are not included yet':''}`,'fits',!best):''}</div>
+  <details class="more"><summary>All STA-300 foams</summary><div class="cgrid2">${S.ladder.map(x=>card(x.c.id,x.c.name,[x.c.L,x.c.W,x.c.base],x.status==='nofit'?x.reason:(x.stick>0?`A part stands ${uT(f1(x.stick)+' mm')} over the parting line`:`${f0(x.fill*100)}% cavity`),x.status,false)).join('')}</div></details>
+  ${S.chosen?`<p class="ok">Chosen: <b>${caseLabel()}</b> ${dimS([S.foam.L,S.foam.W,S.Hf])}. Press Next.</p>`:''}`;}
 function drawMinis(){if(!S.ladder)return;const ringFor=id=>id==='CUSTOM'?rrPts(S.custom.L,S.custom.W,S.set.cornerR):FOUT[id].pts,lringFor=id=>id==='CUSTOM'?rrPts(S.custom.L,S.custom.W,S.set.cornerR):LID_OUT[id].pts;
   $$('canvas[data-mini]').forEach(cv=>{const id=cv.dataset.mini;if(id==='CUSTOM'&&S.custom)miniDraw3(cv,ringFor(id),lringFor(id),S.custom.L,S.custom.W,S.custom.draw,[],150,175);else{const x=S.ladder.find(z=>z.c.id===id);if(x)miniDraw3(cv,ringFor(id),lringFor(id),x.c.L,x.c.W,x.fit?cardDraw(x):x.noFitDraw||[],x.lidDraw||[],150,175);}});
   $$('canvas[data-iso]').forEach(cv=>{const id=cv.dataset.iso;if(id==='CUSTOM'&&S.custom)isoMini(cv,ringFor(id),S.custom.L,S.custom.W,S.custom.H,S.custom.draw,150,175,{ring:lringFor(id),H:S.set.lidH,draw:[],ang:120});else{const x=S.ladder.find(z=>z.c.id===id);if(x)isoMini(cv,ringFor(id),x.c.L,x.c.W,x.c.base,x.fit?cardDraw(x):x.noFitDraw||[],150,175,{ring:lringFor(id),H:x.c.lid,draw:x.lidDraw||[],ang:120});}});}
@@ -10362,15 +10409,15 @@ function scr6(){const tc=S.vec&&S.vec.tc&&S.vec.tc.length,bad=S.flags.some(x=>x.
     +(bad?'<p class="bad">There are still problems in the layout. You can go back to fix them, or accept them and export.</p><label class="chk"><input type="checkbox" id="accBad"> I accept these problems</label>':'')
     +(tc?'<p class="warn"><b>Tool change.</b> Some small slots are cut with the \u00d86 cutter. <label class="chk"><input type="checkbox" id="accTC"> I understand</label></p>':'')
     +'<div class="exgrid">'
-    +'<div class="exc"><b>Base foam only</b><span class="hint">One solid STEP \u2014 cavities cut, true arcs, ready for CNC.</span><button class="btn primary" data-ex="step">Save base foam STEP</button></div>'
+    +'<div class="exc"><b>Base foam only</b><span class="hint">📦 STEP · ready for CNC</span><button class="btn primary" data-ex="step">Save base foam STEP</button></div>'
     +(hasLid?'<div class="exc"><b>Lid foam only</b><span class="hint">Lid foam with cavities, no parts inside.</span><button class="btn primary" data-ex="lid">Save lid foam STEP</button></div>':'')
-    +'<div class="exc"><b>Base foam + products</b><span class="hint">Same STEP with each base part sitting in its cavity. Use this to review in CAD.</span><button class="btn primary" data-ex="stepwp">Save base foam + parts</button></div>'
+    +'<div class="exc"><b>Base foam + products</b><span class="hint">🔎 STEP + parts · for CAD review</span><button class="btn primary" data-ex="stepwp">Save base foam + parts</button></div>'
     +(hasLid?'<div class="exc"><b>Lid foam + products</b><span class="hint">Lid foam with each lid part in its cavity.</span><button class="btn primary" data-ex="lidwp">Save lid + parts</button></div>':'')
-    +'<div class="exc"><b>Drawing</b><span class="hint">PDF with the Shell-Case title block \u2014 Page 1: title and views \u2014 Page 2: dimensions and DXF.</span>'
+    +'<div class="exc"><b>Drawing</b><span class="hint">📄 PDF · 2 pages (views, sizes) + DXF</span>'
     +'<div class="row" style="margin-top:6px"><button class="btn primary" data-ex="pdf">Save drawing PDF</button><button class="btn" data-ex="dxf">Save DXF</button></div>'
     +'<div class="row" style="gap:12px;margin-top:8px">'+dimopts.map(function(kl){return '<label class="chk"><input type="checkbox" data-xo="'+kl[0]+'" '+(xoGet()[kl[0]]?'checked':'')+' > '+kl[1]+'</label>';}).join('')+'</div>'
     +'<div class="row" style="margin-top:4px"><span class="hint">Units</span><div class="seg" role="group">'+['mm','in','both'].map(function(u){return '<button data-xu="'+u+'" aria-pressed="'+(xoGet().units===u)+'">'+u+'</button>';}).join('')+'</div></div></div>'
-    +'<div class="exc"><b>Packing video</b><span class="hint">Short animation: parts go into the foam one by one.</span><button class="btn" data-ex="video">Record video</button></div>'
+    +'<div class="exc"><b>Packing video</b><span class="hint">🎬 Parts go in, one by one</span><button class="btn" data-ex="video">Record video</button></div>'
     +'</div><p class="hint" id="exMsg"></p>';}
 
 /* ===== V2: step 4 layout, exports, events ===== */
@@ -10438,7 +10485,7 @@ function dispName(p,max){const g=S.parts.filter(x=>x.gid===p.gid),base=p.name.le
 function renderParts(){if(S.step!==4)return;$('#chips').innerHTML=S.parts.filter(p=>p.where==='base').map(p=>`<span class="chip${S.sel===p.id?' on':''}" data-id="${p.id}"><i class="sw" style="background:${p.color}"></i><span class="cn">${esc(dispName(p,16))}</span><button data-cv="vis" title="${p.hidden?'Show':'Hide'}" aria-label="${p.hidden?'Show':'Hide'}">${p.hidden?EYEOFF:EYE}</button><button data-cv="lock" title="${p.locked?'Unlock':'Lock'}" style="${p.locked?'color:var(--accent)':''}">${LOCK(p.locked)}</button></span>`).join('');}
 function renderDesignPanel(){const el=$('#designPanel');if(!el)return;el.hidden=!S.designer;if(!S.designer)return;const s=S.set;
   el.innerHTML=`<div class="dp"><b>Design team preferences</b><div class="row" style="gap:16px;flex-wrap:wrap;align-items:end"><div class="seg" role="group" aria-label="Fit"><button data-fit="tight" aria-pressed="${S.fit==='tight'}">Tight fit</button><button data-fit="loose" aria-pressed="${S.fit==='loose'}">Loose fit</button></div><label class="f">Tool radius (mm)<input type="number" step="0.5" min="1" data-ds="toolR" value="${s.toolR}" style="width:96px"></label><label class="f">Floor thickness (mm)<input type="number" step="1" min="3" data-ds="floor" value="${s.floor}" style="width:96px"></label></div><span class="hint">The design team checks these three after the marketing team saves the project. Marketing can leave them as they are.</span></div>`;}
-function renderToolbar(){if(S.step!==4)return;$('#btnFinger').hidden=true;const nn=$('#notesIn');if(nn&&document.activeElement!==nn)nn.value=S.notes||'';renderDesignPanel();{const pb=$('#btnProd');pb.hidden=!(S.view==='top'||S.view==='split');pb.setAttribute('aria-pressed',String(!!S.prodTop));pb.textContent=S.prodTop?'Hide product':'Show product';}{const ob=$('#optBar');if(S.side==='base'&&S.opts&&S.opts.length>1&&S.foam.mode==='sta'){const same=S.optSig===layoutSig();ob.hidden=false;let h='<span class="hint">Layout options</span>',last='';S.opts.forEach((o,i)=>{if(o.kind!==last){last=o.kind;h+=`<span class="hint">${kindLabel(o.kind)}</span>`;}h+=`<button class="btn sm optb" data-opt="${i}" aria-pressed="${same&&S.optIdx===i}" title="Show arrangement option ${i+1}">${i+1}</button>`;});ob.innerHTML=h;}else ob.hidden=true;}{const sb=$('#sideBar'),hasLid=S.parts.some(p=>(p.side||'base')==='lid');if(hasLid){sb.hidden=false;sb.innerHTML='<span class="hint">Show</span>'+['base','lid'].map(k=>`<button class="btn sm optb" data-side="${k}" aria-pressed="${S.side===k}">${k==='base'?'Base foam':'Lid foam'}</button>`).join('');}else sb.hidden=true;$('#btnLid').textContent=S.lidAng>50?'Close lid':'Open lid';}$$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(S.view===b.dataset.view)));
+function renderToolbar(){if(S.step!==4)return;$('#btnFinger').hidden=true;const nn=$('#notesIn');if(nn&&document.activeElement!==nn)nn.value=S.notes||'';renderDesignPanel();{const pb=$('#btnProd');pb.hidden=!(S.view==='top'||S.view==='split');pb.setAttribute('aria-pressed',String(!!S.prodTop));pb.textContent=S.prodTop?'Hide product':'Show product';}{const ob=$('#optBar');if(S.side==='base'&&S.opts&&S.opts.length>1&&S.foam.mode==='sta'){const same=S.optSig===layoutSig();ob.hidden=false;let h='<span class="hint">Layout</span>',last='';S.opts.forEach((o,i)=>{if(o.kind!==last){last=o.kind;h+=`<span class="hint">${kindLabel(o.kind)}</span>`;}h+=`<button class="btn sm optb" data-opt="${i}" aria-pressed="${same&&S.optIdx===i}" title="Show arrangement option ${i+1}">${i+1}</button>`;});ob.innerHTML=h;}else ob.hidden=true;}{const sb=$('#sideBar'),hasLid=S.parts.some(p=>(p.side||'base')==='lid');if(hasLid){sb.hidden=false;sb.innerHTML='<span class="hint">Show</span>'+['base','lid'].map(k=>`<button class="btn sm optb" data-side="${k}" aria-pressed="${S.side===k}">${k==='base'?'Base foam':'Lid foam'}</button>`).join('');}else sb.hidden=true;$('#btnLid').textContent=S.lidAng>50?'Close lid':'Open lid';}$$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(S.view===b.dataset.view)));
   const st=S.flags.some(x=>x.lv==='bad')?'nofit':S.flags.some(x=>x.lv==='warn')?'tight':'fits',n=S.flags.filter(x=>x.lv!=='info').length;
   $('#statusPill').innerHTML=`<span class="pill big ${st}">${st==='fits'?'Looks good':st==='tight'?'Check':'Problem'}</span> <b>${caseLabel()}</b> <span class="hint">${dimS([S.foam.L,S.foam.W,S.Hf])}</span>`;
   $('#checksBtn').textContent=n?`Checks (${n})`:'Checks';$('#dimBar').hidden=S.view==='3d';
@@ -10447,7 +10494,7 @@ function renderRight(){renderToolbar();}
 function renderLayout(){renderParts();renderToolbar();renderRotBar();draw();}
 function draw(){if(S.step!==4)return;$('#stage').dataset.view=S.view;if(S.view==='3d'||S.view==='split'){if(S.dirty3)build3D();else camUpdate();}drawPanes();updZoom();
   const vc=$('#viewCube');if(vc)vc.hidden=!(S.view==='3d'||S.view==='split')||!T3.ready;if(T3.ready)drawCube();
-  $('#stageNote').textContent=S.parts.length?'Drag a part to move it · scroll to zoom · right-click a part for options':'';if(S.vecWant&&!S.vecTimer&&!S.anim)scheduleVec();}
+  $('#stageNote').textContent=S.parts.length?'✥ Drag · 🔍 Scroll · ⋯ Right-click':'';if(S.vecWant&&!S.vecTimer&&!S.anim)scheduleVec();}
 function showCtx(id,x,y){const p=S.parts.find(q=>q.id===id);if(!p)return;S.sel=id;const m=$('#ctxMenu');
   const b=(a,l)=>`<button role="menuitem" data-ca="${a}">${l}</button>`;
   m.innerHTML=`<div class="h">${esc(dispName(p,30))}</div>${b('vis',p.hidden?'Show':'Hide')}${b('lock',p.locked?'Unlock position':'Lock position')}<div class="g">Place</div>${b('auto','Auto flat')}${b('rz','Turn 90° in plan')}${b('rx','Tip 90° over X')}${b('ry','Tip 90° over Y')}<div class="g">Cavity</div>${b('simple',p.simple?'Follow the shape':'Simple pocket')}`;
@@ -11078,7 +11125,7 @@ function measureRect(poly){let best=null;for(let a=0;a<180;a+=0.5){const c=Math.
 
 /* ---------- SCREEN 3: outline (drawing-tool style) ---------- */
 const TOOLS=[['detect','Tap to find part'],['color','Paint'],['shadow','Remove shadow'],['move','Move points'],['dim','Dimension lines']];
-const HINTS={move:'Drag a dot. Shift = straight 90° lines.',curve:'Press a line and pull.',radius:'Click a point to set its radius.',dim:'Drag A and B to where you measured.',detect:'Tap the part.',shadow:'Tap the shadow.',color:''};
+const HINTS={move:'Drag a dot. Shift = straight 90° lines.',curve:'Press a line and pull.',radius:'Click a point to set its radius.',dim:'Drag A and B. Lines stay straight.',detect:'Tap the part.',shadow:'Tap the shadow.',color:''};
 function wire3(){
   const dp=st.phase==='dims',sp=st.phase==='straight';if(dp)st.tool='dim';if(sp){st.tool='move';st.panMode=true;}
   $q('#ppBack').onclick=()=>{closePops();if(st.sketch){if(!st.editGid)go(0);return;}if(sp){st.panMode=false;st.gridMove=false;go(2);}else if(dp){if(!st.editGid){st.phase='straight';render();}}else{st.phase='dims';st.tool='dim';render();}};
@@ -11087,6 +11134,18 @@ function wire3(){
   const tgl=(id,fn)=>{const b=$q(id);if(b)b.onclick=()=>{fn();b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true');draw3();live();};};
   tgl('#ppPts',()=>{st.hidePts=!st.hidePts;});tgl('#ppImg',()=>{st.view=st.view==='outline'?'both':'outline';});tgl('#ppGrid',()=>{st.grid=!st.grid;});tgl('#ppLen',()=>{st.showLen=!st.showLen;});
   const dtg=$q('#ppDimTog');if(dtg)dtg.onclick=()=>{const both=st.dimHide.A&&st.dimHide.B;st.dimHide.A=st.dimHide.B=!both;const ca=$q('#ppShowA'),cb=$q('#ppShowB');if(ca)ca.checked=!st.dimHide.A;if(cb)cb.checked=!st.dimHide.B;dtg.setAttribute('aria-pressed',both?'true':'false');draw3();};tgl('#ppPan',()=>{st.panMode=!st.panMode;const c=$q('#ppWarp');if(c)c.style.cursor=st.panMode?'grab':'';});
+  {const cvw=$q('#ppWarp'),wr=cvw&&cvw.parentElement,g3=$q('.ppcol3'),col=g3&&g3.children[1];
+    if(wr&&col&&g3){wr.style.position='relative';
+      const fl=document.createElement('div');fl.id='ppFloat';fl.style.cssText='position:absolute;z-index:6;width:'+(sp?310:250)+'px;max-width:calc(100% - 24px);display:flex;flex-direction:column;gap:8px';
+      const grip=document.createElement('div');grip.id='ppFloatGrip';grip.title='Drag to move';grip.textContent='⋯⋯';grip.style.cssText='cursor:move;text-align:center;font-size:13px;line-height:8px;color:#9a948a;user-select:none;touch-action:none';fl.appendChild(grip);
+      const card=(el,pad)=>{if(!el)return;el.style.cssText='display:block;background:#fff;border:1px solid #d9d2c3;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:'+(pad||'10px 12px')+';margin:0';fl.appendChild(el);};
+      if(sp)card($q('#ppRot')&&$q('#ppRot').closest('.ppmsg'),'12px 14px');else if(dp){card($q('#ppSize'),'8px 12px');card($q('#ppDimPanel'));}else{card($q('#ppSize'),'8px 12px');card($q('#ppOutPanel'));}
+      wr.appendChild(fl);col.style.display='none';g3.style.gridTemplateColumns='1fr';
+      const place=()=>{const W=wr.clientWidth,Hh=wr.clientHeight,w=fl.offsetWidth,s0=st.stackXY;let x=s0?s0.x:W-w-12,y=s0?s0.y:12;x=Math.max(4,Math.min(W-w-4,x));y=Math.max(4,Math.min(Math.max(4,Hh-40),y));fl.style.left=x+'px';fl.style.top=y+'px';};place();
+      grip.onpointerdown=e=>{e.preventDefault();grip.setPointerCapture(e.pointerId);const x0=parseFloat(fl.style.left),y0=parseFloat(fl.style.top),sx=e.clientX,sy=e.clientY;
+        const mv=ev=>{fl.style.left=(x0+ev.clientX-sx)+'px';fl.style.top=(y0+ev.clientY-sy)+'px';};
+        const up=()=>{grip.removeEventListener('pointermove',mv);grip.removeEventListener('pointerup',up);st.stackXY={x:parseFloat(fl.style.left),y:parseFloat(fl.style.top)};};grip.addEventListener('pointermove',mv);grip.addEventListener('pointerup',up);};}}
+  const dl=$q('#ppDimLock');if(dl)dl.onclick=()=>{st.dimLock=st.dimLock===false;dl.setAttribute('aria-pressed',st.dimLock!==false);if(st.dimLock!==false&&st.dim){const a=st.dim.A,b=st.dim.B,ya=(a[0][1]+a[1][1])/2,xb=(b[0][0]+b[1][0])/2;a[0][1]=a[1][1]=ya;b[0][0]=b[1][0]=xb;st.meas=measure(st.poly);}draw3();live();};
   const gm=$q('#ppGridMove');if(gm)gm.onclick=()=>{st.gridMove=!st.gridMove;gm.textContent=st.gridMove?'🔒 Lock grid':'✥ Move grid';gm.classList.toggle('primary',!!st.gridMove);gm.setAttribute('aria-pressed',!!st.gridMove);const c=$q('#ppWarp');if(c)c.style.cursor=st.gridMove?'move':(st.panMode?'grab':'');draw3();};
   const gp=$q('#ppGridPart');if(gp)gp.onclick=()=>{const pts=st.polyPx?roundedPx():st.dimMask;if(!pts||pts.length<4){const hh=$q('#ppHint');if(hh)hh.textContent='Wait a moment, I am finding the part.';return;}let x0=1e9,y1=-1e9;pts.forEach(p=>{x0=Math.min(x0,p[0]);y1=Math.max(y1,p[1]);});st.gox=x0;st.goy=y1;draw3();};
   const gr=$q('#ppGridReset');if(gr)gr.onclick=()=>{st.gox=0;st.goy=0;draw3();};
@@ -11168,7 +11227,7 @@ function bindCanvas(cv){
     const [X,Y]=g.pos(e);
     if(mode==='griddrag'&&down.u0){const u=g.toU(X,Y);st.gox=down.gox+(u[0]-down.u0[0]);st.goy=down.goy+(u[1]-down.u0[1]);draw3();return;}
     if(mode==='paint'&&st.stroke){const u=g.toU(X,Y);paintTo(u[0],u[1]);st.hover=[X,Y];draw3();return;}
-    if(mode==='dimdrag'&&st.dimSel){const u=g.toU(X,Y);st.dim[st.dimSel[0]][st.dimSel[1]]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];st.meas=measure(st.poly);draw3();live();showLoupeAt(e,st.dim[st.dimSel[0]][st.dimSel[1]]);return;}
+    if(mode==='dimdrag'&&st.dimSel){const u=g.toU(X,Y);st.dim[st.dimSel[0]][st.dimSel[1]]=[Math.max(0,Math.min(st.ww,u[0])),Math.max(0,Math.min(st.wh,u[1]))];if(st.dimLock!==false){const dk=st.dimSel[0],pp=st.dim[dk][st.dimSel[1]];if(dk==='A'){st.dim.A[0][1]=pp[1];st.dim.A[1][1]=pp[1];}else{st.dim.B[0][0]=pp[0];st.dim.B[1][0]=pp[0];}}st.meas=measure(st.poly);draw3();live();showLoupeAt(e,st.dim[st.dimSel[0]][st.dimSel[1]]);return;}
     if(mode==='axisdrag'&&st.mir){const u=g.toU(X,Y);st.mir[st.axisK]=[u[0],u[1]];if(st.mir.a[1]>st.mir.b[1]){const t=st.mir.a;st.mir.a=st.mir.b;st.mir.b=t;st.axisK=st.axisK==='a'?'b':'a';}resym();draw3();live();return;}
     if(mode==='curvedrag'&&st.curve&&st.polyPx[st.curve.i]){const u=g.toU(X,Y),P=st.polyPx,cu=st.curve,p=P[cu.i],q=P[(cu.i+1)%P.length];if(!down.snapped){if(Math.hypot(X-down.X,Y-down.Y)<4*g.k)return;snap();down.snapped=true;}
       let cx,cy;if(cu.ctrl){cx=u[0];cy=u[1];}else{const t0=cu.t0,w0=1-t0;cx=(u[0]-w0*w0*p[0]-t0*t0*q[0])/(2*w0*t0);cy=(u[1]-w0*w0*p[1]-t0*t0*q[1])/(2*w0*t0);}
@@ -11315,7 +11374,14 @@ function updRound(){if(!st||st.tool!=='round')return;const mn=minR(),P=st.polyPx
     msg.textContent=warn?'This corner is too short for R'+f1(mn)+' (it gets only R'+f1(eff)+'). Move the points apart or delete a point.':(has&&r>0?'Real radius of this point: R'+f1(eff)+' mm':(has?'This point is sharp.':''));}}
 
 
-function popPos(pop,cx,cy){const w=pop.offsetWidth||276,h=pop.offsetHeight||150;let x=cx+16,y=cy+16;x=Math.max(8,Math.min(window.innerWidth-w-8,x));y=Math.max(8,Math.min(window.innerHeight-h-8,y));pop.style.left=x+'px';pop.style.top=y+'px';}
+function popPos(pop,cx,cy){const cv=$q('#ppWarp'),r=cv?cv.getBoundingClientRect():{left:0,top:0,right:window.innerWidth,bottom:window.innerHeight},w=pop.offsetWidth||276,h=pop.offsetHeight||150,M=12;let x,y;
+  if(st.popXY){x=r.left+st.popXY.dx;y=r.top+st.popXY.dy;}
+  else{const fl=$q('#ppFloat'),fr=fl?fl.getBoundingClientRect():null,cands=[[r.left+M,r.top+M],[r.left+M,r.bottom-h-M],[r.right-w-M,r.bottom-h-M],[r.right-w-M,r.top+M]];let best=cands[0],bd=-1;
+    for(const c of cands){if(fr&&c[0]<fr.right&&c[0]+w>fr.left&&c[1]<fr.bottom&&c[1]+h>fr.top)continue;const px=Math.max(c[0],Math.min(cx,c[0]+w)),py=Math.max(c[1],Math.min(cy,c[1]+h)),d=Math.hypot(cx-px,cy-py);if(d>bd){bd=d;best=c;}}x=best[0];y=best[1];}
+  x=Math.max(8,Math.min(window.innerWidth-w-8,x));y=Math.max(8,Math.min(window.innerHeight-h-8,y));pop.style.position='fixed';pop.style.left=x+'px';pop.style.top=y+'px';pop.style.cursor='move';pop.title='Drag to move';
+  pop.addEventListener('pointerdown',e=>{if(e.target.closest('input,button,select,textarea,label'))return;const sx=e.clientX,sy=e.clientY,l0=parseFloat(pop.style.left),t0=parseFloat(pop.style.top);pop.setPointerCapture(e.pointerId);
+    const mv=ev=>{pop.style.left=(l0+ev.clientX-sx)+'px';pop.style.top=(t0+ev.clientY-sy)+'px';};
+    const up=()=>{pop.removeEventListener('pointermove',mv);pop.removeEventListener('pointerup',up);const c2=$q('#ppWarp'),rr=c2?c2.getBoundingClientRect():{left:0,top:0};st.popXY={dx:parseFloat(pop.style.left)-rr.left,dy:parseFloat(pop.style.top)-rr.top};};pop.addEventListener('pointermove',mv);pop.addEventListener('pointerup',up);});}
 function delSelected(){if(!st.polyPx||st.selV<0||st.polyPx.length<=3)return;snap();deleteVertex(st.selV);syncPoly();draw3();live();}
 /* magnifier while a point or a line end is dragged */
 function ensureLoupe(){let lp=$q('#ppLoupe');if(lp)return lp;const dpr=Math.min(2,window.devicePixelRatio||1);lp=document.createElement('canvas');lp.id='ppLoupe';lp.width=lp.height=176*dpr;
@@ -11471,7 +11537,7 @@ function shiftSnap(k,u){const P=st.polyPx,n=P.length,a=P[(k-1+n)%n],b=P[(k+1)%n]
 const lenMm=(p,q)=>{const ka=st.k||1,kc=st.kcd>0?st.kcd:ka;return Math.hypot((q[0]-p[0])/PPM*ka,(q[1]-p[1])/PPM*kc);};
 const angMm=(p,q)=>{const ka=st.k||1,kc=st.kcd>0?st.kcd:ka;return Math.atan2(Math.abs(q[1]-p[1])*kc,Math.abs(q[0]-p[0])*ka)*180/Math.PI;};
 
-function partSize(){const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;if(!st.polyPx||!st.meas)return 'Tap the part first.';const q=scaledPoly();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;q.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});return 'Part size: <b>'+f1(x1-x0)+' × '+f1(y1-y0)+' mm</b>'+(st.sketch?'':' (from the Sizes step)');}
+function partSize(){const cs=calcScale();st.k=cs.k;st.kcd=cs.kc;if(!st.polyPx||!st.meas)return 'Tap the part first.';const q=scaledPoly();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;q.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});return 'Part size: <b>'+f1(x1-x0)+' × '+f1(y1-y0)+' mm</b>';}
 function shell(inner,footer,wide){const sk=st.sketch,labels=sk?['Sketch','Height']:STEPS,cur=sk?(st.step===3?1:2):stepIdx();
   return `<div class="ppbox${wide?' wide':''}${st.step===3?' full':''}"><div class="pphd"><h3>${sk?'Sketch a part':'Add from a photo'}</h3><button class="btn sm" id="ppX">Close</button></div>
    <div class="ppsteps">${labels.map((s,i)=>`<span class="ppchip ${cur===i+1?'on':cur>i+1?'done':''}"><i>${cur>i+1?'✓':i+1}</i>${s}</span>`).join('')}</div>
@@ -11517,12 +11583,7 @@ function openRadPop(i){closePops();const P=st.polyPx;if(!P||!P[i])return;st.selV
 /* type the length of a straight line */
 
 const mirBox=()=>'';const mirBoxOld=()=>st.mir?`<div class="ppmsg ok" style="background:#eef3f7;margin-top:8px"><b>⇋ Mirror is ON</b><div class="ppnote">Fix one half. The other half follows, so you see the result on the photo. Drag the grey handles at the ends of the dashed line to put the mirror line in the middle of the part.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppMirL">Edit the left half</button><button class="btn sm" id="ppMirR">Edit the right half</button></div><button class="btn sm" id="ppMirOff">Turn Mirror off</button></div>`:`<div class="ppnote" style="margin-top:8px">The part is symmetrical? Press <b>⇋ Mirror</b> and fix only half of it.</div>`;
-function roundPanel(){const mn=minR();
-  if(st.tool==='curve')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Curve</b><div class="ppnote">• <b>Press a line</b> and pull.<br>• Drag the <b style="color:#2b7cff">blue dot</b> to shape it.<br>• <b>Double-click</b> the line = straight.</div></div>`+mirBox();
-  if(st.tool==='radius')return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Radius</b><div class="ppnote">• <b>Click a point</b> to set its radius.<br>• Inside corners: <b>R${f1(mn)}</b> or more.</div><div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all inside corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>`+mirBox();
-  if(st.tool!=='move')return '';
-  return `<div class="ppmsg ok" style="background:#f6f2ea"><b>Fix the line</b><div class="ppnote">• <b>Drag a dot</b>. Hold <b>Shift</b> = straight 90° lines.<br>• <b>Tap a line</b> = add a dot.<br>• <b>Tap a length</b> = type a new length.</div>
-   <div class="ppflex" style="margin:6px 0"><button class="btn sm" id="ppRadAll">Round all inside corners</button><button class="btn sm" id="ppRadSharp">Make all sharp</button></div></div>`+mirBox();}
+function roundPanel(){const mn=minR();return `<div class="ppflex" style="margin:0"><button class="btn sm" id="ppRadAll" title="Round all inside corners (R${f1(mn)} or more)">◜ Round all</button><button class="btn sm" id="ppRadSharp" title="Make all corners sharp">◻ Sharp all</button></div>`+mirBox();}
 function scr3(){const dp=st.phase==='dims',sp=st.phase==='straight',sk=!!st.sketch,hid=(dp||sp)?' style="display:none"':'',hidD=dp?'':' style="display:none"',hidS=(sk||sp)?' style="display:none"':'';
   const tb=(k,l)=>`<button data-t="${k}" aria-pressed="${st.tool===k}" ${k!=='detect'&&!st.polyPx?'disabled':''}>${l}</button>`;
   const tg=(id,on,l,t,x)=>`<button class="btn sm" id="${id}" aria-pressed="${on}" title="${t}"${x||''}>${l}</button>`;
@@ -11530,7 +11591,7 @@ function scr3(){const dp=st.phase==='dims',sp=st.phase==='straight',sk=!!st.sket
   <div class="ppcol3"><div>
    <div class="pptb"${sp?' style="display:none"':''}><div class="pptoolrow"${hid}><div class="seg pptools">${tb('move','✋ Move points')}${tb('curve','〰 Curve')}${tb('radius','◜ Radius')}</div>${tg('ppMirror',!!st.mir,'⇋ Mirror','Trace only half of the part. The other half follows.',st.polyPx?'':' disabled')}</div>
     <span class="ppgap"></span><button class="btn sm" id="ppUndo" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" id="ppRedo" title="Redo (Ctrl+Y)">↷ Redo</button><button class="btn sm" id="ppDelSel" title="Delete the selected point (Delete key)" disabled${hid}>Delete point</button></div>
-   <div class="pptb" style="margin-top:4px"><span${hid}>${tg('ppPts',!st.hidePts,'● Points','Show or hide the points')}</span><span${hidS}>${tg('ppImg',st.view!=='outline','▣ Photo','Show or hide the photo')}</span>${tg('ppGrid',!!st.grid,'▦ Grid','Show or hide the grid')}<span${hid}>${tg('ppLen',!!st.showLen,'↔ Lengths','Show the length and the angle of every straight line')}</span><span${hidD}>${tg('ppDimTog',!(st.dimHide.A&&st.dimHide.B),'↔ Dimensions','Show or hide the lines A–A and B–B')}</span>${tg('ppPan',!!st.panMode,'🖐 Pan','Drag anywhere to move the view (or hold the Space key)')}
+   <div class="pptb" style="margin-top:4px"><span${hid}>${tg('ppPts',!st.hidePts,'● Points','Show or hide the points')}</span><span${hidS}>${tg('ppImg',st.view!=='outline','▣ Photo','Show or hide the photo')}</span>${tg('ppGrid',!!st.grid,'▦ Grid','Show or hide the grid')}<span${hid}>${tg('ppLen',!!st.showLen,'↔ Lengths','Show the length and the angle of every straight line')}</span><span${hidD}>${tg('ppDimTog',!(st.dimHide.A&&st.dimHide.B),'↔ Dimensions','Show or hide the lines A–A and B–B')}</span><span${hidD}>${tg('ppDimLock',st.dimLock!==false,'⟂ Straight','Lock A–A horizontal and B–B vertical')}</span>${tg('ppPan',!!st.panMode,'🖐 Pan','Drag anywhere to move the view (or hold the Space key)')}
     <span class="ppgap"></span><span style="white-space:nowrap"><button class="btn sm" id="ppZm" title="Zoom out (or use the mouse wheel)">−</button> <button class="btn sm" id="ppZf" title="Show the whole sheet">Fit</button> <button class="btn sm" id="ppZpart" title="${dp?'Zoom to the lines':'Zoom to the part'}">${dp?'Lines':'Part'}</button> <button class="btn sm" id="ppZp" title="Zoom in">+</button></span></div>
    <div class="ppwrap"><canvas class="ppcv" id="ppWarp" style="width:100%"></canvas></div>
    <div class="ppnote" id="ppHint"></div></div>
@@ -11538,7 +11599,7 @@ function scr3(){const dp=st.phase==='dims',sp=st.phase==='straight',sk=!!st.sket
    <div class="ppmsg" style="background:#f6f2ea;margin-bottom:8px${(sk||!sp)?';display:none':''}"><b>Straighten the photo</b> <span id="ppRotV" style="float:right"><b>${f1(st.rot||0)}°</b></span>
     <input type="range" id="ppRot" min="-20" max="20" step="0.1" value="${st.rot||0}" style="width:100%">
     <div class="ppflex" style="margin:4px 0 0"><button class="btn sm" id="ppRotM">◀ 0.5°</button><button class="btn sm" id="ppRotP">0.5° ▶</button><button class="btn sm primary" id="ppRotAuto" title="Turn the photo so the part is straight on the grid">Auto</button><button class="btn sm" id="ppRot0">Reset</button></div>
-    <div class="ppflex" style="margin:8px 0 0"><button class="btn sm${st.gridMove?' primary':''}" id="ppGridMove" aria-pressed="${!!st.gridMove}" title="Drag on the photo to slide the grid. Press again to lock it.">${st.gridMove?'🔒 Lock grid':'✥ Move grid'}</button><button class="btn sm" id="ppGridPart" title="Put the grid zero on the lower-left corner of the part">Part origin</button><button class="btn sm" id="ppGridReset" title="Put the grid back on the sheet corner">Grid reset</button></div>
+    <div class="ppflex" style="margin:8px 0 0"><button class="btn sm${st.gridMove?' primary':''}" id="ppGridMove" aria-pressed="${!!st.gridMove}" title="Drag on the photo to slide the grid. Press again to lock it.">${st.gridMove?'🔒 Lock grid':'✥ Move grid'}</button><button class="btn sm" id="ppGridReset" title="Put the grid back on the sheet corner">Grid reset</button></div>
     <div class="ppnote" style="margin:4px 0 0">Part straight on the grid.</div></div>
    <div id="ppOutPanel"${hid}>
     ${roundPanel()}
@@ -11561,7 +11622,7 @@ function scr3(){const dp=st.phase==='dims',sp=st.phase==='straight',sk=!!st.sket
 
 /* ---------- V3.7: clear Start (green) and End (red) points, typed angle, review with show/hide ---------- */
 function closePops(){['ppRadPop','ppDimPop'].forEach(id=>{const e=$q('#'+id);if(e)e.remove();});if(st&&st.lenSel!=null){st.lenSel=null;try{draw3();}catch(e){}}}
-function openLenPop(i){closePops();const P=st.polyPx,n=P.length,p=P[i];if(!p||hasCurve(p))return;st.lenSel=i;draw3();const g=G(),r=g.cv.getBoundingClientRect(),mm=segMid(P,i),qq=g.toS(mm[0],mm[1]),j=(i+1)%n;
+function openLenPop(i){closePops();const P=st.polyPx,n=P.length,p=P[i];if(!p||hasCurve(p))return;st.lenSel=i;st.lenSwap=false;draw3();const g=G(),r=g.cv.getBoundingClientRect(),mm=segMid(P,i),qq=g.toS(mm[0],mm[1]),j=(i+1)%n;
   const pop=document.createElement('div');pop.id='ppDimPop';pop.className='ppradpop';pop.style.width='340px';
   pop.innerHTML=`<button class="btn sm" id="ppLnX" style="float:right" title="Close">✕</button><b>Line ${i+1}–${j+1}</b>
    <div class="ppnote" style="margin:4px 0 8px">Type the new length. The <span style="color:#dc2626;font-weight:700">red end</span> moves, the <span style="color:#16a34a;font-weight:700">green start</span> stays.</div>
@@ -11569,7 +11630,7 @@ function openLenPop(i){closePops();const P=st.polyPx,n=P.length,p=P[i];if(!p||ha
    <div class="ppnote" style="margin:4px 0">Angle: 0° is horizontal, 90° is vertical. The line keeps its direction.</div>
    
    
-   <div class="ppflex" style="margin:0"><button class="btn primary sm" id="ppLnOk">OK</button></div>
+   <div class="ppflex" style="margin:0"><button class="btn sm" id="ppLnSwap" title="Swap start and end: the other end will move">⇄ Swap</button><button class="btn primary sm" id="ppLnOk">OK</button></div>
    <div class="ppnote" id="ppLnMsg" style="margin:6px 0"></div>`;
   root.appendChild(pop);popPos(pop,r.left+qq[0]/g.k,r.top+qq[1]/g.k);
   const vL=pop.querySelector('#ppLnV'),vA=pop.querySelector('#ppLnA'),msg=pop.querySelector('#ppLnMsg'),cl=v=>Math.max(0,Math.min(v,1e9));
@@ -11578,9 +11639,9 @@ function openLenPop(i){closePops();const P=st.polyPx,n=P.length,p=P[i];if(!p||ha
     const a=P[i],b=P[j],ka=st.k||1,kc=st.kcd>0?st.kcd:ka,dx=(b[0]-a[0])*ka/PPM,dy=(b[1]-a[1])*kc/PPM,sx=dx<0?-1:1,sy=dy>0?1:-1,th=A*Math.PI/180,dxp=sx*L*Math.cos(th)/ka*PPM,dyp=sy*L*Math.sin(th)/kc*PPM;snap();
     if(which==='end'){b[0]=Math.max(0,Math.min(st.ww,a[0]+dxp));b[1]=Math.max(0,Math.min(st.wh,a[1]+dyp));if(st.mir)mirrorSync(j);}else{a[0]=Math.max(0,Math.min(st.ww,b[0]-dxp));a[1]=Math.max(0,Math.min(st.wh,b[1]-dyp));if(st.mir)mirrorSync(i);}
     syncPoly();draw3();live();msg.textContent='Done. Length '+f1(lenMm(P[i],P[j]))+' mm, angle '+f1(angMm(P[i],P[j]))+'°.';fill();};
-  pop.querySelector('#ppLnOk').onclick=()=>{apply('end');if(/^Done/.test(msg.textContent))closePops();};pop.querySelector('#ppLnX').onclick=closePops;
+  pop.querySelector('#ppLnOk').onclick=()=>{apply(st.lenSwap?'start':'end');if(/^Done/.test(msg.textContent))closePops();};pop.querySelector('#ppLnX').onclick=closePops;pop.querySelector('#ppLnSwap').onclick=()=>{st.lenSwap=!st.lenSwap;msg.textContent=st.lenSwap?'Swapped: the other end moves.':'';draw3();};
   
-  [vL,vA].forEach(x=>{x.onkeydown=ev=>{if(ev.key==='Enter'){apply('end');if(/^Done/.test(msg.textContent))closePops();}};});
+  [vL,vA].forEach(x=>{x.onkeydown=ev=>{if(ev.key==='Enter'){apply(st.lenSwap?'start':'end');if(/^Done/.test(msg.textContent))closePops();}};});
   setTimeout(()=>{vL.focus();vL.select();},30);}
 /* the final check: the outline on the photo with the sizes, and show or hide each */
 function drawReview(){const cv=$q('#ppRev');if(!cv||!st.polyPx)return;const W=cv.width,Hh=cv.height,g=cv.getContext('2d');g.clearRect(0,0,W,Hh);g.fillStyle='#f6f3ec';g.fillRect(0,0,W,Hh);
@@ -11632,11 +11693,11 @@ function openFinger(gid,kind){kind=kind==='notch'?'notch':'finger';const p=S.par
   froot=document.createElement('div');froot.className='ppov';document.body.appendChild(froot);fgRender();}
 function fgRender(){const p=fs.p;
   froot.innerHTML=`<div class="ppbox wide full"><div class="pphd"><h3>${fs.kind==='notch'?'Notches':'Finger access'}: ${esc(p.name)}</h3><button class="btn sm" id="fgX">Close</button></div>
-   <div class="ppnote" style="margin:0 0 6px">${fs.kind==='notch'?'Cut a <b>round, oval or rectangle notch</b> in the cavity of the part, for example for a cable, a button or a side feature. <b>Finger access is a separate tool.</b> Each notch has its own size and depth: full depth of the cavity, or a smaller depth you type (5 mm or more).':'Cut a <b>round, oval or rectangle notch</b> in the foam next to the part, so a finger can reach under it. <b>Notches for part features are a separate tool.</b> Each finger access goes to the full depth of the cavity, or to a smaller depth you type (5 mm or more).'} <b>The part, your drawing and its STEP do not change.</b></div>
+   <div class="ppnote" style="margin:0 0 6px">${fs.kind==='notch'?'✂ Notch in the cavity (cable, button, side feature). Own size and depth.':'☝ Notch next to the part, so a finger can lift it. Own size and depth.'} <b>Part and STEP stay the same.</b></div>
    <div class="ppcol3"><div>
     <div class="pptb"><button class="btn sm primary" id="fgAddC">＋ Circle</button><button class="btn sm primary" id="fgAddO">＋ Oval</button><button class="btn sm primary" id="fgAddR">＋ Rectangle</button><span class="ppgap"></span><button class="btn sm" id="fgGrid" aria-pressed="${fs.grid}">▦ Grid</button><button class="btn sm" id="fgDim" aria-pressed="${fs.dims}">↔ Sizes</button><span class="ppgap"></span><span style="white-space:nowrap"><button class="btn sm" id="fgZm">−</button> <button class="btn sm" id="fgZf">Fit</button> <button class="btn sm" id="fgZp">+</button></span></div>
     <div class="ppwrap"><canvas class="ppcv" id="fgCv" style="width:100%"></canvas></div>
-    <div class="ppnote">Orange = the cavity of the part. ${fs.kind==='notch'?'Green = a notch.':'Blue = a finger access.'} Grey dashed = the other tool (not editable here). Drag a notch to move it, drag the white dots to change the size, drag the green dot to turn it. Wheel = zoom, drag the empty area = move the view.</div></div>
+    <div class="ppnote">🟧 Cavity · ${fs.kind==='notch'?'🟩 Notch':'🟦 Finger access'} · ⬜ Other tool · Drag = move · ○ size · 🟢 turn</div></div>
    <div id="fgPanel"></div></div>
    <div class="ppft"><button class="btn" id="fgCancel">Cancel</button><button class="btn primary" id="fgApply">Apply to the foam</button></div></div>`;
   const q=s=>froot.querySelector(s);q('#fgX').onclick=q('#fgCancel').onclick=closeFinger;
@@ -11757,9 +11818,9 @@ if(st.guides&&st.guides.length){c.save();c.strokeStyle='#2b7cff';c.lineWidth=1.5
         c.fillStyle='rgba(255,255,255,.93)';c.fillRect(lx,ly,tw,18*d);c.strokeStyle=skew?'#c2410c':'#0f766e';c.lineWidth=1*d;c.strokeRect(lx,ly,tw,18*d);c.fillStyle=skew?'#c2410c':'#0f766e';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,lx+tw/2,ly+9*d);st._lenLabels.push({i,x:lx,y:ly,w:tw,h:18*d});}}
     if(st.selV>=0&&P[st.selV]){const k=st.selV,a=P[(k-1+n)%n],p=P[k],b=P[(k+1)%n],ka=st.k||1,kc=st.kcd>0?st.kcd:ka,u1=[(a[0]-p[0])*ka,(a[1]-p[1])*kc],u2=[(b[0]-p[0])*ka,(b[1]-p[1])*kc],cosv=(u1[0]*u2[0]+u1[1]*u2[1])/((Math.hypot(u1[0],u1[1])*Math.hypot(u2[0],u2[1]))||1),ang=Math.acos(Math.max(-1,Math.min(1,cosv)))*180/Math.PI,q=g.toS(p[0],p[1]),txt='∠ '+f1(ang)+'°';
       c.font='bold '+(12*d)+'px sans-serif';const tw=c.measureText(txt).width+12*d;c.fillStyle='#1d2a44';c.fillRect(q[0]+12*d,q[1]-30*d,tw,20*d);c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,q[0]+12*d+tw/2,q[1]-20*d);}}
-if(st.lenSel!=null&&st.polyPx&&st.polyPx[st.lenSel]&&st.phase!=='dims'){const P=st.polyPx,i=st.lenSel,n=P.length,a=g.toS(P[i][0],P[i][1]),b=g.toS(P[(i+1)%n][0],P[(i+1)%n][1]);c.save();c.lineCap='round';c.lineWidth=6*d;const gr=c.createLinearGradient(a[0],a[1],b[0],b[1]);gr.addColorStop(0,'rgba(22,163,74,.9)');gr.addColorStop(1,'rgba(220,38,38,.9)');c.strokeStyle=gr;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();
+if(st.lenSel!=null&&st.polyPx&&st.polyPx[st.lenSel]&&st.phase!=='dims'){const P=st.polyPx,i=st.lenSel,n=P.length,a=g.toS(P[i][0],P[i][1]),b=g.toS(P[(i+1)%n][0],P[(i+1)%n][1]);c.save();c.lineCap='round';c.lineWidth=6*d;const gr=c.createLinearGradient(a[0],a[1],b[0],b[1]);gr.addColorStop(0,st.lenSwap?'rgba(220,38,38,.9)':'rgba(22,163,74,.9)');gr.addColorStop(1,st.lenSwap?'rgba(22,163,74,.9)':'rgba(220,38,38,.9)');c.strokeStyle=gr;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();
     const mk=(q,col,txt,word)=>{c.beginPath();c.arc(q[0],q[1],12*d,0,7);c.fillStyle=col;c.fill();c.strokeStyle='#fff';c.lineWidth=2.5*d;c.stroke();c.fillStyle='#fff';c.font='bold '+(11*d)+'px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,q[0],q[1]+d);c.font='bold '+(12*d)+'px sans-serif';const tw=c.measureText(word).width+12*d;c.fillStyle=col;c.fillRect(q[0]-tw/2,q[1]-38*d,tw,19*d);c.fillStyle='#fff';c.fillText(word,q[0],q[1]-28*d);};
-    mk(a,'#16a34a','S','START');mk(b,'#dc2626','E','END');const ang=Math.atan2(b[1]-a[1],b[0]-a[0]),ex=b[0]-Math.cos(ang)*20*d,ey=b[1]-Math.sin(ang)*20*d,ah=14*d;c.fillStyle='#dc2626';c.beginPath();c.moveTo(ex+Math.cos(ang)*ah*0.5,ey+Math.sin(ang)*ah*0.5);c.lineTo(ex-Math.cos(ang)*ah*0.5-Math.sin(ang)*ah*0.6,ey-Math.sin(ang)*ah*0.5+Math.cos(ang)*ah*0.6);c.lineTo(ex-Math.cos(ang)*ah*0.5+Math.sin(ang)*ah*0.6,ey-Math.sin(ang)*ah*0.5-Math.cos(ang)*ah*0.6);c.closePath();c.fill();c.restore();}
+    const sw=!!st.lenSwap,A=sw?b:a,B=sw?a:b;mk(A,'#16a34a','S','START');mk(B,'#dc2626','E','END');const ang=Math.atan2(B[1]-A[1],B[0]-A[0]),ex=B[0]-Math.cos(ang)*20*d,ey=B[1]-Math.sin(ang)*20*d,ah=14*d;c.fillStyle='#dc2626';c.beginPath();c.moveTo(ex+Math.cos(ang)*ah*0.5,ey+Math.sin(ang)*ah*0.5);c.lineTo(ex-Math.cos(ang)*ah*0.5-Math.sin(ang)*ah*0.6,ey-Math.sin(ang)*ah*0.5+Math.cos(ang)*ah*0.6);c.lineTo(ex-Math.cos(ang)*ah*0.5+Math.sin(ang)*ah*0.6,ey-Math.sin(ang)*ah*0.5-Math.cos(ang)*ah*0.6);c.closePath();c.fill();c.restore();}
   drawDims(c,g,d);
   if(st.tap&&st.tool==='detect'){const q=g.toS(st.tap[0],st.tap[1]);c.strokeStyle='#2f8f5b';c.lineWidth=3*d;c.beginPath();c.arc(q[0],q[1],9*d,0,7);c.stroke();}
   if(!st.polyPx&&st.phase==='outline'){const msg=st.autoBusy?'Finding the outline…':'Tap on your part to find its outline';c.font='bold '+(18*d)+'px sans-serif';const tw=c.measureText(msg).width+40*d,th=44*d,x0=(g.W-tw)/2,y0=g.H*0.05;c.fillStyle='rgba(29,42,68,.9)';c.beginPath();if(c.roundRect)c.roundRect(x0,y0,tw,th,12*d);else c.rect(x0,y0,tw,th);c.fill();c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.fillText(msg,g.W/2,y0+th/2);}}
