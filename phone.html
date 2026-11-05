@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="color-scheme" content="only light">
 <meta name="theme-color" content="#f05325">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Photo Tracer">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Shell-Case Photo Tracer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -199,7 +206,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
 <li>Measure the <b>longest side</b> of the real object with a ruler or caliper and type it. Type the depth (thickness) too.</li>
-<li>The size is an estimate. Check it with a real sample.</li></ul>
+<li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
 <div class="bt"><button class="go" id="tipsOk">OK</button></div></div></div>
 
 <div class="modal" id="mSend"><div class="card"><h3>Send to the computer</h3><div id="sendTxt"></div>
@@ -432,6 +439,11 @@ $('#sendShare').onclick=async()=>{try{if(navigator.share){await navigator.share(
 $('#sendCopy').onclick=async()=>{try{await navigator.clipboard.writeText(sendLink);toast('Link copied.');}catch(e){const t=document.createElement('textarea');t.value=sendLink;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('Link copied.');}};
 window.__A=A;window.__makeLink=makeLink;
 
+/* ---------- mini app: install and offline ---------- */
+let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;$('#instRow').style.display='flex';});
+$('#instBtn').onclick=async()=>{if(!instEv)return;instEv.prompt();try{await instEv.userChoice;}catch(e){}instEv=null;$('#instRow').style.display='none';};
+window.addEventListener('appinstalled',()=>{toast('Installed. Open it from your home screen.');$('#instRow').style.display='none';});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('offline mode not available',e));});
 startCam();
 </script>
 </body>
