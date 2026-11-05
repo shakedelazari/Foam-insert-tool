@@ -45,23 +45,20 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 #grid{position:absolute;inset:0;pointer-events:none;background:
  linear-gradient(to right,transparent calc(33.33% - 1px),rgba(255,255,255,.3) calc(33.33% - 1px),rgba(255,255,255,.3) 33.33%,transparent 33.33%,transparent calc(66.66% - 1px),rgba(255,255,255,.3) calc(66.66% - 1px),rgba(255,255,255,.3) 66.66%,transparent 66.66%),
  linear-gradient(to bottom,transparent calc(33.33% - 1px),rgba(255,255,255,.3) calc(33.33% - 1px),rgba(255,255,255,.3) 33.33%,transparent 33.33%,transparent calc(66.66% - 1px),rgba(255,255,255,.3) calc(66.66% - 1px),rgba(255,255,255,.3) 66.66%,transparent 66.66%)}
-.aim{position:absolute;pointer-events:none;filter:drop-shadow(0 0 3px rgba(0,0,0,.55))}
-#aimFix{left:50%;top:50%;width:190px;height:190px;margin:-95px 0 0 -95px}
-#aimMov{left:50%;top:50%;width:100px;height:100px;margin:-50px 0 0 -50px;transition:transform .06s linear}
+.aim{position:absolute;pointer-events:none;filter:drop-shadow(0 0 3px rgba(0,0,0,.6))}
+#aimFix{left:50%;top:50%;width:104px;height:104px;margin:-52px 0 0 -52px}
 .aim path{stroke-linejoin:round}
-.aim .q{fill:#fff;fill-opacity:.26;stroke:#fff;stroke-opacity:.85;stroke-width:3}
-.aim .o{fill:var(--or);fill-opacity:.62;stroke:#fff;stroke-opacity:.9;stroke-width:3}
-#aimMov .q{fill-opacity:.55}#aimMov .o{fill-opacity:.9}
-.flat .aim .o{fill:var(--ok)}
-.flat #aimFix .q{fill-opacity:.38}
-#chev{position:absolute;pointer-events:none;width:34px;height:34px;margin:-17px 0 0 -17px;display:none}
-#chev path{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
-.flat #chev{display:none!important}
-#lvl{position:absolute;top:calc(env(safe-area-inset-top) + 70px);left:14px;right:14px;text-align:center;color:#fff;font-size:15px;font-weight:600;text-shadow:0 1px 4px #000}
+#sCam{--c:#f05325}
+#sCam.lv-red{--c:#e5252f}#sCam.lv-orange{--c:#ff8c1a}#sCam.lv-green{--c:#22c07a}
+.aim .q{fill:var(--c);fill-opacity:.22;stroke:#fff;stroke-opacity:.9;stroke-width:3.5}
+.aim .o{fill:var(--c);fill-opacity:.85;stroke:#fff;stroke-opacity:.95;stroke-width:3.5}
+#angle{position:absolute;top:calc(env(safe-area-inset-top) + 62px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;background:rgba(0,0,0,.42);border-radius:20px;padding:6px 22px 8px;min-width:190px;color:var(--c)}
+#angleNum{font-size:58px;line-height:1.05;font-weight:700;letter-spacing:-1px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+#angleMsg{font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 4px #000;text-align:center}
 #camBack{position:absolute;top:calc(env(safe-area-inset-top) + 8px);left:6px;color:#fff;filter:drop-shadow(0 1px 3px #000)}
 #zoomChip{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:12px;background:rgba(0,0,0,.5);color:#fff;border:2px solid rgba(255,255,255,.7);border-radius:20px;padding:6px 14px;font:600 15px 'Poppins',sans-serif}
 #camMsg{position:absolute;left:20px;right:20px;top:34%;color:#fff;text-align:center;font-size:17px;display:none;background:rgba(0,0,0,.65);padding:16px;border-radius:14px}
-#enLvl{position:absolute;top:calc(env(safe-area-inset-top) + 112px);left:50%;transform:translateX(-50%);display:none;background:var(--or);color:#fff;border:0;border-radius:22px;padding:11px 18px;font:600 15px 'Poppins',sans-serif}
+#enLvl{position:absolute;top:calc(env(safe-area-inset-top) + 190px);left:50%;transform:translateX(-50%);display:none;background:var(--or);color:#fff;border:0;border-radius:22px;padding:11px 18px;font:600 15px 'Poppins',sans-serif}
 .camBar{position:absolute;left:0;right:0;bottom:0;height:150px;background:rgba(20,18,16,.45);display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom)}
 .camBtn{background:none;border:0;color:#fff;font:600 15px 'Poppins',sans-serif;text-align:center;width:104px}
 .camBtn svg{display:block;margin:0 auto 4px;width:34px;height:34px}
@@ -122,11 +119,11 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
   <video id="vid" playsinline muted autoplay></video>
   <div id="grid"></div>
   <div class="aim" id="aimFix"><svg viewBox="-100 -100 200 200"><path class="q" d="M -4 -4 L -91.9 -4 A 92 92 0 0 1 -4 -91.9 Z"/><path class="o" d="M 4 -4 L 4 -91.9 A 92 92 0 0 1 91.9 -4 Z"/><path class="q" d="M -4 4 L -4 91.9 A 92 92 0 0 1 -91.9 4 Z"/><path class="q" d="M 4 4 L 91.9 4 A 92 92 0 0 1 4 91.9 Z"/></svg></div>
-  <div class="aim" id="aimMov"><svg viewBox="-100 -100 200 200"><path class="q" d="M -4 -4 L -91.9 -4 A 92 92 0 0 1 -4 -91.9 Z"/><path class="o" d="M 4 -4 L 4 -91.9 A 92 92 0 0 1 91.9 -4 Z"/><path class="q" d="M -4 4 L -4 91.9 A 92 92 0 0 1 -91.9 4 Z"/><path class="q" d="M 4 4 L 91.9 4 A 92 92 0 0 1 4 91.9 Z"/></svg></div>
-  <svg id="chev" viewBox="-20 -20 40 40"><path d="M-12 7 0 -7 12 7"/></svg>
+  
+  
   <button class="back" id="camBack" aria-label="Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button>
   <button id="zoomChip">Zoom 3×</button>
-  <div id="lvl">Hold the phone flat above the object</div>
+  <div id="angle"><div id="angleNum">–</div><div id="angleMsg">Hold the phone flat above the object</div></div>
   <button id="enLvl">Tap to turn on the level</button>
   <div id="camMsg"></div>
   <div class="camBar">
@@ -201,7 +198,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 
 <div class="modal" id="mTips"><div class="card"><h3>Tips for a good scan</h3><ul>
 <li>Put <b>one object</b> on a flat, plain surface that looks different from the object (a dark object on a light surface, or the other way).</li>
-<li>Hold the phone <b>flat, straight above</b> the object. Move the small pointer onto the big target. Both turn <b style="color:#22a366">green</b> when the phone is flat.</li>
+<li>Hold the phone <b>flat, straight above</b> the object. Watch the tilt number: <b style="color:#e5252f">red</b> = off, <b style="color:#ff8c1a">orange</b> = close, <b style="color:#22a366">green</b> = spot on. The logo has the same colours.</li>
 <li><b>Zoom:</b> use <b>3×</b> (the chip at the top). The object should fill about half of the screen. Hold the phone about 40 cm above it.</li>
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
@@ -259,24 +256,23 @@ function initLevel(){
   else bindLevel();
 }
 function bindLevel(){if(levelOn)return;levelOn=true;window.addEventListener('deviceorientation',onOri);}
-let wasFlat=false;
+let wasState='';
+// tilt state: red = off (more than 5 degrees), orange = close (2 to 5), green = spot on (2 or less)
+function tiltState(t){return t<=2?'green':t<=5?'orange':'red';}
 function onOri(e){
-  if(e.beta==null)return;const b=e.beta,g=e.gamma,t=Math.hypot(b,g);flat=t<2.5;
-  // the pointer is a bubble: it slides toward the high side. Put it on the target.
-  const sc=$('#sCam'),mx=Math.min(innerWidth,innerHeight)*0.42,K=14;let dx=-g*K,dy=-b*K;const L=Math.hypot(dx,dy);if(L>mx){dx*=mx/L;dy*=mx/L;}
-  if(flat){dx=0;dy=0;}
-  $('#aimMov').style.transform='translate('+dx+'px,'+dy+'px)';
-  const ch=$('#chev');if(!flat&&Math.hypot(dx,dy)>46){const ang=Math.atan2(-dy,-dx)*180/Math.PI+90,ux=dx/Math.hypot(dx,dy);ch.style.display='block';ch.style.left=(innerWidth/2+dx*0.62)+'px';ch.style.top=(innerHeight/2+dy*0.62)+'px';ch.style.transform='rotate('+ang+'deg)';}else ch.style.display='none';
-  sc.classList.toggle('flat',flat);
-  $('#lvl').textContent=flat?'Flat ✓ Take the photo':'Tilt '+t.toFixed(0)+'° — move the pointer onto the target';
-  if(flat&&!wasFlat&&navigator.vibrate)try{navigator.vibrate(25);}catch(e){}wasFlat=flat;
+  if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),stt=tiltState(t),sc=$('#sCam');flat=stt==='green';
+  sc.classList.remove('lv-red','lv-orange','lv-green');sc.classList.add('lv-'+stt);
+  $('#angleNum').textContent=(t<10?t.toFixed(1):Math.round(t))+'°';
+  $('#angleMsg').textContent=stt==='green'?'Spot on. Take the photo':stt==='orange'?'Almost flat':'Hold the phone flat above the object';
+  tiltNow=t;if(stt==='green'&&wasState!=='green'&&navigator.vibrate)try{navigator.vibrate(25);}catch(e){}wasState=stt;
 }
+let tiltNow=null;
 function grabFrame(){
   const v=$('#vid'),vw=v.videoWidth,vh=v.videoHeight,W=v.clientWidth||innerWidth,H=v.clientHeight||innerHeight,s=Math.max(W/vw,H/vh);
   let cw=W/s/digZoom,ch=H/s/digZoom;cw=Math.min(cw,vw);ch=Math.min(ch,vh);const sx=(vw-cw)/2,sy=(vh-ch)/2,c=document.createElement('canvas');c.width=Math.round(cw);c.height=Math.round(ch);c.getContext('2d').drawImage(v,sx,sy,cw,ch,0,0,c.width,c.height);return c;}
 $('#shut').onclick=()=>{
   const v=$('#vid');if(!stream||!v.videoWidth){toast('The camera is not ready.');return;}
-  if(levelOn&&!flat)toast('The phone is not flat. Sizes can be wrong.',1800);
+  if(levelOn&&tiltNow!=null&&tiltNow>5)toast('The phone is not flat ('+tiltNow.toFixed(0)+'°). Sizes can be wrong.',2200);
   newSource(grabFrame());
 };
 $('#camLib').onclick=()=>go.lib();
