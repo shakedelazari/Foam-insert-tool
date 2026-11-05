@@ -50,8 +50,8 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 .aim path{stroke-linejoin:round}
 #sCam{--c:#f05325}
 #sCam.lv-red{--c:#e5252f}#sCam.lv-orange{--c:#ff8c1a}#sCam.lv-green{--c:#22c07a}
-.aim .q{fill:var(--c);fill-opacity:.22;stroke:#fff;stroke-opacity:.9;stroke-width:3.5}
-.aim .o{fill:var(--c);fill-opacity:.85;stroke:#fff;stroke-opacity:.95;stroke-width:3.5}
+.aim .q{fill:#fff;fill-opacity:.25;stroke:#fff;stroke-opacity:.9;stroke-width:3.5}
+.aim .o{fill:#f05325;fill-opacity:.85;stroke:#fff;stroke-opacity:.95;stroke-width:3.5}
 #angle{position:absolute;top:calc(env(safe-area-inset-top) + 62px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;background:rgba(0,0,0,.42);border-radius:20px;padding:6px 22px 8px;min-width:190px;color:var(--c)}
 #angleNum{font-size:58px;line-height:1.05;font-weight:700;letter-spacing:-1px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
 #angleMsg{font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 4px #000;text-align:center}
@@ -198,7 +198,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 
 <div class="modal" id="mTips"><div class="card"><h3>Tips for a good scan</h3><ul>
 <li>Put <b>one object</b> on a flat, plain surface that looks different from the object (a dark object on a light surface, or the other way).</li>
-<li>Hold the phone <b>flat, straight above</b> the object. Watch the tilt number: <b style="color:#e5252f">red</b> = off, <b style="color:#ff8c1a">orange</b> = close, <b style="color:#22a366">green</b> = spot on. The logo has the same colours.</li>
+<li>Hold the phone <b>flat, straight above</b> the object. The four parts of the logo show which side of the phone is too high: <b style="color:#e5252f">red</b> = very high, <b style="color:#ff8c1a">orange</b> = a little high, <b style="color:#22a366">green</b> = fine. Press the red side down until all four are green.</li>
 <li><b>Zoom:</b> use <b>3×</b> (the chip at the top). The object should fill about half of the screen. Hold the phone about 40 cm above it.</li>
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
@@ -257,13 +257,26 @@ function initLevel(){
 }
 function bindLevel(){if(levelOn)return;levelOn=true;window.addEventListener('deviceorientation',onOri);}
 let wasState='';
-// tilt state: red = off (more than 5 degrees), orange = close (2 to 5), green = spot on (2 or less)
+// states: red = off (more than 5 degrees), orange = close (2 to 5), green = spot on (2 or less)
 function tiltState(t){return t<=2?'green':t<=5?'orange':'red';}
+const COL={red:'#e5252f',orange:'#ff8c1a',green:'#22c07a'};
+const QDIR=[[-1,-1],[1,-1],[-1,1],[1,1]]; // the 4 logo parts: top-left, top-right, bottom-left, bottom-right
+const EDGE=['right edge','bottom-right corner','bottom edge','bottom-left corner','left edge','top-left corner','top edge','top-right corner'];
+function paintLogo(Hx,Hy,t){ // each part shows how high that side of the phone is
+  const P=$$('#aimFix path');
+  if(t<0.15){P.forEach(p=>{p.style.fill=COL.green;p.style.fillOpacity=.7;});return;}
+  const c=QDIR.map(u=>Math.max(0,(Hx*u[0]+Hy*u[1])/(1.4142*t))),m=Math.max(...c)||1;
+  P.forEach((p,i)=>{const v=t*c[i]/m,st=tiltState(v);p.style.fill=COL[st];p.style.fillOpacity=.7;});
+}
 function onOri(e){
   if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),stt=tiltState(t),sc=$('#sCam');flat=stt==='green';
+  // the high side of the phone (top edge up when beta > 0, right edge down when gamma > 0, so the left is high)
+  const Hx=-e.gamma,Hy=-e.beta;
   sc.classList.remove('lv-red','lv-orange','lv-green');sc.classList.add('lv-'+stt);
+  paintLogo(Hx,Hy,t);
   $('#angleNum').textContent=(t<10?t.toFixed(1):Math.round(t))+'°';
-  $('#angleMsg').textContent=stt==='green'?'Spot on. Take the photo':stt==='orange'?'Almost flat':'Hold the phone flat above the object';
+  const ang=(Math.atan2(Hy,Hx)*180/Math.PI+360)%360,side=EDGE[Math.round(ang/45)%8];
+  $('#angleMsg').textContent=stt==='green'?'Spot on. Take the photo':stt==='orange'?'Almost. Lower the '+side+' a little':'Lower the '+side;
   tiltNow=t;if(stt==='green'&&wasState!=='green'&&navigator.vibrate)try{navigator.vibrate(25);}catch(e){}wasState=stt;
 }
 let tiltNow=null;
