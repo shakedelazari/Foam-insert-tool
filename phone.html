@@ -46,7 +46,13 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
  linear-gradient(to right,transparent calc(33.33% - 1px),rgba(255,255,255,.3) calc(33.33% - 1px),rgba(255,255,255,.3) 33.33%,transparent 33.33%,transparent calc(66.66% - 1px),rgba(255,255,255,.3) calc(66.66% - 1px),rgba(255,255,255,.3) 66.66%,transparent 66.66%),
  linear-gradient(to bottom,transparent calc(33.33% - 1px),rgba(255,255,255,.3) calc(33.33% - 1px),rgba(255,255,255,.3) 33.33%,transparent 33.33%,transparent calc(66.66% - 1px),rgba(255,255,255,.3) calc(66.66% - 1px),rgba(255,255,255,.3) 66.66%,transparent 66.66%)}
 .aim{position:absolute;pointer-events:none;filter:drop-shadow(0 0 3px rgba(0,0,0,.6))}
-#aimFix{left:50%;top:50%;width:104px;height:104px;margin:-52px 0 0 -52px}
+#aimFix,#plusWrap{left:50%;top:50%;width:104px;height:104px;margin:-52px 0 0 -52px}
+#plusWrap{filter:drop-shadow(0 0 3px rgba(0,0,0,.65))}
+#plusMov{width:100%;height:100%;transition:transform .07s linear}
+#plusMov rect{fill:#fff;stroke:#292524;stroke-opacity:.55;stroke-width:1.6}
+#sCam.lv-green #plusMov rect{fill:#22c07a;stroke:#fff;stroke-opacity:1}
+#sCam.lv-orange #plusMov rect{fill:#ffe0b8}
+#sCam.lv-red #plusMov rect{fill:#ffd0d3}
 .aim path{stroke-linejoin:round}
 #sCam{--c:#f05325}
 #sCam.lv-red{--c:#e5252f}#sCam.lv-orange{--c:#ff8c1a}#sCam.lv-green{--c:#22c07a}
@@ -118,7 +124,8 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <section id="sCam" class="scr on">
   <video id="vid" playsinline muted autoplay></video>
   <div id="grid"></div>
-  <div class="aim" id="aimFix"><svg viewBox="-100 -100 200 200"><path class="q" d="M -4 -4 L -91.9 -4 A 92 92 0 0 1 -4 -91.9 Z"/><path class="o" d="M 4 -4 L 4 -91.9 A 92 92 0 0 1 91.9 -4 Z"/><path class="q" d="M -4 4 L -4 91.9 A 92 92 0 0 1 -91.9 4 Z"/><path class="q" d="M 4 4 L 91.9 4 A 92 92 0 0 1 4 91.9 Z"/></svg></div>
+  <div class="aim" id="aimFix"><svg viewBox="-100 -100 200 200"><path class="q" d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/><path class="o" d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/><path class="q" d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/><path class="q" d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/></svg></div>
+  <div class="aim" id="plusWrap"><svg class="aim" id="plusMov" viewBox="-100 -100 200 200" style="display:none"><rect x="-92" y="-5.25" width="184" height="10.5" rx="1"/><rect x="-5.25" y="-92" width="10.5" height="184" rx="1"/></svg></div>
   
   
   <button class="back" id="camBack" aria-label="Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button>
@@ -200,7 +207,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 
 <div class="modal" id="mTips"><div class="card"><h3>Tips for a good scan</h3><ul>
 <li>Put <b>one object</b> on a flat, plain surface that looks different from the object (a dark object on a light surface, or the other way).</li>
-<li>Hold the phone <b>flat, straight above</b> the object. The four parts of the logo show which side of the phone is too high: <b style="color:#e5252f">red</b> = very high, <b style="color:#ff8c1a">orange</b> = a little high, <b style="color:#22a366">green</b> = fine. Press the red side down until all four are green.</li>
+<li>Hold the phone <b>flat, straight above</b> the object. The four parts of the logo show which side of the phone is too high: <b style="color:#e5252f">red</b> = very high, <b style="color:#ff8c1a">orange</b> = a little high, <b style="color:#22a366">green</b> = fine. The <b>+</b> slides toward the middle as the phone gets flat. When it fits into the gap of the logo, the logo turns green. Press the red side down until all four are green.</li>
 <li><b>Zoom:</b> use <b>3×</b> (the chip at the top). The object should fill about half of the screen. Hold the phone about 40 cm above it.</li>
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
@@ -270,12 +277,17 @@ function paintLogo(Hx,Hy,t){ // each part shows how high that side of the phone 
   const c=QDIR.map(u=>Math.max(0,(Hx*u[0]+Hy*u[1])/(1.4142*t))),m=Math.max(...c)||1;
   P.forEach((p,i)=>{const v=t*c[i]/m,st=tiltState(v);p.style.fill=COL[st];p.style.fillOpacity=.7;});
 }
+const PLUSK=14; // pixels for each degree
+function movePlus(Hx,Hy,stt){const pl=$('#plusMov'),mx=Math.min(innerWidth,innerHeight)*0.42;pl.style.display='block';let dx=Hx*PLUSK,dy=Hy*PLUSK;const L=Math.hypot(dx,dy);if(L>mx){dx*=mx/L;dy*=mx/L;}
+  if(stt==='green'){dx=0;dy=0;} // spot on: it fits inside the gap of the logo
+  pl.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';}
 function onOri(e){
   if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),stt=tiltState(t),sc=$('#sCam');flat=stt==='green';
   // the high side of the phone (top edge up when beta > 0, right edge down when gamma > 0, so the left is high)
   const Hx=-e.gamma,Hy=-e.beta;
   sc.classList.remove('lv-red','lv-orange','lv-green');sc.classList.add('lv-'+stt);
   paintLogo(Hx,Hy,t);
+  movePlus(Hx,Hy,stt);
   $('#angleNum').textContent=(t<10?t.toFixed(1):Math.round(t))+'°';
   const ang=(Math.atan2(Hy,Hx)*180/Math.PI+360)%360,side=EDGE[Math.round(ang/45)%8];
   $('#angleMsg').textContent=stt==='green'?'Spot on. Take the photo':stt==='orange'?'Almost. Lower the '+side+' a little':'Lower the '+side;
