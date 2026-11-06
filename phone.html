@@ -125,6 +125,12 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 #shapeChip{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:128px;background:rgba(0,0,0,.5);color:#fff;border:2px solid rgba(255,255,255,.7);border-radius:20px;padding:6px 14px;font:600 15px 'Poppins',sans-serif}
 #shCv{background:#fff;border:1px solid var(--line);border-radius:12px}
 .seg.sm button{font-size:16px;padding:10px 4px}
+.bd{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font:700 15px 'Poppins',sans-serif;margin-right:8px;flex:none}
+.bd.l{background:#f05325}.bd.w{background:#1d2a44}.bd.d{background:#2f8f5b}
+.row label.lb{width:150px;font-size:16px;display:flex;align-items:center;line-height:1.15}
+.wnote{font-size:13px;color:#8a8279;min-height:18px;text-align:center;line-height:1.3}
+.mini{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;font:600 13px 'Poppins',sans-serif;color:var(--ink)}
+#silCv,#sideCv{background:#fff;border:1px solid var(--line);border-radius:12px}
 </style>
 </head>
 <body>
@@ -169,12 +175,13 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <section id="sMeas" class="scr">
   <div class="top"><button class="back" data-back="cut" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button><div class="logo"></div><span class="spacer"></span></div><div class="steps"><span class="st done"><i>✓</i>Adjust</span><span class="ln"></span><span class="st on"><i>2</i>Measure</span><span class="ln"></span><span class="st "><i>3</i>Upload</span></div>
   <div class="body" style="justify-content:flex-start">
-    <canvas id="silCv" width="680" height="300" style="width:100%;max-height:34%"></canvas>
-    <div id="lenLab">Length: –</div>
-    <div style="font-size:16px;text-align:center">Type the length of the longest side, and the depth</div>
-    <div class="seg"><button id="uIn">inches</button><button id="uMm" class="on">millimeters</button></div>
-    <div class="row"><label>Length</label><input id="inLen" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
-    <div class="row"><label>Depth</label><input id="inDep" type="number" inputmode="decimal" min="0" step="any" placeholder="0" class="bad"></div>
+    <canvas id="silCv" width="680" height="360" style="width:100%;max-height:31%"></canvas>
+    <canvas id="sideCv" width="680" height="200" style="width:100%;max-height:16%"></canvas>
+    <div class="seg sm"><button id="uIn">inches</button><button id="uMm" class="on">millimeters</button></div>
+    <div class="row"><label class="lb"><b class="bd l">L</b>Long side</label><input id="inLen" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+    <div class="row"><label class="lb"><b class="bd w">W</b>Short side</label><input id="inWid" type="number" inputmode="decimal" min="0" step="any" placeholder="auto"><button class="mini" id="wReset" style="display:none">Auto</button></div>
+    <div class="wnote" id="wNote"></div>
+    <div class="row"><label class="lb"><b class="bd d">D</b>Depth</label><input id="inDep" type="number" inputmode="decimal" min="0" step="any" placeholder="0" class="bad"></div>
   </div>
   <div class="bar"><button class="btn" data-tips>Tips</button><button class="btn go" id="measGo" disabled>Next</button></div>
 </section>
@@ -236,7 +243,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <li><b>Zoom:</b> use <b>3×</b> (the chip at the top). The object should fill about half of the screen. Hold the phone about 40 cm above it.</li>
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
-<li>Measure the <b>longest side</b> of the real object with a ruler or caliper and type it. Type the depth (thickness) too.</li>
+<li><b>L</b> is the longest side of the real object: measure it with a ruler or caliper and type it. <b>W</b>, the short side, is filled in from the photo. If your caliper shows something else, type it and the outline is stretched a little to match. <b>D</b> is the depth: how deep the part sinks into the foam (the side view in the drawing).</li>
 <li>No object at hand? Use <b>Shape</b> (camera screen or Your Library): rectangle, rectangle with round corners or cylinder, with typed sizes.</li><li>On the last screen choose <b>How many?</b> if you have several of the same part.</li><li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
 <div class="bt"><button class="go" id="tipsOk">OK</button></div></div></div>
 
@@ -331,7 +338,7 @@ $('#camLib').onclick=()=>go.lib();
 $('#camBack').onclick=()=>go.lib();
 $('#libPhoto').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const bm=await createImageBitmap(f,{imageOrientation:'from-image'});const c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d').drawImage(bm,0,0);newSource(c);}catch(err){toast('Could not open this picture.');}};
-function newSource(c){A.qty=1;A.fromShape=false;A.src=c;A.rot90=0;A.tilt=0;A.crop={x0:0,y0:0,x1:1,y1:1};A.editId=null;$('#tilt').value=0;$('#tiltLab').textContent='Tilt: 0°';go.adj();}
+function newSource(c){A.qty=1;A.fromShape=false;A.wManual=false;A.src=c;A.rot90=0;A.tilt=0;A.crop={x0:0,y0:0,x1:1,y1:1};A.editId=null;$('#tilt').value=0;$('#tiltLab').textContent='Tilt: 0°';go.adj();}
 
 /* ---------- adjust: tilt and crop ---------- */
 const adj=$('#adjCv');let adjGeo=null,drag=null;
@@ -425,29 +432,54 @@ async function runCut(){
 $('#adjGo').onclick=()=>{if(!A.src)return;runCut();};
 $('#cutGo').onclick=()=>{if(!A.cut)return;prepMeasure();go.meas();drawSil();};
 
-/* ---------- measure ---------- */
+/* ---------- measure: L (long side), W (short side, automatic) and D (depth) ---------- */
 function bbox(){const r=A.cut.ring;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;r.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1};}
 const toMm=v=>A.unit==='in'?v*25.4:v;
-function prepMeasure(){if(!A.editId){A.len='';A.dep='';A.name='';}$('#inLen').value=A.len;$('#inDep').value=A.dep;$('#inName').value=A.name;measUpdate();}
-function measUpdate(){const L=toMm(+$('#inLen').value),D=toMm(+$('#inDep').value);$('#inDep').classList.toggle('bad',!(D>0));$('#inLen').classList.toggle('bad',!(L>0));
-  $('#lenLab').textContent='Length: '+(L>0?(A.unit==='in'?(L/25.4).toFixed(2)+'in':Math.round(L*10)/10+'mm'):'–');$('#measGo').disabled=!(L>0&&D>0);A.len=$('#inLen').value;A.dep=$('#inDep').value;drawSil();}
-$('#inLen').oninput=measUpdate;$('#inDep').oninput=measUpdate;
-$('#uMm').onclick=()=>{A.unit='mm';$('#uMm').classList.add('on');$('#uIn').classList.remove('on');measUpdate();};
-$('#uIn').onclick=()=>{A.unit='in';$('#uIn').classList.add('on');$('#uMm').classList.remove('on');measUpdate();};
-function drawSil(){const cv=$('#silCv');if(!A.cut||!cv)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);const b=bbox(),k=Math.min((W-60)/b.w,(H-70)/b.h),ox=(W-b.w*k)/2,oy=20+((H-70)-b.h*k)/2;
-  g.fillStyle='#292524';g.beginPath();A.cut.ring.forEach((p,i)=>{const x=ox+(p[0]-b.x0)*k,y=oy+(p[1]-b.y0)*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
-  g.strokeStyle='#f05325';g.lineWidth=3;g.setLineDash([8,8]);g.beginPath();g.moveTo(ox,10);g.lineTo(ox,H-34);g.moveTo(ox+b.w*k,10);g.lineTo(ox+b.w*k,H-34);g.stroke();g.setLineDash([]);g.beginPath();g.moveTo(ox,H-34);g.lineTo(ox,H-14);g.lineTo(ox+b.w*k,H-14);g.lineTo(ox+b.w*k,H-34);g.stroke();}
-$('#measGo').onclick=()=>{A.fromShape=false;buildItem();$('#inQty').value=A.qty||1;$('#sumLab').textContent='Length: '+Math.round(A.cur.len*10)/10+'mm  Depth: '+Math.round(A.cur.dep*10)/10+'mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
+const fmtU=mm=>A.unit==='in'?String(+(mm/25.4).toFixed(2)):String(Math.round(mm*10)/10);
+const lblU=mm=>A.unit==='in'?(mm/25.4).toFixed(2)+' in':(Math.round(mm*10)/10)+' mm';
+function prepBase(){const b=bbox();let tol=1.0,ring;for(let t=0;t<12;t++){ring=simplify(A.cut.ring,tol);if(ring.length<=140)break;tol*=1.35;}
+  let pts=ring.map(p=>[p[0]-b.x0,b.y1-p[1]]);let ar=0;for(let i=0;i<pts.length;i++){const u=pts[i],v=pts[(i+1)%pts.length];ar+=u[0]*v[1]-v[0]*u[1];}if(ar<0)pts.reverse();
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys),ex=(Math.max(...xs)-x0)||1,ey=(Math.max(...ys)-y0)||1;
+  A.base={pts:pts.map(p=>[p[0]-x0,p[1]-y0]),ex,ey,longX:ex>=ey};}
+function dims(){const B=A.base,L=toMm(+$('#inLen').value),longE=B.longX?B.ex:B.ey,shortE=B.longX?B.ey:B.ex,autoW=L*shortE/longE,W=A.wManual?toMm(+$('#inWid').value):autoW;return {L,W,autoW,D:toMm(+$('#inDep').value)};}
+function prepMeasure(){prepBase();A.wManual=false;if(!A.editId){A.len='';A.dep='';A.name='';}$('#inLen').value=A.len;$('#inDep').value=A.dep;$('#inWid').value='';$('#inName').value=A.name;measUpdate();}
+function measUpdate(src){if(!A.base)return;if(src==='wid')A.wManual=true;
+  let d=dims();if(!A.wManual)$('#inWid').value=d.L>0?fmtU(d.autoW):'';d=dims();
+  let note='',bigC=false;if(A.wManual&&d.L>0&&d.autoW>0&&d.W>0){const pc=(d.W/d.autoW-1)*100;if(Math.abs(pc)>=0.5){note='W is '+(pc>0?'+':'')+pc.toFixed(0)+'% from the photo: the outline is stretched a little to match your measure.';if(Math.abs(pc)>15){note+=' Big change, check the photo.';bigC=true;}}}
+  $('#wNote').textContent=note;$('#wNote').style.color=bigC?'#b91c1c':'#8a8279';$('#wReset').style.display=A.wManual?'inline-block':'none';
+  $('#inLen').classList.toggle('bad',!(d.L>0));$('#inWid').classList.toggle('bad',A.wManual&&!(d.W>0));$('#inDep').classList.toggle('bad',!(d.D>0));
+  $('#measGo').disabled=!(d.L>0&&d.W>0&&d.D>0);A.len=$('#inLen').value;A.dep=$('#inDep').value;drawSil();drawSide();}
+$('#inLen').oninput=()=>measUpdate('len');$('#inWid').oninput=()=>measUpdate('wid');$('#inDep').oninput=()=>measUpdate('dep');$('#wReset').onclick=()=>{A.wManual=false;measUpdate('len');};
+function setUnit(u){if(u===A.unit)return;const old=A.unit;['inLen','inWid','inDep'].forEach(id=>{const v=+$('#'+id).value;if(v>0)$('#'+id).value=u==='in'?+(v/25.4).toFixed(2):+(v*25.4).toFixed(1);});A.unit=u;$('#uMm').classList.toggle('on',u!=='in');$('#uIn').classList.toggle('on',u==='in');measUpdate();}
+$('#uMm').onclick=()=>setUnit('mm');$('#uIn').onclick=()=>setUnit('in');
+function badge(g,x,y,t,col){g.fillStyle=col;g.beginPath();g.arc(x,y,17,0,7);g.fill();g.fillStyle='#fff';g.font='bold 20px Poppins,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x,y+1);}
+function dimLine(g,x0,y0,x1,y1,col){g.strokeStyle=col;g.lineWidth=3;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();const dx=y1-y0,dy=x0-x1,n=Math.hypot(dx,dy)||1,tx=dx/n*9,ty=dy/n*9;g.beginPath();g.moveTo(x0-tx,y0-ty);g.lineTo(x0+tx,y0+ty);g.moveTo(x1-tx,y1-ty);g.lineTo(x1+tx,y1+ty);g.stroke();}
+function drawSil(){const cv=$('#silCv');if(!A.base||!cv)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height,B=A.base,d=dims();g.clearRect(0,0,W,H);
+  const k=Math.min((W-(B.longX?300:220))/B.ex,(H-(B.longX?150:190))/B.ey),ox=(W-B.ex*k)/2-(B.longX?40:0),oy=(H-B.ey*k)/2+(B.longX?14:-4);
+  g.fillStyle='#292524';g.beginPath();B.pts.forEach((p,i)=>{const x=ox+p[0]*k,y=oy+(B.ey-p[1])*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
+  const OR='#f05325',NV='#1d2a44',lv=d.L>0?lblU(d.L):'L',wv=d.W>0?lblU(d.W):'W';g.font='bold 22px Poppins,sans-serif';g.textBaseline='middle';
+  if(B.longX){const y=oy-30;dimLine(g,ox,y,ox+B.ex*k,y,OR);badge(g,ox+B.ex*k/2,y-2,'L',OR);g.fillStyle=OR;g.textAlign='center';g.fillText(lv,ox+B.ex*k/2,y-32);
+    const x=ox+B.ex*k+34;dimLine(g,x,oy,x,oy+B.ey*k,NV);badge(g,x+30,oy+B.ey*k/2,'W',NV);g.fillStyle=NV;g.textAlign='left';g.fillText(wv,x+54,oy+B.ey*k/2);}
+  else{const x=ox-34;dimLine(g,x,oy,x,oy+B.ey*k,OR);badge(g,x-30,oy+B.ey*k/2,'L',OR);g.fillStyle=OR;g.textAlign='right';g.fillText(lv,x-54,oy+B.ey*k/2);
+    const y=oy+B.ey*k+32;dimLine(g,ox,y,ox+B.ex*k,y,NV);badge(g,ox+B.ex*k/2,y+30,'W',NV);g.fillStyle=NV;g.textAlign='left';g.fillText(wv,ox+B.ex*k/2+26,y+30);}}
+function drawSide(){const cv=$('#sideCv');if(!cv)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height,d=dims(),GR='#2f8f5b',OR='#f05325';g.clearRect(0,0,W,H);
+  const Lpx=380,x0=(W-Lpx)/2-62,top=70,fh=110,Dpx=(d.L>0&&d.D>0)?Math.max(14,Math.min(fh-16,d.D/d.L*Lpx)):34;
+  g.fillStyle='#e6dfcf';g.strokeStyle='#cfc6b2';g.lineWidth=2;g.fillRect(14,top,W-28,fh);g.strokeRect(14,top,W-28,fh);   // the foam, seen from the side
+  g.fillStyle='#f6f3ec';g.fillRect(x0,top,Lpx,Dpx);                                                                        // the cut in the foam
+  g.fillStyle='#292524';g.beginPath();g.roundRect?g.roundRect(x0+3,top+2,Lpx-6,Dpx-2,4):g.rect(x0+3,top+2,Lpx-6,Dpx-2);g.fill();   // the part (side view of L)
+  // L over the part (it is the side view of the long side)
+  g.strokeStyle=OR;g.lineWidth=3;g.beginPath();g.moveTo(x0,top-22);g.lineTo(x0+Lpx,top-22);g.moveTo(x0,top-31);g.lineTo(x0,top-13);g.moveTo(x0+Lpx,top-31);g.lineTo(x0+Lpx,top-13);g.stroke();badge(g,x0+Lpx/2,top-24,'L',OR);
+  // D: how deep it goes into the foam
+  const ax=x0+Lpx+30;g.strokeStyle=GR;g.lineWidth=3;g.beginPath();g.moveTo(ax,top);g.lineTo(ax,top+Dpx);g.moveTo(ax-9,top);g.lineTo(ax+9,top);g.moveTo(ax-9,top+Dpx);g.lineTo(ax+9,top+Dpx);g.stroke();
+  badge(g,ax+30,top+Dpx/2,'D',GR);g.fillStyle=GR;g.font='bold 20px Poppins,sans-serif';g.textAlign='left';g.textBaseline='middle';g.fillText(d.D>0?lblU(d.D):'D',ax+54,top+Dpx/2);
+  g.fillStyle='#8a8279';g.font='600 17px Poppins,sans-serif';g.textAlign='left';g.fillText('Side view of L: D is how deep the part sinks into the foam',20,H-12);}
+$('#measGo').onclick=()=>{A.fromShape=false;buildItem();$('#inQty').value=A.qty||1;$('#sumLab').textContent='L '+Math.round(A.cur.len*10)/10+' × W '+Math.round(A.cur.wid*10)/10+' mm, depth '+Math.round(A.cur.dep*10)/10+' mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
 
 /* ---------- name, outline in mm ---------- */
 function buildItem(){
-  const b=bbox(),Lmm=toMm(+$('#inLen').value),Dmm=toMm(+$('#inDep').value),s=Lmm/Math.max(b.w,b.h);
-  let tol=0.35/s,ring;for(let t=0;t<12;t++){ring=simplify(A.cut.ring,tol);if(ring.length<=140)break;tol*=1.35;}
-  let mm=ring.map(p=>[(p[0]-b.x0)*s,(b.y1-p[1])*s]); // y up, origin at the lower left corner of the box
-  let ar=0;for(let i=0;i<mm.length;i++){const u=mm[i],v=mm[(i+1)%mm.length];ar+=u[0]*v[1]-v[0]*u[1];}if(ar<0)mm.reverse();
-  {const xs=mm.map(p=>p[0]),ys=mm.map(p=>p[1]),span=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys))||1,f=Lmm/span,mx=Math.min(...xs),my=Math.min(...ys);mm=mm.map(p=>[(p[0]-mx)*f,(p[1]-my)*f]);} // the longest side is exactly the typed length
-  mm=mm.map(p=>[Math.round(p[0]*10)/10,Math.round(p[1]*10)/10]);
-  A.cur={len:Lmm,dep:Dmm,ring:mm,w:Math.round((Math.max(...mm.map(p=>p[0]))-Math.min(...mm.map(p=>p[0])))*10)/10,h:Math.round((Math.max(...mm.map(p=>p[1]))-Math.min(...mm.map(p=>p[1])))*10)/10};}
+  const B=A.base,d=dims(),sx=(B.longX?d.L:d.W)/B.ex,sy=(B.longX?d.W:d.L)/B.ey; // the long side is exactly L, the short side is W (automatic or typed)
+  const mm=B.pts.map(p=>[Math.round(p[0]*sx*10)/10,Math.round(p[1]*sy*10)/10]),xs=mm.map(p=>p[0]),ys=mm.map(p=>p[1]);
+  A.cur={len:d.L,wid:d.W,dep:d.D,ring:mm,w:Math.round((Math.max(...xs)-Math.min(...xs))*10)/10,h:Math.round((Math.max(...ys)-Math.min(...ys))*10)/10};}
 function drawPrev(cv,item){const o=item||null;if(!o){const c=A.cut,vw=Math.min(window.innerWidth-32,460),vk=Math.min(vw/c.w,(window.innerHeight*0.42)/c.h);cv.width=c.w;cv.height=c.h;cv.style.width=Math.round(c.w*vk)+'px';cv.style.height=Math.round(c.h*vk)+'px';const g=cv.getContext('2d');g.clearRect(0,0,c.w,c.h);g.putImageData(c.img,0,0);}}
 $('#inName').oninput=()=>{A.name=$('#inName').value;upCheck();};
 function upCheck(){const ok=$('#inName').value.trim().length>0;$('#inName').classList.toggle('bad',!ok);$('#upGo').disabled=!ok;}
@@ -468,8 +500,8 @@ $('#libScan').onclick=go.cam;$('#libSend').onclick=()=>{const list=A.items.filte
 $('#libEdit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));if(l.length!==1){toast('Select one object to edit.');return;}const it=l[0];A.editId=it.id;A.name=it.name;A.qty=it.qty||1;A.fromShape=false;A.unit=it.unit||'mm';
   // rebuild a cut-out view from the saved outline so the length, depth and name can be changed
   const ring=it.ring,w=420,h=Math.max(8,Math.round(420*it.h/Math.max(1,it.w)));let k=Math.min((w-4)/it.w,(h-4)/it.h);const m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#292524';g.beginPath();ring.forEach((p,i)=>{const x=2+p[0]*k,y=h-2-p[1]*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
-  const id=g.getImageData(0,0,w,h),mk=new Uint8Array(w*h);for(let i=0;i<w*h;i++)mk[i]=id.data[i*4+3]>128?1:0;A.cut={w,h,m:mk,ring:contour(mk,w,h),how:'saved',img:id,area:0.5};$('#inLen').value=it.len/(A.unit==='in'?25.4:1);$('#inDep').value=it.dep/(A.unit==='in'?25.4:1);A.len=$('#inLen').value;A.dep=$('#inDep').value;
-  $('#uMm').classList.toggle('on',A.unit!=='in');$('#uIn').classList.toggle('on',A.unit==='in');measUpdate();go.meas();drawSil();};
+  const id=g.getImageData(0,0,w,h),mk=new Uint8Array(w*h);for(let i=0;i<w*h;i++)mk[i]=id.data[i*4+3]>128?1:0;A.cut={w,h,m:mk,ring:contour(mk,w,h),how:'saved',img:id,area:0.5};prepBase();A.wManual=false;$('#inLen').value=+(Math.max(it.w,it.h)/(A.unit==='in'?25.4:1)).toFixed(2);$('#inDep').value=+(it.dep/(A.unit==='in'?25.4:1)).toFixed(2);A.len=$('#inLen').value;A.dep=$('#inDep').value;
+  $('#uMm').classList.toggle('on',A.unit!=='in');$('#uIn').classList.toggle('on',A.unit==='in');measUpdate();go.meas();};
 
 
 /* ---------- send to the computer (a link that carries the outlines) ---------- */
