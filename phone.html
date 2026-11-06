@@ -131,6 +131,20 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 .wnote{font-size:13px;color:#8a8279;min-height:18px;text-align:center;line-height:1.3}
 .mini{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;font:600 13px 'Poppins',sans-serif;color:var(--ink)}
 #silCv,#sideCv{background:#fff;border:1px solid var(--line);border-radius:12px}
+#sMeas .body{justify-content:flex-start;gap:6px;overflow-y:auto;padding-bottom:8px}
+#sMeas canvas{width:100%;object-fit:contain;min-height:0}
+#silCv{flex:2 1 110px;height:0}#sideCv{flex:1 1 66px;height:0}
+#sMeas .row{gap:8px}#sMeas .row input{font-size:22px;padding:8px 12px}
+#sMeas .seg.sm button{padding:7px 4px;font-size:15px}
+#sMeas .wnote{min-height:0;font-size:12.5px}
+#sMeas .row label.lb{width:136px}
+#libGrid{grid-template-columns:repeat(2,1fr)!important}
+.lib{aspect-ratio:auto!important;display:flex;flex-direction:column}
+.lib .im{position:relative;aspect-ratio:4/3;background:#fff}.lib .im img{width:100%;height:100%;object-fit:contain}
+.lib .ft{display:flex;align-items:center;gap:6px;padding:6px 8px;border-top:1px solid var(--line)}
+.lib .nm2{flex:1;min-width:0;font:600 13px 'Poppins',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lq{display:flex;align-items:center;gap:6px}.lq b{min-width:22px;text-align:center;font:700 16px 'Poppins',sans-serif}
+.qm{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:#fff;font:700 20px 'Poppins',sans-serif;color:var(--ink);line-height:1;padding:0}
 </style>
 </head>
 <body>
@@ -175,8 +189,8 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <section id="sMeas" class="scr">
   <div class="top"><button class="back" data-back="cut" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button><div class="logo"></div><span class="spacer"></span></div><div class="steps"><span class="st done"><i>✓</i>Adjust</span><span class="ln"></span><span class="st on"><i>2</i>Measure</span><span class="ln"></span><span class="st "><i>3</i>Upload</span></div>
   <div class="body" style="justify-content:flex-start">
-    <canvas id="silCv" width="680" height="360" style="width:100%;max-height:31%"></canvas>
-    <canvas id="sideCv" width="680" height="200" style="width:100%;max-height:16%"></canvas>
+    <canvas id="silCv" width="680" height="360"></canvas>
+    <canvas id="sideCv" width="680" height="200"></canvas>
     <div class="seg sm"><button id="uIn">inches</button><button id="uMm" class="on">millimeters</button></div>
     <div class="row"><label class="lb"><b class="bd l">L</b>Long side</label><input id="inLen" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
     <div class="row"><label class="lb"><b class="bd w">W</b>Short side</label><input id="inWid" type="number" inputmode="decimal" min="0" step="any" placeholder="auto"><button class="mini" id="wReset" style="display:none">Auto</button></div>
@@ -191,7 +205,6 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
   <div class="body">
     <div class="row" style="justify-content:center"><input id="inName" type="text" placeholder="Name your object" class="bad" style="flex:none;width:86%;text-align:center;font-size:22px"></div>
     <div id="sumLab"></div>
-    <div class="row" style="justify-content:center;gap:12px"><label style="width:auto">How many?</label><button class="qb" id="qMinus" aria-label="Fewer">−</button><input id="inQty" type="number" min="1" max="20" step="1" inputmode="numeric" value="1"><button class="qb" id="qPlus" aria-label="More">+</button></div>
     <canvas id="upCv" class="chk"></canvas>
   </div>
   <div class="bar"><button class="btn" data-tips>Tips</button><button class="btn go" id="upGo" disabled>Save</button></div>
@@ -244,7 +257,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
 <li><b>L</b> is the longest side of the real object: measure it with a ruler or caliper and type it. <b>W</b>, the short side, is filled in from the photo. If your caliper shows something else, type it and the outline is stretched a little to match. <b>D</b> is the depth: how deep the part sinks into the foam (the side view in the drawing).</li>
-<li>No object at hand? Use <b>Shape</b> (camera screen or Your Library): rectangle, rectangle with round corners or cylinder, with typed sizes.</li><li>On the last screen choose <b>How many?</b> if you have several of the same part.</li><li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
+<li>No object at hand? Use <b>Shape</b> (camera screen or Your Library): rectangle, rectangle with round corners or cylinder, with typed sizes.</li><li>In <b>Your Library</b> use <b>− / +</b> on a card to set how many of that part you have.</li><li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
 <div class="bt"><button class="go" id="tipsOk">OK</button></div></div></div>
 
 <div class="modal" id="mSend"><div class="card"><h3>Send to the computer</h3><div id="sendTxt"></div>
@@ -454,7 +467,9 @@ function setUnit(u){if(u===A.unit)return;const old=A.unit;['inLen','inWid','inDe
 $('#uMm').onclick=()=>setUnit('mm');$('#uIn').onclick=()=>setUnit('in');
 function badge(g,x,y,t,col){g.fillStyle=col;g.beginPath();g.arc(x,y,17,0,7);g.fill();g.fillStyle='#fff';g.font='bold 20px Poppins,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x,y+1);}
 function dimLine(g,x0,y0,x1,y1,col){g.strokeStyle=col;g.lineWidth=3;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();const dx=y1-y0,dy=x0-x1,n=Math.hypot(dx,dy)||1,tx=dx/n*9,ty=dy/n*9;g.beginPath();g.moveTo(x0-tx,y0-ty);g.lineTo(x0+tx,y0+ty);g.moveTo(x1-tx,y1-ty);g.lineTo(x1+tx,y1+ty);g.stroke();}
-function drawSil(){const cv=$('#silCv');if(!A.base||!cv)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height,B=A.base,d=dims();g.clearRect(0,0,W,H);
+function drawSil(){const cv=$('#silCv');if(!A.base||!cv)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height,B0=A.base,d=dims();g.clearRect(0,0,W,H);
+  const fs=(A.wManual&&d.autoW>0&&d.W>0)?d.W/d.autoW:1,B={pts:B0.pts.map(p=>[p[0]*(B0.longX?1:fs),p[1]*(B0.longX?fs:1)]),ex:B0.ex*(B0.longX?1:fs),ey:B0.ey*(B0.longX?fs:1),longX:B0.longX}; // the drawing is stretched like the outline will be
+
   const k=Math.min((W-(B.longX?300:220))/B.ex,(H-(B.longX?150:190))/B.ey),ox=(W-B.ex*k)/2-(B.longX?40:0),oy=(H-B.ey*k)/2+(B.longX?14:-4);
   g.fillStyle='#292524';g.beginPath();B.pts.forEach((p,i)=>{const x=ox+p[0]*k,y=oy+(B.ey-p[1])*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
   const OR='#f05325',NV='#1d2a44',lv=d.L>0?lblU(d.L):'L',wv=d.W>0?lblU(d.W):'W';g.font='bold 22px Poppins,sans-serif';g.textBaseline='middle';
@@ -473,7 +488,7 @@ function drawSide(){const cv=$('#sideCv');if(!cv)return;const g=cv.getContext('2
   const ax=x0+Lpx+30;g.strokeStyle=GR;g.lineWidth=3;g.beginPath();g.moveTo(ax,top);g.lineTo(ax,top+Dpx);g.moveTo(ax-9,top);g.lineTo(ax+9,top);g.moveTo(ax-9,top+Dpx);g.lineTo(ax+9,top+Dpx);g.stroke();
   badge(g,ax+30,top+Dpx/2,'D',GR);g.fillStyle=GR;g.font='bold 20px Poppins,sans-serif';g.textAlign='left';g.textBaseline='middle';g.fillText(d.D>0?lblU(d.D):'D',ax+54,top+Dpx/2);
   g.fillStyle='#8a8279';g.font='600 17px Poppins,sans-serif';g.textAlign='left';g.fillText('Side view of L: D is how deep the part sinks into the foam',20,H-12);}
-$('#measGo').onclick=()=>{A.fromShape=false;buildItem();$('#inQty').value=A.qty||1;$('#sumLab').textContent='L '+Math.round(A.cur.len*10)/10+' × W '+Math.round(A.cur.wid*10)/10+' mm, depth '+Math.round(A.cur.dep*10)/10+' mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
+$('#measGo').onclick=()=>{A.fromShape=false;buildItem();$('#sumLab').textContent='L '+Math.round(A.cur.len*10)/10+' × W '+Math.round(A.cur.wid*10)/10+' mm, depth '+Math.round(A.cur.dep*10)/10+' mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
 
 /* ---------- name, outline in mm ---------- */
 function buildItem(){
@@ -484,7 +499,7 @@ function drawPrev(cv,item){const o=item||null;if(!o){const c=A.cut,vw=Math.min(w
 $('#inName').oninput=()=>{A.name=$('#inName').value;upCheck();};
 function upCheck(){const ok=$('#inName').value.trim().length>0;$('#inName').classList.toggle('bad',!ok);$('#upGo').disabled=!ok;}
 function thumb(){const c=A.cut,t=document.createElement('canvas'),k=Math.min(180/c.w,180/c.h);t.width=Math.round(c.w*k);t.height=Math.round(c.h*k);const g=t.getContext('2d'),s=document.createElement('canvas');s.width=c.w;s.height=c.h;s.getContext('2d').putImageData(c.img,0,0);g.fillStyle='#fff';g.fillRect(0,0,t.width,t.height);g.drawImage(s,0,0,t.width,t.height);return t.toDataURL('image/jpeg',0.8);}
-$('#upGo').onclick=()=>{const name=$('#inName').value.trim();if(!name)return;const it={id:A.editId||('i'+Date.now()),name,len:A.cur.len,dep:A.cur.dep,w:A.cur.w,h:A.cur.h,ring:A.cur.ring,thumb:thumb(),unit:A.unit,qty:getQty()};
+$('#upGo').onclick=()=>{const name=$('#inName').value.trim();if(!name)return;const it={id:A.editId||('i'+Date.now()),name,len:A.cur.len,dep:A.cur.dep,w:A.cur.w,h:A.cur.h,ring:A.cur.ring,thumb:thumb(),unit:A.unit,qty:A.qty||1};
   const i=A.items.findIndex(x=>x.id===it.id);if(i>=0)A.items[i]=it;else A.items.push(it);save();A.last=it.id;A.editId=null;
   const c=A.cut,cv=$('#doneCv');cv.width=c.w;cv.height=c.h;const vk=Math.min((window.innerWidth-32)/c.w,(window.innerHeight*0.42)/c.h);cv.style.width=Math.round(c.w*vk)+'px';cv.style.height=Math.round(c.h*vk)+'px';cv.getContext('2d').putImageData(c.img,0,0);
   $('#doneMsg').innerHTML='<b>'+esc(name)+'</b> is saved'+(it.qty>1?' (× '+it.qty+')':'')+'.<br>'+it.w+' × '+it.h+' mm, depth '+it.dep+' mm';go.done();};
@@ -492,8 +507,11 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 $('#doneAgain').onclick=go.cam;$('#doneLib').onclick=go.lib;$('#doneSend').onclick=()=>openSend([A.items.find(x=>x.id===A.last)].filter(Boolean));
 
 /* ---------- library ---------- */
-function renderLib(){const g=$('#libGrid');g.innerHTML=A.items.length?'':'<div style="grid-column:1/-1;text-align:center;padding:30px;font-size:19px">No objects yet. Scan one.</div>';
-  A.items.forEach(it=>{const d=document.createElement('div');d.className='lib'+(A.sel.has(it.id)?' sel':'');d.innerHTML='<img src="'+it.thumb+'"><span class="dot"></span><span class="nm">'+esc(it.name)+'</span>'+(it.qty>1?'<span class="qty">×'+it.qty+'</span>':'');d.onclick=()=>{A.sel.has(it.id)?A.sel.delete(it.id):A.sel.add(it.id);d.classList.toggle('sel');};g.appendChild(d);});}
+function renderLib(){const g=$('#libGrid');g.innerHTML=A.items.length?'':'<div style="grid-column:1/-1;text-align:center;padding:30px;font-size:19px">No objects yet. Scan one or add a shape.</div>';
+  A.items.forEach(it=>{const d=document.createElement('div');d.className='lib'+(A.sel.has(it.id)?' sel':'');
+    d.innerHTML='<div class="im"><img src="'+it.thumb+'"><span class="dot"></span></div><div class="ft"><span class="nm2">'+esc(it.name)+'</span><span class="lq"><button class="qm" data-q="-1" aria-label="Fewer">−</button><b>'+(it.qty||1)+'</b><button class="qm" data-q="1" aria-label="More">+</button></span></div>';
+    d.onclick=e=>{const qb=e.target.closest('[data-q]');if(qb){it.qty=Math.max(1,Math.min(20,(it.qty||1)+(+qb.dataset.q)));save();d.querySelector('.lq b').textContent=it.qty;return;}A.sel.has(it.id)?A.sel.delete(it.id):A.sel.add(it.id);d.classList.toggle('sel');};
+    g.appendChild(d);});}
 $('#libAll').onclick=()=>{A.items.forEach(i=>A.sel.add(i.id));renderLib();};$('#libNone').onclick=()=>{A.sel.clear();renderLib();};
 $('#libDel').onclick=()=>{if(!A.sel.size)return;if(!confirm('Delete '+A.sel.size+' object(s)?'))return;A.items=A.items.filter(i=>!A.sel.has(i.id));A.sel.clear();save();renderLib();};
 $('#libScan').onclick=go.cam;$('#libSend').onclick=()=>{const list=A.items.filter(i=>A.sel.has(i.id));openSend(list.length?list:A.items);};
@@ -528,10 +546,6 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.se
 async function goFit(list){if(!list||!list.length){toast('Scan an object first.');return;}let u;try{u=await makeLink(list);}catch(e){toast('Could not prepare the fit check.');return;}location.href=u+'&fit=1';}
 $('#libFit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));goFit(l.length?l:A.items);};
 $('#doneFit').onclick=()=>goFit([A.items.find(x=>x.id===A.last)].filter(Boolean));
-/* ---------- how many ---------- */
-const getQty=()=>Math.max(1,Math.min(20,Math.round(+$('#inQty').value||1)));
-const setQtyBox=v=>{$('#inQty').value=Math.max(1,Math.min(20,v));A.qty=getQty();};
-$('#qMinus').onclick=()=>setQtyBox(getQty()-1);$('#qPlus').onclick=()=>setQtyBox(getQty()+1);$('#inQty').oninput=()=>{A.qty=getQty();};$('#inQty').onchange=()=>setQtyBox(getQty());
 /* ---------- simple shapes: rectangle, round corners, cylinder ---------- */
 const SH={type:'rect'};
 go.upback=()=>{if(A.fromShape)show('sShape');else go.meas();};
@@ -567,7 +581,7 @@ $('#shGo').onclick=()=>{const ring=shRing(),v=shVals();if(!ring||!(v.d>0))return
   const w=420,h=Math.max(8,Math.round(420*y1/Math.max(1,x1))),k=Math.min((w-4)/x1,(h-4)/y1),m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#292524';g.beginPath();rr.forEach((p,i)=>{const x=2+p[0]*k,y=h-2-p[1]*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
   const id=g.getImageData(0,0,w,h),mk=new Uint8Array(w*h);for(let i=0;i<w*h;i++)mk[i]=id.data[i*4+3]>128?1:0;A.cut={w,h,m:mk,ring:contour(mk,w,h),how:'shape',img:id,area:0.5};
   A.fromShape=true;A.editId=null;A.qty=1;A.name=SH.type==='cyl'?'Cylinder Ø'+Math.round(x1*10)/10:(SH.type==='round'?'Rounded ':'Rectangle ')+Math.round(x1*10)/10+' x '+Math.round(y1*10)/10;
-  $('#sumLab').textContent='Length: '+Math.round(A.cur.len*10)/10+'mm  Depth: '+Math.round(v.d*10)/10+'mm';drawPrev($('#upCv'));$('#inName').value=A.name;$('#inQty').value=1;upCheck();go.up();};
+  $('#sumLab').textContent='Length: '+Math.round(A.cur.len*10)/10+'mm  Depth: '+Math.round(v.d*10)/10+'mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
 startCam();
 </script>
 </body>
