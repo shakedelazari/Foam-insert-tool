@@ -117,6 +117,14 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 .card .bt .go{background:var(--or);border-color:var(--or);color:#fff}
 .card ul{padding-left:20px;margin:6px 0}
 #toast{position:fixed;left:50%;bottom:130px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;font-size:15px;font-weight:600;display:none;z-index:60;max-width:90%;text-align:center}
+
+.qb{width:50px;height:50px;border-radius:14px;border:2px solid var(--line);background:#fff;font:700 26px 'Poppins',sans-serif;color:var(--ink)}
+#inQty{width:84px;text-align:center;font:600 24px 'Poppins',sans-serif;border:2px solid var(--line);border-radius:14px;padding:9px;background:#fff;color:var(--ink)}
+.lib .qty{position:absolute;right:6px;top:6px;background:var(--or);color:#fff;border-radius:12px;padding:2px 8px;font:700 13px 'Poppins',sans-serif}
+.libTop{grid-template-columns:repeat(5,1fr)!important}.libTop button{font-size:11.5px!important}
+#shapeChip{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:128px;background:rgba(0,0,0,.5);color:#fff;border:2px solid rgba(255,255,255,.7);border-radius:20px;padding:6px 14px;font:600 15px 'Poppins',sans-serif}
+#shCv{background:#fff;border:1px solid var(--line);border-radius:12px}
+.seg.sm button{font-size:16px;padding:10px 4px}
 </style>
 </head>
 <body>
@@ -130,6 +138,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
   
   <button class="back" id="camBack" aria-label="Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button>
   <button id="zoomChip">Zoom 3×</button>
+  <button id="shapeChip">▭ Shape</button>
   <div id="angle"><div id="angleNum">–</div><div id="angleMsg">Hold the phone flat above the object</div></div>
   <button id="enLvl">Tap to turn on the level</button>
   <div id="camMsg"></div>
@@ -171,10 +180,11 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 </section>
 
 <section id="sUp" class="scr">
-  <div class="top"><button class="back" data-back="meas" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button><div class="logo"></div><span class="spacer"></span></div><div class="steps"><span class="st done"><i>✓</i>Adjust</span><span class="ln"></span><span class="st done"><i>✓</i>Measure</span><span class="ln"></span><span class="st on"><i>3</i>Upload</span></div>
+  <div class="top"><button class="back" data-back="upback" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button><div class="logo"></div><span class="spacer"></span></div><div class="steps"><span class="st done"><i>✓</i>Adjust</span><span class="ln"></span><span class="st done"><i>✓</i>Measure</span><span class="ln"></span><span class="st on"><i>3</i>Upload</span></div>
   <div class="body">
     <div class="row" style="justify-content:center"><input id="inName" type="text" placeholder="Name your object" class="bad" style="flex:none;width:86%;text-align:center;font-size:22px"></div>
     <div id="sumLab"></div>
+    <div class="row" style="justify-content:center;gap:12px"><label style="width:auto">How many?</label><button class="qb" id="qMinus" aria-label="Fewer">−</button><input id="inQty" type="number" min="1" max="20" step="1" inputmode="numeric" value="1"><button class="qb" id="qPlus" aria-label="More">+</button></div>
     <canvas id="upCv" class="chk"></canvas>
   </div>
   <div class="bar"><button class="btn" data-tips>Tips</button><button class="btn go" id="upGo" disabled>Save</button></div>
@@ -195,12 +205,27 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
   <div class="top"><button class="back" data-back="cam" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button><div class="logo"></div><span class="spacer"></span></div>
   <div class="body" style="justify-content:flex-start">
     <div style="font-size:19px;font-weight:700;align-self:flex-start">Your scans</div>
-    <div class="libTop"><button id="libScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Scan</button><button id="libSend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Send</button><button id="libEdit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v14h14M3 7h14v14"/></svg>Edit</button><button id="libPhoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>Phone photo</button></div>
+    <div class="libTop"><button id="libScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Scan</button><button id="libSend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Send</button><button id="libEdit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v14h14M3 7h14v14"/></svg>Edit</button><button id="libShape"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="12" rx="3"/><circle cx="17" cy="9" r="4"/></svg>Shape</button><button id="libPhoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>Phone photo</button></div>
     <button class="btn go" id="libFit" style="flex:none;width:100%;padding:14px">Check which case fits</button>
     <div class="libSel"><button id="libAll">Select all</button><button id="libNone">Deselect</button><button class="del" id="libDel">Delete</button></div>
     <div id="libGrid"></div>
   </div>
   <div class="bar"><button class="btn" data-tips style="flex:none;width:46%">Tips</button></div>
+</section>
+
+<section id="sShape" class="scr">
+  <div class="top"><button class="back" data-back="cam" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button><div class="logo"></div><span class="spacer"></span></div>
+  <div class="body" style="justify-content:flex-start;overflow:auto">
+    <div style="font-size:19px;font-weight:700;align-self:flex-start">Add a simple shape</div>
+    <div class="seg" id="shSeg"><button data-sh="rect" class="on">Rectangle</button><button data-sh="round">Round corners</button><button data-sh="cyl">Cylinder</button></div>
+    <canvas id="shCv" width="680" height="300" style="width:100%;max-height:28%"></canvas>
+    <div class="seg sm"><button id="shIn">inches</button><button id="shMm" class="on">millimeters</button></div>
+    <div class="row" id="rwA"><label id="lbA">Length</label><input id="shA" type="number" inputmode="decimal" min="0" step="any" placeholder="0" class="bad"></div>
+    <div class="row" id="rwB"><label>Width</label><input id="shB" type="number" inputmode="decimal" min="0" step="any" placeholder="0" class="bad"></div>
+    <div class="row" id="rwR"><label>Corner</label><input id="shR" type="number" inputmode="decimal" min="0" step="any" placeholder="radius"></div>
+    <div class="row"><label>Depth</label><input id="shD" type="number" inputmode="decimal" min="0" step="any" placeholder="0" class="bad"></div>
+  </div>
+  <div class="bar"><button class="btn" data-tips>Tips</button><button class="btn go" id="shGo" disabled>Next</button></div>
 </section>
 
 <input type="file" id="file" accept="image/*" style="display:none">
@@ -212,7 +237,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
 <li>Measure the <b>longest side</b> of the real object with a ruler or caliper and type it. Type the depth (thickness) too.</li>
-<li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
+<li>No object at hand? Use <b>Shape</b> (camera screen or Your Library): rectangle, rectangle with round corners or cylinder, with typed sizes.</li><li>On the last screen choose <b>How many?</b> if you have several of the same part.</li><li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
 <div class="bt"><button class="go" id="tipsOk">OK</button></div></div></div>
 
 <div class="modal" id="mSend"><div class="card"><h3>Send to the computer</h3><div id="sendTxt"></div>
@@ -306,7 +331,7 @@ $('#camLib').onclick=()=>go.lib();
 $('#camBack').onclick=()=>go.lib();
 $('#libPhoto').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const bm=await createImageBitmap(f,{imageOrientation:'from-image'});const c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d').drawImage(bm,0,0);newSource(c);}catch(err){toast('Could not open this picture.');}};
-function newSource(c){A.src=c;A.rot90=0;A.tilt=0;A.crop={x0:0,y0:0,x1:1,y1:1};A.editId=null;$('#tilt').value=0;$('#tiltLab').textContent='Tilt: 0°';go.adj();}
+function newSource(c){A.qty=1;A.fromShape=false;A.src=c;A.rot90=0;A.tilt=0;A.crop={x0:0,y0:0,x1:1,y1:1};A.editId=null;$('#tilt').value=0;$('#tiltLab').textContent='Tilt: 0°';go.adj();}
 
 /* ---------- adjust: tilt and crop ---------- */
 const adj=$('#adjCv');let adjGeo=null,drag=null;
@@ -412,7 +437,7 @@ $('#uIn').onclick=()=>{A.unit='in';$('#uIn').classList.add('on');$('#uMm').class
 function drawSil(){const cv=$('#silCv');if(!A.cut||!cv)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);const b=bbox(),k=Math.min((W-60)/b.w,(H-70)/b.h),ox=(W-b.w*k)/2,oy=20+((H-70)-b.h*k)/2;
   g.fillStyle='#292524';g.beginPath();A.cut.ring.forEach((p,i)=>{const x=ox+(p[0]-b.x0)*k,y=oy+(p[1]-b.y0)*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
   g.strokeStyle='#f05325';g.lineWidth=3;g.setLineDash([8,8]);g.beginPath();g.moveTo(ox,10);g.lineTo(ox,H-34);g.moveTo(ox+b.w*k,10);g.lineTo(ox+b.w*k,H-34);g.stroke();g.setLineDash([]);g.beginPath();g.moveTo(ox,H-34);g.lineTo(ox,H-14);g.lineTo(ox+b.w*k,H-14);g.lineTo(ox+b.w*k,H-34);g.stroke();}
-$('#measGo').onclick=()=>{buildItem();$('#sumLab').textContent='Length: '+Math.round(A.cur.len*10)/10+'mm  Depth: '+Math.round(A.cur.dep*10)/10+'mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
+$('#measGo').onclick=()=>{A.fromShape=false;buildItem();$('#inQty').value=A.qty||1;$('#sumLab').textContent='Length: '+Math.round(A.cur.len*10)/10+'mm  Depth: '+Math.round(A.cur.dep*10)/10+'mm';drawPrev($('#upCv'));$('#inName').value=A.name;upCheck();go.up();};
 
 /* ---------- name, outline in mm ---------- */
 function buildItem(){
@@ -427,20 +452,20 @@ function drawPrev(cv,item){const o=item||null;if(!o){const c=A.cut,vw=Math.min(w
 $('#inName').oninput=()=>{A.name=$('#inName').value;upCheck();};
 function upCheck(){const ok=$('#inName').value.trim().length>0;$('#inName').classList.toggle('bad',!ok);$('#upGo').disabled=!ok;}
 function thumb(){const c=A.cut,t=document.createElement('canvas'),k=Math.min(180/c.w,180/c.h);t.width=Math.round(c.w*k);t.height=Math.round(c.h*k);const g=t.getContext('2d'),s=document.createElement('canvas');s.width=c.w;s.height=c.h;s.getContext('2d').putImageData(c.img,0,0);g.fillStyle='#fff';g.fillRect(0,0,t.width,t.height);g.drawImage(s,0,0,t.width,t.height);return t.toDataURL('image/jpeg',0.8);}
-$('#upGo').onclick=()=>{const name=$('#inName').value.trim();if(!name)return;const it={id:A.editId||('i'+Date.now()),name,len:A.cur.len,dep:A.cur.dep,w:A.cur.w,h:A.cur.h,ring:A.cur.ring,thumb:thumb(),unit:A.unit};
+$('#upGo').onclick=()=>{const name=$('#inName').value.trim();if(!name)return;const it={id:A.editId||('i'+Date.now()),name,len:A.cur.len,dep:A.cur.dep,w:A.cur.w,h:A.cur.h,ring:A.cur.ring,thumb:thumb(),unit:A.unit,qty:getQty()};
   const i=A.items.findIndex(x=>x.id===it.id);if(i>=0)A.items[i]=it;else A.items.push(it);save();A.last=it.id;A.editId=null;
   const c=A.cut,cv=$('#doneCv');cv.width=c.w;cv.height=c.h;const vk=Math.min((window.innerWidth-32)/c.w,(window.innerHeight*0.42)/c.h);cv.style.width=Math.round(c.w*vk)+'px';cv.style.height=Math.round(c.h*vk)+'px';cv.getContext('2d').putImageData(c.img,0,0);
-  $('#doneMsg').innerHTML='<b>'+esc(name)+'</b> is saved.<br>'+it.w+' × '+it.h+' mm, depth '+it.dep+' mm';go.done();};
+  $('#doneMsg').innerHTML='<b>'+esc(name)+'</b> is saved'+(it.qty>1?' (× '+it.qty+')':'')+'.<br>'+it.w+' × '+it.h+' mm, depth '+it.dep+' mm';go.done();};
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 $('#doneAgain').onclick=go.cam;$('#doneLib').onclick=go.lib;$('#doneSend').onclick=()=>openSend([A.items.find(x=>x.id===A.last)].filter(Boolean));
 
 /* ---------- library ---------- */
 function renderLib(){const g=$('#libGrid');g.innerHTML=A.items.length?'':'<div style="grid-column:1/-1;text-align:center;padding:30px;font-size:19px">No objects yet. Scan one.</div>';
-  A.items.forEach(it=>{const d=document.createElement('div');d.className='lib'+(A.sel.has(it.id)?' sel':'');d.innerHTML='<img src="'+it.thumb+'"><span class="dot"></span><span class="nm">'+esc(it.name)+'</span>';d.onclick=()=>{A.sel.has(it.id)?A.sel.delete(it.id):A.sel.add(it.id);d.classList.toggle('sel');};g.appendChild(d);});}
+  A.items.forEach(it=>{const d=document.createElement('div');d.className='lib'+(A.sel.has(it.id)?' sel':'');d.innerHTML='<img src="'+it.thumb+'"><span class="dot"></span><span class="nm">'+esc(it.name)+'</span>'+(it.qty>1?'<span class="qty">×'+it.qty+'</span>':'');d.onclick=()=>{A.sel.has(it.id)?A.sel.delete(it.id):A.sel.add(it.id);d.classList.toggle('sel');};g.appendChild(d);});}
 $('#libAll').onclick=()=>{A.items.forEach(i=>A.sel.add(i.id));renderLib();};$('#libNone').onclick=()=>{A.sel.clear();renderLib();};
 $('#libDel').onclick=()=>{if(!A.sel.size)return;if(!confirm('Delete '+A.sel.size+' object(s)?'))return;A.items=A.items.filter(i=>!A.sel.has(i.id));A.sel.clear();save();renderLib();};
 $('#libScan').onclick=go.cam;$('#libSend').onclick=()=>{const list=A.items.filter(i=>A.sel.has(i.id));openSend(list.length?list:A.items);};
-$('#libEdit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));if(l.length!==1){toast('Select one object to edit.');return;}const it=l[0];A.editId=it.id;A.name=it.name;A.unit=it.unit||'mm';
+$('#libEdit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));if(l.length!==1){toast('Select one object to edit.');return;}const it=l[0];A.editId=it.id;A.name=it.name;A.qty=it.qty||1;A.fromShape=false;A.unit=it.unit||'mm';
   // rebuild a cut-out view from the saved outline so the length, depth and name can be changed
   const ring=it.ring,w=420,h=Math.max(8,Math.round(420*it.h/Math.max(1,it.w)));let k=Math.min((w-4)/it.w,(h-4)/it.h);const m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#292524';g.beginPath();ring.forEach((p,i)=>{const x=2+p[0]*k,y=h-2-p[1]*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
   const id=g.getImageData(0,0,w,h),mk=new Uint8Array(w*h);for(let i=0;i<w*h;i++)mk[i]=id.data[i*4+3]>128?1:0;A.cut={w,h,m:mk,ring:contour(mk,w,h),how:'saved',img:id,area:0.5};$('#inLen').value=it.len/(A.unit==='in'?25.4:1);$('#inDep').value=it.dep/(A.unit==='in'?25.4:1);A.len=$('#inLen').value;A.dep=$('#inDep').value;
@@ -450,7 +475,7 @@ $('#libEdit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));if(l.lengt
 /* ---------- send to the computer (a link that carries the outlines) ---------- */
 const b64u=u8=>{let s='';u8.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');};
 async function makeLink(list){
-  const data={v:1,items:list.map(it=>({n:it.name,h:Math.round(it.dep*10)/10,o:it.ring.reduce((a,p)=>a.concat([Math.round(p[0]*10),Math.round(p[1]*10)]),[])}))};
+  const data={v:1,items:list.map(it=>({n:it.name,q:it.qty||1,h:Math.round(it.dep*10)/10,o:it.ring.reduce((a,p)=>a.concat([Math.round(p[0]*10),Math.round(p[1]*10)]),[])}))};
   const txt=new TextEncoder().encode(JSON.stringify(data));let tag='j.',body=txt;
   if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(txt);w.close();body=new Uint8Array(await new Response(cs.readable).arrayBuffer());tag='z.';}
   return DESKTOP_URL+'#phone='+tag+b64u(body);}
@@ -471,6 +496,46 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.se
 async function goFit(list){if(!list||!list.length){toast('Scan an object first.');return;}let u;try{u=await makeLink(list);}catch(e){toast('Could not prepare the fit check.');return;}location.href=u+'&fit=1';}
 $('#libFit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));goFit(l.length?l:A.items);};
 $('#doneFit').onclick=()=>goFit([A.items.find(x=>x.id===A.last)].filter(Boolean));
+/* ---------- how many ---------- */
+const getQty=()=>Math.max(1,Math.min(20,Math.round(+$('#inQty').value||1)));
+const setQtyBox=v=>{$('#inQty').value=Math.max(1,Math.min(20,v));A.qty=getQty();};
+$('#qMinus').onclick=()=>setQtyBox(getQty()-1);$('#qPlus').onclick=()=>setQtyBox(getQty()+1);$('#inQty').oninput=()=>{A.qty=getQty();};$('#inQty').onchange=()=>setQtyBox(getQty());
+/* ---------- simple shapes: rectangle, round corners, cylinder ---------- */
+const SH={type:'rect'};
+go.upback=()=>{if(A.fromShape)show('sShape');else go.meas();};
+go.shape=()=>{show('sShape');shUpdate();};
+function openShape(){A.editId=null;A.qty=1;A.fromShape=false;['shA','shB','shR','shD'].forEach(i=>{$('#'+i).value='';});SH.type='rect';$$('#shSeg [data-sh]').forEach(b=>b.classList.toggle('on',b.dataset.sh==='rect'));go.shape();}
+$('#shapeChip').onclick=openShape;$('#libShape').onclick=openShape;
+$$('#shSeg [data-sh]').forEach(b=>b.onclick=()=>{SH.type=b.dataset.sh;$$('#shSeg [data-sh]').forEach(x=>x.classList.toggle('on',x===b));shUpdate();});
+$('#shMm').onclick=()=>{A.unit='mm';$('#shMm').classList.add('on');$('#shIn').classList.remove('on');shUpdate();};
+$('#shIn').onclick=()=>{A.unit='in';$('#shIn').classList.add('on');$('#shMm').classList.remove('on');shUpdate();};
+['shA','shB','shR','shD'].forEach(i=>$('#'+i).oninput=shUpdate);
+function shVals(){const u=A.unit==='in'?25.4:1,v=i=>(+$('#'+i).value||0)*u;return {a:v('shA'),b:v('shB'),r:v('shR'),d:v('shD')};}
+function shRing(){const v=shVals();let pts=[];
+  if(SH.type==='cyl'){const D=v.a,r=D/2;if(!(D>0))return null;for(let i=0;i<48;i++){const t=2*Math.PI*i/48;pts.push([r+r*Math.cos(t),r+r*Math.sin(t)]);}return pts;}
+  const L=v.a,W=v.b;if(!(L>0&&W>0))return null;
+  if(SH.type==='round'){const r=Math.max(0,Math.min(v.r,L/2,W/2));if(r>0.2){const c=[[r,r,180],[L-r,r,270],[L-r,W-r,0],[r,W-r,90]];c.forEach(([cx,cy,a0])=>{for(let k=0;k<=8;k++){const t=(a0+90*k/8)*Math.PI/180;pts.push([cx+r*Math.cos(t),cy+r*Math.sin(t)]);}});return pts;}}
+  return [[0,0],[L,0],[L,W],[0,W]];}
+function shUpdate(){
+  const cyl=SH.type==='cyl';$('#lbA').textContent=cyl?'Diameter':'Length';$('#rwB').style.display=cyl?'none':'flex';$('#rwR').style.display=SH.type==='round'?'flex':'none';
+  const ring=shRing(),v=shVals();['shA','shB','shD'].forEach(i=>{$('#'+i).classList.toggle('bad',!(+$('#'+i).value>0));});
+  $('#shGo').disabled=!(ring&&v.d>0);
+  const cv=$('#shCv'),g=cv.getContext('2d'),W=cv.width,H=cv.height;g.clearRect(0,0,W,H);if(!ring)return;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;ring.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+  const k=Math.min((W-120)/(x1-x0),(H-80)/(y1-y0)),ox=(W-(x1-x0)*k)/2,oy=(H-(y1-y0)*k)/2;
+  g.fillStyle='#292524';g.beginPath();ring.forEach((p,i)=>{const x=ox+(p[0]-x0)*k,y=H-oy-(p[1]-y0)*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
+  g.strokeStyle='#f05325';g.lineWidth=3;g.fillStyle='#f05325';g.font='bold 24px Poppins,sans-serif';g.textAlign='center';
+  const lab=(mm)=>A.unit==='in'?(mm/25.4).toFixed(2)+'"':(Math.round(mm*10)/10)+' mm';
+  g.beginPath();g.moveTo(ox,oy-14);g.lineTo(ox+(x1-x0)*k,oy-14);g.stroke();g.fillText(lab(x1-x0),ox+(x1-x0)*k/2,oy-22);
+  if(!cyl){g.beginPath();g.moveTo(ox-14,H-oy);g.lineTo(ox-14,H-oy-(y1-y0)*k);g.stroke();g.save();g.translate(ox-24,H-oy-(y1-y0)*k/2);g.rotate(-Math.PI/2);g.fillText(lab(y1-y0),0,0);g.restore();}}
+$('#shGo').onclick=()=>{const ring=shRing(),v=shVals();if(!ring||!(v.d>0))return;
+  const rr=ring.map(p=>[Math.round(p[0]*10)/10,Math.round(p[1]*10)/10]);let x1=0,y1=0;rr.forEach(p=>{x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
+  A.cur={len:Math.max(x1,y1),dep:v.d,ring:rr,w:x1,h:y1};
+  // a picture of the shape for the preview and the thumbnail
+  const w=420,h=Math.max(8,Math.round(420*y1/Math.max(1,x1))),k=Math.min((w-4)/x1,(h-4)/y1),m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#292524';g.beginPath();rr.forEach((p,i)=>{const x=2+p[0]*k,y=h-2-p[1]*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();
+  const id=g.getImageData(0,0,w,h),mk=new Uint8Array(w*h);for(let i=0;i<w*h;i++)mk[i]=id.data[i*4+3]>128?1:0;A.cut={w,h,m:mk,ring:contour(mk,w,h),how:'shape',img:id,area:0.5};
+  A.fromShape=true;A.editId=null;A.qty=1;A.name=SH.type==='cyl'?'Cylinder Ø'+Math.round(x1*10)/10:(SH.type==='round'?'Rounded ':'Rectangle ')+Math.round(x1*10)/10+' x '+Math.round(y1*10)/10;
+  $('#sumLab').textContent='Length: '+Math.round(A.cur.len*10)/10+'mm  Depth: '+Math.round(v.d*10)/10+'mm';drawPrev($('#upCv'));$('#inName').value=A.name;$('#inQty').value=1;upCheck();go.up();};
 startCam();
 </script>
 </body>
