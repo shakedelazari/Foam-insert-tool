@@ -149,6 +149,19 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 
 .tickwrap{position:relative;width:130px;height:130px}.tickwrap svg{position:absolute;left:0;top:0;width:100%;height:100%}.tickwrap .tb path{fill:#292524}.tickwrap .ov path{fill:#f05325}.tickwrap .ov{opacity:0;will-change:opacity;animation:tickop 1.6s steps(1,end) infinite}.tickwrap .ov.br{animation-delay:.4s}.tickwrap .ov.bl{animation-delay:.8s}.tickwrap .ov.tl{animation-delay:1.2s}@keyframes tickop{0%{opacity:1}25%{opacity:0}100%{opacity:0}}
 #goSplash{display:none;position:fixed;inset:0;z-index:200;background:#f0ede4;align-items:center;justify-content:center;flex-direction:column;gap:16px;font:600 18px 'Poppins',sans-serif;color:#292524;text-align:center;padding:20px}
+#libGrid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
+.lib .im{aspect-ratio:auto!important;height:92px;display:flex;align-items:center;justify-content:center;background:#fff}
+.lib .im img{width:auto!important;height:auto!important;max-width:100%;max-height:100%;object-fit:contain;display:block}
+.lib .dot{left:5px;top:5px;width:22px;height:22px}
+.lib .ft{padding:5px 6px 6px!important;gap:0!important}
+.lib .nm2{font-size:12px!important}
+.qbadge{position:absolute;top:5px;right:5px;background:var(--or);color:#fff;border:0;border-radius:14px;padding:4px 8px;font:700 12.5px 'Poppins',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.3);line-height:1.1}
+.qpop{display:none;position:fixed;z-index:150;background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.3);width:224px;text-align:center}
+.qpop .qt{font:600 13px 'Poppins',sans-serif;color:#6b645d;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpop .qctl{display:flex;align-items:center;justify-content:center;gap:16px}
+.qpop .qctl button{width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:#fff;font:700 28px 'Poppins',sans-serif;color:var(--ink);line-height:1;padding:0}
+.qpop .qctl b{min-width:40px;font:700 28px 'Poppins',sans-serif}
+.qpop .qok{margin-top:10px;width:100%;border:0;border-radius:12px;background:var(--or);color:#fff;font:600 16px 'Poppins',sans-serif;padding:11px}
 </style>
 </head>
 <body>
@@ -261,7 +274,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <li>Keep all of the object in the picture and avoid hard shadows.</li>
 <li>Use <b>Tilt</b> to straighten the object and crop close to it.</li>
 <li><b>L</b> is the longest side of the real object: measure it with a ruler or caliper and type it. <b>W</b>, the short side, is filled in from the photo. If your caliper shows something else, type it and the outline is stretched a little to match. <b>D</b> is the depth: how deep the part sinks into the foam (the side view in the drawing).</li>
-<li>No object at hand? Use <b>Shape</b> (camera screen or Your Library): rectangle, rectangle with round corners or cylinder, with typed sizes.</li><li>In <b>Your Library</b> use <b>− / +</b> on a card to set how many of that part you have.</li><li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
+<li>No object at hand? Use <b>Shape</b> (camera screen or Your Library): rectangle, rectangle with round corners or cylinder, with typed sizes.</li><li>In <b>Your Library</b> tap the orange <b>×1 +</b> in the corner of a card to set how many of that part you have.</li><li>The size is an estimate. Check it with a real sample.</li></ul><p style="margin:8px 0 0"><b>Make it an app:</b> Chrome menu ⋮ then <b>Install app</b>. iPhone: Share then <b>Add to Home Screen</b>.</p><div class="bt" id="instRow" style="display:none"><button id="instBtn">Install the app now</button></div>
 <div class="bt"><button class="go" id="tipsOk">OK</button></div></div></div>
 
 <div class="modal" id="mSend"><div class="card"><h3>Send to the computer</h3><div id="sendTxt"></div>
@@ -269,6 +282,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <div class="bt"><button id="sendClose">Close</button></div></div></div>
 
 <div id="goSplash"><div class="tickwrap"><svg class="tb" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg><svg class="ov tr" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/></svg><svg class="ov br" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/></svg><svg class="ov bl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/></svg><svg class="ov tl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg></div><span id="goSplashT">Opening the fit check…</span><span style="font-size:14px;font-weight:400;color:#6b645d">The first time it can take a little while.</span></div>
+<div class="qpop" id="qPop"><div class="qt" id="qpT"></div><div class="qctl"><button id="qpMinus" aria-label="Fewer">−</button><b id="qpNum">1</b><button id="qpPlus" aria-label="More">+</button></div><button class="qok" id="qpOk">Done</button></div>
 <div id="toast"></div>
 
 <script>
@@ -514,9 +528,16 @@ $('#doneAgain').onclick=go.cam;$('#doneLib').onclick=go.lib;$('#doneSend').oncli
 /* ---------- library ---------- */
 function renderLib(){const g=$('#libGrid');g.innerHTML=A.items.length?'':'<div style="grid-column:1/-1;text-align:center;padding:30px;font-size:19px">No objects yet. Scan one or add a shape.</div>';
   A.items.forEach(it=>{const d=document.createElement('div');d.className='lib'+(A.sel.has(it.id)?' sel':'');
-    d.innerHTML='<div class="im"><img src="'+it.thumb+'"><span class="dot"></span></div><div class="ft"><span class="nm2">'+esc(it.name)+'</span><span class="lq"><button class="qm" data-q="-1" aria-label="Fewer">−</button><b>'+(it.qty||1)+'</b><button class="qm" data-q="1" aria-label="More">+</button></span></div>';
-    d.onclick=e=>{const qb=e.target.closest('[data-q]');if(qb){it.qty=Math.max(1,Math.min(20,(it.qty||1)+(+qb.dataset.q)));save();d.querySelector('.lq b').textContent=it.qty;return;}A.sel.has(it.id)?A.sel.delete(it.id):A.sel.add(it.id);d.classList.toggle('sel');};
+    d.innerHTML='<div class="im"><img src="'+it.thumb+'"><span class="dot"></span><button class="qbadge" data-qopen aria-label="How many">×'+(it.qty||1)+' +</button></div><div class="ft"><span class="nm2">'+esc(it.name)+'</span></div>';
+    d.onclick=e=>{const qb=e.target.closest('[data-qopen]');if(qb){openQty(it,qb);return;}A.sel.has(it.id)?A.sel.delete(it.id):A.sel.add(it.id);d.classList.toggle('sel');};
     g.appendChild(d);});}
+/* the pop-up that sets how many of a part */
+const QP={it:null,badge:null};
+function qpShow(){const p=$('#qPop');p.style.display='block';const r=QP.badge.getBoundingClientRect(),w=p.offsetWidth,h=p.offsetHeight;let left=Math.max(8,Math.min(innerWidth-w-8,r.right-w)),top=r.bottom+8;if(top+h>innerHeight-8)top=Math.max(8,r.top-h-8);p.style.left=left+'px';p.style.top=top+'px';}
+function openQty(it,badge){QP.it=it;QP.badge=badge;$('#qpT').textContent=it.name;$('#qpNum').textContent=it.qty||1;qpShow();}
+function qpSet(n){const it=QP.it;if(!it)return;it.qty=Math.max(1,Math.min(20,n));save();$('#qpNum').textContent=it.qty;if(QP.badge)QP.badge.textContent='×'+it.qty+' +';}
+$('#qpMinus').onclick=()=>qpSet((QP.it&&QP.it.qty||1)-1);$('#qpPlus').onclick=()=>qpSet((QP.it&&QP.it.qty||1)+1);$('#qpOk').onclick=()=>{$('#qPop').style.display='none';};
+document.addEventListener('pointerdown',e=>{const p=$('#qPop');if(p.style.display==='block'&&!p.contains(e.target)&&!e.target.closest('[data-qopen]'))p.style.display='none';},true);
 $('#libAll').onclick=()=>{A.items.forEach(i=>A.sel.add(i.id));renderLib();};$('#libNone').onclick=()=>{A.sel.clear();renderLib();};
 $('#libDel').onclick=()=>{if(!A.sel.size)return;if(!confirm('Delete '+A.sel.size+' object(s)?'))return;A.items=A.items.filter(i=>!A.sel.has(i.id));A.sel.clear();save();renderLib();};
 $('#libScan').onclick=go.cam;$('#libSend').onclick=()=>{const list=A.items.filter(i=>A.sel.has(i.id));openSend(list.length?list:A.items);};
