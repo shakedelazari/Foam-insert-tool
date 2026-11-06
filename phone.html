@@ -138,13 +138,17 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 #sMeas .seg.sm button{padding:7px 4px;font-size:15px}
 #sMeas .wnote{min-height:0;font-size:12.5px}
 #sMeas .row label.lb{width:136px}
-#libGrid{grid-template-columns:repeat(2,1fr)!important}
+#libGrid{grid-template-columns:repeat(2,1fr)!important;grid-auto-rows:max-content;align-content:start}
+.lib{flex-shrink:0}
 .lib{aspect-ratio:auto!important;display:flex;flex-direction:column}
 .lib .im{position:relative;aspect-ratio:4/3;background:#fff}.lib .im img{width:100%;height:100%;object-fit:contain}
-.lib .ft{display:flex;align-items:center;gap:6px;padding:6px 8px;border-top:1px solid var(--line)}
-.lib .nm2{flex:1;min-width:0;font:600 13px 'Poppins',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lq{display:flex;align-items:center;gap:6px}.lq b{min-width:22px;text-align:center;font:700 16px 'Poppins',sans-serif}
+.lib .ft{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:6px 8px 8px;border-top:1px solid var(--line)}
+.lib .nm2{min-width:0;font:600 14px 'Poppins',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.lq{display:flex;align-items:center;justify-content:center;gap:16px}.lq b{min-width:22px;text-align:center;font:700 16px 'Poppins',sans-serif}
 .qm{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:#fff;font:700 20px 'Poppins',sans-serif;color:var(--ink);line-height:1;padding:0}
+
+.tickwrap{position:relative;width:130px;height:130px}.tickwrap svg{position:absolute;left:0;top:0;width:100%;height:100%}.tickwrap .tb path{fill:#292524}.tickwrap .ov path{fill:#f05325}.tickwrap .ov{opacity:0;will-change:opacity;animation:tickop 1.6s steps(1,end) infinite}.tickwrap .ov.br{animation-delay:.4s}.tickwrap .ov.bl{animation-delay:.8s}.tickwrap .ov.tl{animation-delay:1.2s}@keyframes tickop{0%{opacity:1}25%{opacity:0}100%{opacity:0}}
+#goSplash{display:none;position:fixed;inset:0;z-index:200;background:#f0ede4;align-items:center;justify-content:center;flex-direction:column;gap:16px;font:600 18px 'Poppins',sans-serif;color:#292524;text-align:center;padding:20px}
 </style>
 </head>
 <body>
@@ -264,6 +268,7 @@ html,body{margin:0;height:100%;background:var(--bg);font-family:'Poppins',system
 <div class="bt"><button class="go" id="sendShare">Share the link</button><button id="sendCopy">Copy the link</button></div>
 <div class="bt"><button id="sendClose">Close</button></div></div></div>
 
+<div id="goSplash"><div class="tickwrap"><svg class="tb" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg><svg class="ov tr" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/></svg><svg class="ov br" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/></svg><svg class="ov bl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/></svg><svg class="ov tl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg></div><span id="goSplashT">Opening the fit check…</span><span style="font-size:14px;font-weight:400;color:#6b645d">The first time it can take a little while.</span></div>
 <div id="toast"></div>
 
 <script>
@@ -543,7 +548,8 @@ $('#instBtn').onclick=async()=>{if(!instEv)return;instEv.prompt();try{await inst
 window.addEventListener('appinstalled',()=>{toast('Installed. Open it from your home screen.');$('#instRow').style.display='none';});
 if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('offline mode not available',e));});
 /* ---------- fit check: opens the Foam Insert tool with the scans (Base, Lid or Both, best case, 3D) ---------- */
-async function goFit(list){if(!list||!list.length){toast('Scan an object first.');return;}let u;try{u=await makeLink(list);}catch(e){toast('Could not prepare the fit check.');return;}location.href=u+'&fit=1';}
+async function goFit(list){if(!list||!list.length){toast('Scan an object first.');return;}const sp=$('#goSplash');sp.style.display='flex';await new Promise(r=>setTimeout(r,60));let u;try{u=await makeLink(list);}catch(e){sp.style.display='none';toast('Could not prepare the fit check.');return;}location.href=u+'&fit=1';}
+window.addEventListener('pageshow',()=>{const sp=$('#goSplash');if(sp)sp.style.display='none';});
 $('#libFit').onclick=()=>{const l=A.items.filter(i=>A.sel.has(i.id));goFit(l.length?l:A.items);};
 $('#doneFit').onclick=()=>goFit([A.items.find(x=>x.id===A.last)].filter(Boolean));
 /* ---------- simple shapes: rectangle, round corners, cylinder ---------- */
