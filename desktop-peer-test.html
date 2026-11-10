@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shell-Case – Import from Phone (Test)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --flamingo: #F05325;
+    --eerie: #292524;
+    --khaki: #C6B68D;
+    --spring: #F1EEE5;
+    --green: #4CAF50;
+    --red: #E53935;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--spring);
+    color: var(--eerie);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    background: var(--eerie);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header span { font-size: 13px; opacity: 0.6; }
+
+  .top-buttons {
+    display: flex;
+    gap: 12px;
+    margin: 24px 16px 0;
+    max-width: 600px;
+    width: 100%;
+  }
+  .top-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: 10px;
+    border: 2px solid #e0ddd6;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s;
+  }
+  .top-btn:hover { border-color: var(--flamingo); }
+  .top-btn.active { border-color: var(--flamingo); background: #FFF5F2; }
+  .top-btn .icon { font-size: 20px; margin-bottom: 4px; }
+  .top-btn .label { font-size: 14px; font-weight: 600; display: block; }
+  .top-btn .sub { font-size: 11px; color: #888; }
+
+  /* QR Panel */
+  .qr-panel {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px;
+    margin: 16px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .qr-panel.show { display: block; }
+  .qr-panel h2 { font-size: 18px; margin-bottom: 6px; }
+  .qr-panel p { font-size: 13px; color: #666; margin-bottom: 16px; }
+  #qr-container {
+    display: inline-block;
+    padding: 12px;
+    background: #fff;
+    border-radius: 8px;
+    border: 2px solid var(--spring);
+  }
+  #qr-container canvas, #qr-container img { display: block; }
+
+  .status {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .status.waiting { background: #FFF3E0; color: #E65100; }
+  .status.connected { background: #E8F5E9; color: #2E7D32; }
+  .status.error { background: #FFEBEE; color: #C62828; }
+
+  .session-id {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #bbb;
+    word-break: break-all;
+  }
+
+  /* Library */
+  .library {
+    max-width: 800px;
+    width: 100%;
+    padding: 24px 16px 32px;
+  }
+  .library h2 {
+    font-size: 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .library-count {
+    background: var(--flamingo);
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 12px;
+  }
+  .photo-card {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .photo-card:hover { transform: translateY(-2px); }
+  .photo-card img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-card .info {
+    padding: 8px 10px;
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .photo-card .delete-btn {
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .new-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: var(--green);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .empty-library {
+    text-align: center;
+    padding: 36px;
+    color: #999;
+    font-size: 14px;
+    background: #fff;
+    border-radius: 10px;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 75vh;
+    border-radius: 8px;
+  }
+  .lightbox-actions { display: flex; gap: 12px; }
+  .lightbox-actions button {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-use { background: var(--flamingo); color: #fff; }
+  .btn-close-lb { background: rgba(255,255,255,0.15); color: #fff; }
+  .btn-delete-lb { background: var(--red); color: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Shell-Case – Foam Insert Tool</h1>
+  <span>PeerJS transfer test</span>
+</header>
+
+<!-- Two buttons like in the real tool -->
+<div class="top-buttons">
+  <button class="top-btn" id="btn-import" onclick="toggleQR()">
+    <div class="icon">📲</div>
+    <span class="label">Import from phone</span>
+    <span class="sub">Show QR code or open a link</span>
+  </button>
+  <button class="top-btn" id="btn-library" onclick="scrollToLibrary()">
+    <div class="icon">📱</div>
+    <span class="label">Phone Library</span>
+    <span class="sub">Parts saved from the phone app</span>
+  </button>
+</div>
+
+<!-- QR panel — hidden until "Import from phone" is clicked -->
+<div id="qr-panel" class="qr-panel">
+  <h2>Import from phone</h2>
+  <p>In the phone app, tap <b>Send to computer → Scan QR code</b> and point at this code.</p>
+  <div id="qr-container"></div>
+  <div id="status" class="status waiting">⏳ Waiting for phone to scan…</div>
+  <div id="session-id" class="session-id"></div>
+</div>
+
+<!-- Library -->
+<div class="library" id="library-section">
+  <h2>📱 Phone Library <span id="count" class="library-count">0</span></h2>
+  <div id="library-grid" class="library-grid"></div>
+  <div id="empty" class="empty-library">No photos yet. Click "Import from phone" and scan the QR from your phone app.</div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox">
+  <img id="lb-img" src="">
+  <div class="lightbox-actions">
+    <button class="btn-use" onclick="usePhoto()">✅ Use this photo</button>
+    <button class="btn-delete-lb" onclick="deleteFromLightbox()">🗑️ Delete</button>
+    <button class="btn-close-lb" onclick="closeLightbox()">✕ Close</button>
+  </div>
+</div>
+
+<script>
+// ─── IndexedDB ───
+const DB_NAME = 'ShellCasePhoneLibrary';
+const DB_VERSION = 1;
+const STORE_NAME = 'photos';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME))
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function savePhoto(dataUrl) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const record = { dataUrl, timestamp: Date.now(),
+      name: 'Phone_' + new Date().toISOString().slice(0,19).replace(/[T:]/g,'-') };
+    const req = store.add(record);
+    req.onsuccess = () => { record.id = req.result; resolve(record); };
+    req.onerror = () => reject(req.error);
+  });
+}
+async function getAllPhotos() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function deletePhoto(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).delete(id).onsuccess = () => resolve();
+  });
+}
+
+// ─── PeerJS — desktop is the RECEIVER ───
+const sessionId = 'sc-' + Math.random().toString(36).slice(2, 10);
+let peer = null;
+let qrShown = false;
+
+function initPeer() {
+  peer = new Peer(sessionId);
+  peer.on('open', (id) => {
+    document.getElementById('session-id').textContent = 'Session: ' + id;
+    // Build QR with the phone-peer-test URL + session
+    const phoneUrl = window.location.href.replace('desktop-peer-test.html', 'phone-peer-test.html') + '?s=' + id;
+    new QRCode(document.getElementById('qr-container'), {
+      text: phoneUrl, width: 200, height: 200,
+      colorDark: '#292524', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    qrShown = true;
+  });
+
+  peer.on('connection', (conn) => {
+    const s = document.getElementById('status');
+    s.className = 'status connected';
+    s.textContent = '✅ Phone connected!';
+
+    conn.on('data', async (data) => {
+      if (data && data.type === 'photo') {
+        s.textContent = '📸 Photo received! Saving…';
+        const record = await savePhoto(data.dataUrl);
+        addPhotoCard(record, true);
+        updateCount();
+        s.textContent = '✅ Saved. Send more or close.';
+      }
+    });
+    conn.on('close', () => {
+      s.className = 'status waiting';
+      s.textContent = '📱 Phone disconnected. Scan again to reconnect.';
+    });
+  });
+
+  peer.on('error', (err) => {
+    const s = document.getElementById('status');
+    s.className = 'status error';
+    s.textContent = '❌ Error: ' + err.type;
+  });
+}
+
+// Init peer immediately so QR is ready
+initPeer();
+
+// ─── UI ───
+function toggleQR() {
+  const panel = document.getElementById('qr-panel');
+  const btn = document.getElementById('btn-import');
+  const isOpen = panel.classList.contains('show');
+  panel.classList.toggle('show');
+  btn.classList.toggle('active');
+}
+
+function scrollToLibrary() {
+  document.getElementById('library-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+let currentLightboxId = null;
+
+function addPhotoCard(record, isNew) {
+  document.getElementById('empty').style.display = 'none';
+  const grid = document.getElementById('library-grid');
+  const card = document.createElement('div');
+  card.className = 'photo-card';
+  card.dataset.id = record.id;
+  card.innerHTML = `
+    ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+    <img src="${record.dataUrl}" alt="${record.name}">
+    <div class="info">
+      <span>${record.name.slice(0,18)}</span>
+      <button class="delete-btn" onclick="event.stopPropagation();deleteCard(${record.id})" title="Delete">✕</button>
+    </div>`;
+  card.addEventListener('click', () => openLightbox(record));
+  grid.prepend(card);
+}
+
+function openLightbox(r) {
+  currentLightboxId = r.id;
+  document.getElementById('lb-img').src = r.dataUrl;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  currentLightboxId = null;
+}
+function usePhoto() {
+  alert('In the real tool this opens the sketch editor.\nPhoto ID: ' + currentLightboxId);
+  closeLightbox();
+}
+async function deleteFromLightbox() {
+  if (currentLightboxId != null) { await deleteCard(currentLightboxId); closeLightbox(); }
+}
+async function deleteCard(id) {
+  await deletePhoto(id);
+  const c = document.querySelector(`.photo-card[data-id="${id}"]`);
+  if (c) c.remove();
+  updateCount();
+  if (document.getElementById('library-grid').children.length === 0)
+    document.getElementById('empty').style.display = 'block';
+}
+async function updateCount() {
+  const p = await getAllPhotos();
+  document.getElementById('count').textContent = p.length;
+}
+
+// Load existing library
+(async () => {
+  const photos = await getAllPhotos();
+  if (photos.length > 0) {
+    document.getElementById('empty').style.display = 'none';
+    photos.sort((a,b) => b.timestamp - a.timestamp).forEach(p => addPhotoCard(p, false));
+  }
+  updateCount();
+})();
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
+</html>
