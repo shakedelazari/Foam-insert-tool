@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Photo Tracer: update check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1EEE5;--panel:#fff;--ink:#292524;--muted:#6f6865;--line:#dcd6c8;--acc:#F05325;--accink:#fff;--ok:#4A9462;--bad:#D84C55;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1f1c1b;--panel:#292524;--ink:#F1EEE5;--muted:#b3aca5;--line:#474342;--acc:#ff7143;--accink:#1f1c1b;--ok:#68b280;--bad:#f66a73;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,system-ui,Arial,sans-serif;padding:20px 16px 40px}
+main{max-width:460px;margin:0 auto}h1{font-family:Antonio,'Arial Narrow',sans-serif;font-size:34px;margin:6px 0 4px;line-height:1.05}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px;line-height:1.4}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:6px 16px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}.row:last-child{border:0}
+.row b{font-weight:600;text-align:right}.ok{color:var(--ok)}.bad{color:var(--bad)}
+#msg{margin:16px 0;font-size:15px;line-height:1.45;font-weight:600}
+button{width:100%;border:2px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink);font:600 17px Poppins,sans-serif;padding:16px;margin-top:10px}
+button.go{background:var(--acc);border-color:var(--acc);color:var(--accink)}button[hidden]{display:none}
+.note{color:var(--muted);font-size:12.5px;margin-top:18px;line-height:1.45}
+</style></head><body><main>
+<h1>Photo Tracer update</h1>
+<p class="sub">This page checks which version your phone is showing and fixes it. Your saved scans are not touched.</p>
+<div class="card">
+ <div class="row"><span>Newest version</span><b id="vExpect"></b></div>
+ <div class="row"><span>The website serves</span><b id="vServer">checking...</b></div>
+ <div class="row"><span>Saved on this phone</span><b id="vSaved">checking...</b></div>
+</div>
+<div id="msg"></div>
+<button class="go" id="fix" hidden>Update now</button>
+<button id="open" hidden>Open the app</button>
+<p class="note">If you use the app icon on your home screen: after this, close the app completely (swipe it away) and open it again.</p>
+</main>
+<script>
+const EXPECT='V3.13 · 11 Nov 2026';
+const V=/APP_VERSION='([^']+)'/;
+const $=s=>document.querySelector(s);
+const APP=new URL('phone.html',location.href).href;
+$('#vExpect').textContent=EXPECT;
+async function serverVersion(){const r=await fetch('phone.html?check='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('http '+r.status);const m=V.exec(await r.text());return m?m[1]:'unknown';}
+async function savedVersion(){try{if(!('caches' in window))return 'none';for(const k of await caches.keys()){const c=await caches.open(k);const r=await c.match(APP);if(r){const m=V.exec(await r.text());return m?m[1]:'unknown';}}return 'nothing saved';}catch(e){return 'unknown';}}
+async function clean(){let n=0;try{for(const r of await navigator.serviceWorker.getRegistrations()){await r.unregister();n++;}}catch(e){}try{for(const k of await caches.keys())if(k.startsWith('sc-')){await caches.delete(k);n++;}}catch(e){}return n;}
+async function run(){
+  let sv='?',sd='?';
+  sd=await savedVersion(); /* first: what this phone saved. Asking the website refreshes the saved copy. */
+  try{sv=await serverVersion();}catch(e){sv='not reachable';}
+  $('#vServer').textContent=sv;$('#vServer').className=sv===EXPECT?'ok':'bad';
+  $('#vSaved').textContent=sd;$('#vSaved').className=(sd===EXPECT||sd==='nothing saved')?'ok':'bad';
+  const msg=$('#msg');
+  if(sv==='not reachable'){msg.textContent='The website cannot be reached. Check the internet connection and open this page again.';$('#open').hidden=false;return;}
+  if(sv!==EXPECT){msg.innerHTML='The website still serves <b>'+sv+'</b>, not '+EXPECT+'. So the problem is on GitHub, not on your phone: the upload is not published yet. Wait 5 minutes and reload this page. If it stays like this, open the repository on GitHub, tab <b>Actions</b>, and look for a red mark.';$('#fix').hidden=false;$('#fix').textContent='Clean the phone anyway';$('#open').hidden=false;return;}
+  if(sd!==sv&&sd!=='nothing saved'){msg.innerHTML='Your phone kept an old copy (<b>'+sd+'</b>). Tap the button to remove it. The new version opens by itself.';$('#fix').hidden=false;return;}
+  msg.innerHTML='Good: your phone can show the newest version. If the app still looks old, tap the button once more, then close and reopen the app.';$('#fix').hidden=false;$('#fix').textContent='Clean and open the app';$('#open').hidden=false;
+}
+$('#fix').onclick=async()=>{$('#msg').textContent='Removing the old copy...';await clean();$('#msg').textContent='Opening the fresh app...';setTimeout(()=>location.replace('phone.html?fresh='+Date.now()),500);};
+$('#open').onclick=()=>location.replace('phone.html?fresh='+Date.now());
+run();
+</script></body></html>
