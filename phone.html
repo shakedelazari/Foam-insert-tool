@@ -446,7 +446,7 @@ input::placeholder{color:var(--muted);opacity:.7}
 <p class="hint appver" style="margin:10px 0 0;font-size:13px"></p><div class="bt"><button id="updBtn">Check for a new version</button></div>
 <div class="bt"><button class="go" id="tipsOk">OK</button></div></div></div>
 
-<div class="modal" id="mHowto"><div class="card howto"><svg id="hwSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="How to take the photo: put the part on an A4 or Letter sheet, hold the phone about one and a half sheets high (A4: 45 centimetres, 17 and a half inches; Letter: 42 centimetres, 16 and a half inches), fit the whole sheet in the orange dashed frame, keep the phone flat and slide the plus into the middle of the logo until the logo turns green"></svg>
+<div class="modal" id="mHowto"><div class="card howto"><svg id="hwSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="How to take the photo: put an A4 or Letter sheet on the floor and the part on it, stand over it and hold the phone about one and a half sheets high (A4: 45 centimetres, 17 and a half inches; Letter: 42 centimetres, 16 and a half inches), fit the whole sheet in the orange dashed frame, keep the phone flat and slide the plus into the middle of the logo until the logo turns green"></svg>
 <div class="bt"><button id="hwPause" aria-pressed="false">⏸ Pause</button></div>
 <div class="bt"><button id="hwClose">Close</button><button class="go" id="hwOff">OK, don't show again this session</button></div></div></div>
 
@@ -490,13 +490,13 @@ window.HW=(function(){
   var INK='var(--ink,#292524)',MUTED='var(--muted,#6f6865)',ACC='var(--accent,#F05325)',PANEL='var(--panel,#fff)',BG='var(--bg,#F1EEE5)',KH='var(--khaki,#C6B68D)',LINE='var(--line,#dcd6c8)',FITS='var(--fits,#4A9462)',AI='var(--accent-ink,#fff)';
   var HEAD="Antonio,'Arial Narrow',Arial,sans-serif",BODY="Poppins,Arial,sans-serif";
   function txt(p,x,y,s,size,weight,fill,font,anchor){var t=el('text',{x:x,y:y,'font-size':size,'font-weight':weight||600,'text-anchor':anchor||'start'},p);t.setAttribute('style','fill:'+fill+';font-family:'+font);t.textContent=s;return t;}
-  function ik(S,H,L1,L2){var dx=H[0]-S[0],dy=H[1]-S[1],d=Math.hypot(dx,dy),dd=Math.min(d,L1+L2-0.5),a=Math.acos(clamp((L1*L1+dd*dd-L2*L2)/(2*L1*dd),-1,1)),ang=Math.atan2(dy,dx)-a;return [S[0]+L1*Math.cos(ang),S[1]+L1*Math.sin(ang)];}
+  function ik(S,H,L1,L2,sg){var dx=H[0]-S[0],dy=H[1]-S[1],d=Math.hypot(dx,dy),dd=Math.min(d,L1+L2-0.5),a=Math.acos(clamp((L1*L1+dd*dd-L2*L2)/(2*L1*dd),-1,1)),ang=Math.atan2(dy,dx)-(sg||1)*a;return [S[0]+L1*Math.cos(ang),S[1]+L1*Math.sin(ang)];}
   function limb(p,pts,w,fill,halo){ // a limb is a line that bends: a white outline first, then the black limb on top
     var d='M'+pts.map(function(q){return q[0]+','+q[1];}).join(' L');var out=[];
     if(halo){var h=el('path',{d:d,fill:'none','stroke-width':w+halo*2,'stroke-linecap':'round','stroke-linejoin':'round'},p);h.setAttribute('style','stroke:'+PANEL);out.push(h);}
     var b=el('path',{d:d,fill:'none','stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round'},p);b.setAttribute('style','stroke:'+fill);out.push(b);return out;}
   function setLimb(arr,pts){var d='M'+pts.map(function(q){return q[0]+','+q[1];}).join(' L');arr.forEach(function(e){e.setAttribute('d',d);});}
-  var SX=262,TT=298,SC=2.3; // sheet centre, table top, pixels per cm
+  var SX=296,TT=468,SC=2.3,HIP=[394,258],ANK=[394,446]; // sheet centre, floor, pixels per cm, hip and ankle of the man
   function mount(svg){
     svg.setAttribute('viewBox','0 0 520 720');svg.innerHTML='';R={};
     var bg=el('rect',{x:0,y:0,width:520,height:720},svg);bg.setAttribute('style','fill:'+PANEL);
@@ -506,18 +506,18 @@ window.HW=(function(){
     var sd=el('line',{x1:20,y1:470,x2:500,y2:470,'stroke-width':4},sc);sd.setAttribute('style','stroke:'+LINE);
     /* ---- the man: one plain black figure, standing straight ---- */
     var per=el('g',{},sc);per.setAttribute('style','fill:'+INK+';stroke:none');
-    var legs=el('path',{d:'M377,258 L411,258 L406,448 L383,448 Z','stroke-linejoin':'round'},per);legs.setAttribute('style','fill:'+INK+';stroke:'+INK+';stroke-width:6;stroke-linejoin:round');
+    R.leg=limb(per,[HIP,HIP,ANK],30,INK,0);
     var ft=el('rect',{x:356,y:447,width:50,height:18,rx:9},per);ft.setAttribute('style','fill:'+INK);
-    var tor=el('path',{d:'M378,150 C392,141 407,145 413,159 C417,190 414,226 413,260 L376,260 C372,226 371,188 378,150 Z'},per);tor.setAttribute('style','fill:'+INK);
-    var nk=el('rect',{x:385,y:132,width:16,height:22,rx:7},per);nk.setAttribute('style','fill:'+INK);
-    var hd=el('circle',{cx:393,cy:118,r:23},per);hd.setAttribute('style','fill:'+INK);
+    R.hipc=el('circle',{cx:HIP[0],cy:HIP[1],r:19},per);R.hipc.setAttribute('style','fill:'+INK);
+    R.up=el('g',{},per);
+    var tor=el('path',{d:'M378,150 C392,141 407,145 413,159 C417,190 414,226 413,260 L376,260 C372,226 371,188 378,150 Z'},R.up);tor.setAttribute('style','fill:'+INK);
+    var nk=el('rect',{x:385,y:132,width:16,height:22,rx:7},R.up);nk.setAttribute('style','fill:'+INK);
+    var hd=el('circle',{cx:393,cy:118,r:23},R.up);hd.setAttribute('style','fill:'+INK);
     R.arm=limb(per,[[0,0],[0,0],[0,0]],16,INK,0);
     R.hand=el('circle',{cx:0,cy:0,r:8.5},per);R.hand.setAttribute('style','fill:'+INK);
-    var t1=el('rect',{x:60,y:TT,width:410,height:12,rx:3},sc);t1.setAttribute('style','fill:'+KH);
-    [66,452].forEach(function(x){var l=el('rect',{x:x,y:310,width:12,height:160},sc);l.setAttribute('style','fill:'+KH+';opacity:.75');});
-    var sh=el('rect',{x:SX-34,y:TT-3,width:68,height:4,'stroke-width':1.5},sc);sh.setAttribute('style','fill:'+PANEL+';stroke:'+INK);
+    R.sheet=el('g',{},sc);var sh=el('rect',{x:SX-34,y:TT-3,width:68,height:4,'stroke-width':1.5},R.sheet);sh.setAttribute('style','fill:'+PANEL+';stroke:'+INK);
     R.part=el('g',{},sc);var pr=el('rect',{x:SX-18,y:0,width:36,height:12,rx:4},R.part);pr.setAttribute('style','fill:'+INK);var pd=el('circle',{cx:SX+10,cy:6,r:2.6},R.part);pd.setAttribute('style','fill:'+ACC);
-    R.sheetLab=txt(sc,SX,338,'A4 or Letter sheet',15,600,INK,BODY,'middle');
+    R.sheetLab=txt(sc,SX-46,TT-10,'A4 or Letter sheet',15,600,INK,BODY,'end');
     /* beam, phone, zoom chip */
     R.beam=el('polygon',{points:'0,0 0,0 0,0'},sc);R.beam.setAttribute('style','fill:'+ACC+';opacity:.16');
     R.bl=el('line',{x1:0,y1:0,x2:0,y2:0,'stroke-width':2.5,'stroke-dasharray':'8 6'},sc);R.bl.setAttribute('style','stroke:'+ACC);
@@ -525,7 +525,7 @@ window.HW=(function(){
     R.ph=el('rect',{x:0,y:0,width:60,height:8,rx:3},sc);R.ph.setAttribute('style','fill:'+ACC);
     R.zc=el('g',{},sc);var zr=el('rect',{x:-52,y:-14,width:104,height:28,rx:14},R.zc);zr.setAttribute('style','fill:'+INK);txt(R.zc,0,6,'Zoom 1.5\u00d7',15,600,PANEL,BODY,'middle');
     /* height arrow and the box with the numbers */
-    R.dim=el('g',{},sc);var ax=216;var da=el('line',{x1:ax,y1:0,x2:ax,y2:TT,'stroke-width':4},R.dim);da.setAttribute('style','stroke:'+ACC);R.da=da;
+    R.dim=el('g',{},sc);var ax=SX-52;var da=el('line',{x1:ax,y1:0,x2:ax,y2:TT,'stroke-width':4},R.dim);da.setAttribute('style','stroke:'+ACC);R.da=da;
     R.dt=el('line',{x1:ax-12,y1:0,x2:ax+12,y2:0,'stroke-width':3},R.dim);R.dt.setAttribute('style','stroke:'+ACC);var db=el('line',{x1:ax-12,y1:TT,x2:ax+12,y2:TT,'stroke-width':3},R.dim);db.setAttribute('style','stroke:'+ACC);
     // box A: the height while the phone goes up
     R.bA=el('g',{},sc);var la=el('rect',{x:20,y:84,width:172,height:78,rx:16,'stroke-width':3},R.bA);la.setAttribute('style','fill:'+PANEL+';stroke:'+ACC);
@@ -539,8 +539,8 @@ window.HW=(function(){
     function stack(x,w,len,name,cm,inch){var h1=len*SC,h2=len*SC/2;
       var s1=el('rect',{x:x,y:TT-h1,width:w,height:h1,'stroke-width':2.5},R.st);s1.setAttribute('style','fill:'+PANEL+';stroke:'+INK);txt(R.st,x+w/2,TT-h1/2+8,name,name==='A4'?24:19,700,INK,HEAD,'middle');
       var s2=el('rect',{x:x,y:TT-h1-h2,width:w,height:h2,'stroke-width':2.5,'stroke-dasharray':'6 5'},R.st);s2.setAttribute('style','fill:'+PANEL+';stroke:'+INK);txt(R.st,x+w/2,TT-h1-h2/2+7,'\u00bd',19,700,MUTED,HEAD,'middle');
-      txt(R.st,x+w/2,336,cm,15,700,INK,BODY,'middle');txt(R.st,x+w/2,355,inch,15,600,MUTED,BODY,'middle');}
-    stack(96,48,29.7,'A4','45 cm','17\u00bd in');stack(154,50,27.94,'Letter','42 cm','16\u00bd in');
+      txt(R.st,x+w/2,TT-h1-h2-27,cm,15,700,INK,BODY,'middle');txt(R.st,x+w/2,TT-h1-h2-9,inch,15,600,MUTED,BODY,'middle');}
+    stack(82,48,29.7,'A4','45 cm','17\u00bd in');stack(150,50,27.94,'Letter','42 cm','16\u00bd in');
     R.ok=el('g',{},sc);var oc=el('circle',{cx:0,cy:0,r:13},R.ok);oc.setAttribute('style','fill:'+FITS);var op=el('path',{d:'M-6 0 L-2 5 L7 -5','stroke-width':3.2,fill:'none','stroke-linecap':'round','stroke-linejoin':'round'},R.ok);op.setAttribute('style','stroke:#fff');
     /* ---- what you see on the phone: one hand holds it, the screen is the camera of the app ---- */
     var pv=el('g',{},svg);R.pv=pv;
@@ -576,12 +576,12 @@ window.HW=(function(){
     /* ---- captions ---- */
     R.badge=el('g',{},svg);R.bcol=el('circle',{cx:38,cy:524,r:22},R.badge);R.bn=txt(R.badge,38,533,'1',28,700,AI,HEAD,'middle');
     R.c=[];for(var i=0;i<4;i++)R.c.push(el('g',{},svg));
-    txt(R.c[0],72,520,'Put the part on a sheet',24,700,INK,BODY);txt(R.c[0],72,550,'of paper (A4 or Letter).',24,700,INK,BODY);
+    txt(R.c[0],72,520,'Put an A4 or Letter sheet',24,700,INK,BODY);txt(R.c[0],72,550,'on the floor, the part on it.',24,700,INK,BODY);
     function sheetIcon(p,x,w,h,name,a,b){var r=el('rect',{x:x,y:586,width:w,height:h,'stroke-width':2.5},p);r.setAttribute('style','fill:'+PANEL+';stroke:'+INK);if(name==='A4')txt(p,x+w/2,586+h/2+8,'A4',22,700,MUTED,HEAD,'middle');
       txt(p,x+w+14,614,name,34,700,INK,HEAD);txt(p,x+w+14,642,a,17,600,INK,BODY);txt(p,x+w+14,666,b,17,600,MUTED,BODY);}
     sheetIcon(R.c[0],26,63,89,'A4','297 \u00d7 210 mm','11.7 \u00d7 8.3 in');sheetIcon(R.c[0],268,65,84,'Letter','279 \u00d7 216 mm','11 \u00d7 8.5 in');
     txt(R.c[1],72,520,'Set the zoom to 1.5\u00d7',24,700,INK,BODY);txt(R.c[1],72,556,'Tap the zoom button on the camera',20,600,MUTED,BODY);txt(R.c[1],72,582,'screen until it shows 1.5\u00d7.',20,600,MUTED,BODY);
-    txt(R.c[2],72,520,'Hold the phone about',24,700,INK,BODY);txt(R.c[2],72,578,'1\u00bd sheets high',52,700,ACC,HEAD);
+    txt(R.c[2],72,520,'Stand over it. Hold the phone',24,700,INK,BODY);txt(R.c[2],72,578,'1\u00bd sheets high',52,700,ACC,HEAD);
     txt(R.c[2],72,616,'A4:  45 cm \u00b7 17\u00bd in',22,700,INK,BODY);txt(R.c[2],72,646,'Letter:  42 cm \u00b7 16\u00bd in',22,700,INK,BODY);txt(R.c[2],72,676,'35\u201355 cm \u00b7 14\u201322 in is fine.',17,600,MUTED,BODY);
     txt(R.c[3],72,520,'Fit the whole sheet',24,700,INK,BODY);txt(R.c[3],72,550,'in the dashed frame.',24,700,INK,BODY);
     txt(R.c[3],72,590,'Keep the phone flat: slide the + into the',19,600,MUTED,BODY);txt(R.c[3],72,614,'middle of the logo. When the logo turns',19,600,MUTED,BODY);txt(R.c[3],72,638,'green, take the photo.',19,600,MUTED,BODY);
@@ -591,12 +591,18 @@ window.HW=(function(){
   function render(t){
     t=((t%DUR)+DUR)%DUR;var S=[394,168],step=t<3.2?0:t<5.4?1:t<9.9?2:3;
     var sv=1-ease((t-9.6)/0.6);R.sc.style.opacity=sv;R.pv.style.opacity=1-sv;
-    var drop=bounce((t-0.4)/1.0),py=lerp(120,284,t<0.4?0:drop);R.part.setAttribute('transform','translate(0,'+py+')');
-    R.sheetLab.style.opacity=fade(t,0.3,0.7,2.7,3.1);
+    var sd2=ease((t-0.05)/0.45);R.sheet.setAttribute('transform','translate(0,'+lerp(-150,0,sd2)+')');R.sheet.style.opacity=clamp(t/0.2);var drop=bounce((t-0.8)/1.0),py=lerp(120,TT-15,t<0.8?0:drop);R.part.setAttribute('transform','translate(0,'+py+')');R.part.style.opacity=t<0.7?0:1;
+    R.sheetLab.style.opacity=fade(t,0.5,0.9,2.7,3.1);
     var raise=ease((t-2.9)/0.8),h=lerp(28,44.6,ease((t-5.8)/2.0)),P0=[352,304],P1=[SX,TT-28*SC],P=[lerp(P0[0],P1[0],raise),lerp(P0[1],P1[1],raise)];
     if(t>=5.8)P=[SX,TT-h*SC];
     R.ph.style.opacity=t>2.9?1:0;R.ph.setAttribute('x',P[0]-30);R.ph.setAttribute('y',P[1]-8);
-    var H=[P[0]+20,P[1]+8],E=ik(S,H,78,86);setLimb(R.arm,[S,E,H]);R.hand.setAttribute('cx',H[0]);R.hand.setAttribute('cy',H[1]);
+    var H=[P[0]+20,P[1]+8];
+    // the man bends down to the sheet on the floor: the knees give a little, the upper body turns at the hip until the hand reaches the phone
+    var hip=[HIP[0]+10*raise,HIP[1]+28*raise],sh=function(a){return [hip[0]-90*Math.sin(a),hip[1]-90*Math.cos(a)];},far=function(a){var q=sh(a);return Math.hypot(q[0]-H[0],q[1]-H[1])-150;},th=0;
+    if(far(0)>0){var lo=0,hi=1.45;for(var n=0;n<18;n++){var md=(lo+hi)/2;if(far(md)>0)lo=md;else hi=md;}th=hi;}
+    S=sh(th);R.up.setAttribute('transform','translate('+(hip[0]-HIP[0]).toFixed(1)+','+(hip[1]-HIP[1]).toFixed(1)+') rotate('+(-th*180/Math.PI).toFixed(2)+' '+HIP[0]+' '+HIP[1]+')');
+    R.hipc.setAttribute('cx',hip[0]);R.hipc.setAttribute('cy',hip[1]);setLimb(R.leg,[hip,ik(hip,ANK,94,94,-1),ANK]);
+    var E=ik(S,H,78,86);setLimb(R.arm,[S,E,H]);R.hand.setAttribute('cx',H[0]);R.hand.setAttribute('cy',H[1]);
     var zp=ease((t-3.7)/0.35)*(1-ease((t-5.3)/0.3));R.zc.style.opacity=zp;R.zc.setAttribute('transform','translate('+P[0]+','+(P[1]-34)+') scale('+(0.6+0.4*zp)+')');
     var bo=ease((t-5.4)/0.4),half=34*(h/44.6),ax=P[0],ay=P[1]+4;
     R.beam.setAttribute('points',ax+','+ay+' '+(SX-half)+','+TT+' '+(SX+half)+','+TT);R.beam.style.opacity=.16*bo;
@@ -606,7 +612,7 @@ window.HW=(function(){
     R.bA.style.opacity=ease((t-5.5)/0.4)*(1-swp)*(1-ease((t-9.5)/0.4));R.bB.style.opacity=swp*(1-ease((t-9.5)/0.4));
     R.cm.textContent=Math.round(h)+' cm';R.inch.textContent=fmtIn(h)+' in';
     R.st.style.opacity=ease((t-7.9)/0.4)*(1-ease((t-9.5)/0.4));
-    R.ok.style.opacity=okk;R.ok.setAttribute('transform','translate('+SX+','+(TT+36)+')');
+    R.ok.style.opacity=okk;R.ok.setAttribute('transform','translate('+SX+','+(TT-46)+')');
     // the phone screen: the + slides to the middle of the logo, the logo turns green
     var tilt=lerp(7.4,0.8,ease((t-10.2)/1.9)),dx=5.2*tilt,fit=tilt<2.0,u=clamp((tilt-0.8)/6.6);
     R.plus.setAttribute('transform','translate('+(260+dx)+',272)');
@@ -627,7 +633,7 @@ window.HW=(function(){
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='V3.14 · 12 Nov 2026';
+const APP_VERSION='V3.15 · 12 Nov 2026';
 const LOGO_SVG=`<svg role="img" aria-label="Shell-Case" viewBox="0 0 402 83" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_47_78)"> <path d="M401.898 25.8812C401.736 26.303 402.122 27.3275 401.959 27.7694C401.371 27.7694 400.783 27.7493 400.215 27.7292C400.052 24.917 399.951 22.1249 399.788 19.3127C398.977 21.9241 398.186 24.5555 397.293 27.1467C397.192 27.6891 396.542 27.669 396.116 27.669C395.65 27.669 395.061 27.6489 394.96 27.0864C394.108 24.5555 393.418 21.9642 392.606 19.4132C392.424 22.1852 392.363 24.9572 392.16 27.7292C391.531 27.7292 390.902 27.7292 390.273 27.7292C390.456 24.4952 390.78 21.2813 390.963 18.0472C391.957 18.0472 392.931 18.0472 393.925 18.0472C394.757 20.4175 395.71 22.7476 396.238 25.2183C396.948 22.8079 397.78 20.4175 398.632 18.0472C399.586 18.0472 400.539 18.0472 401.493 18.0472C401.594 19.4935 401.675 20.9599 401.817 22.4061" fill="#292524"/> <path d="M381.529 19.6543C381.529 19.132 381.529 18.5896 381.529 18.0674C384.268 18.0674 386.987 18.0674 389.705 18.0674C389.705 18.5896 389.705 19.1119 389.705 19.6342C388.67 19.6342 387.636 19.6342 386.601 19.6342C386.601 22.3259 386.601 25.0175 386.601 27.7092C385.952 27.7092 385.303 27.7092 384.653 27.7092C384.633 25.0175 384.653 22.3259 384.653 19.6342C383.619 19.6342 382.584 19.6342 381.569 19.6342" fill="#292524"/> <path d="M257.808 23.1092C262.84 17.6254 270.286 14.532 277.752 14.4114C283.413 14.2909 287.288 14.4315 292.766 16.5206C292.36 18.5695 291.65 20.5581 290.98 22.5266C286.922 20.4978 282.216 20.0559 277.732 20.317C272.741 20.6384 267.75 22.5065 264.24 26.1021C260.689 29.6375 258.884 34.5588 258.417 39.4601C257.443 49.584 260.71 59.7481 271.077 63.424C274.648 64.7297 282.317 64.9506 285.624 64.1873C287.592 63.886 289.418 63.1026 291.366 62.7009C291.812 64.5288 292.238 66.3768 292.725 68.2048C289.56 69.7113 286.05 70.2135 282.601 70.6755C278.077 70.9567 273.451 70.9567 269.068 69.6309C267.384 69.2292 265.822 68.4458 264.24 67.7628C259.37 65.3323 255.414 61.1542 253.223 56.2127C250.991 51.2512 250.423 45.7072 250.748 40.3238C251.174 34.0566 253.466 27.7694 257.808 23.1092Z" fill="#292524"/> <path d="M309.382 50.267C305.243 50.729 300.191 53.0792 299.704 57.6993C299.42 60.0896 300.049 62.8616 302.139 64.3079C304.371 65.8546 307.374 65.9149 309.889 65.0913C313.176 64.0066 316.098 61.1743 316.504 57.6591C316.625 55.0678 316.463 52.4766 316.585 49.9055C314.17 49.7648 311.756 49.9255 309.382 50.2871M295.2 33.0524C299.4 30.6419 304.31 29.5572 309.139 29.738C313.136 29.738 317.356 30.9432 320.034 34.0366C322.894 37.2907 323.665 41.7702 323.686 45.9684C323.645 50.3474 323.706 54.7063 323.686 59.0853C323.665 62.701 323.747 66.3367 324.294 69.9122C322.55 70.1934 320.784 70.0528 319.04 70.0729C318.573 70.0729 318.106 70.1131 317.701 69.8721C317.437 68.245 317.396 66.5778 317.031 64.9507C315.144 67.2607 312.71 69.1891 309.808 70.0729C306.684 71.1375 303.255 71.1375 300.09 70.2738C297.655 69.4101 295.464 67.8031 294.125 65.5935C291.853 61.9176 291.934 57.0364 294.024 53.3002C295.606 50.4478 298.447 48.4793 301.429 47.254C306.177 45.3457 311.37 44.9439 316.443 44.8435C316.463 42.2723 316.118 39.4802 314.333 37.4715C312.689 35.6436 310.133 34.9807 307.739 34.9807C303.985 34.9606 300.07 35.7641 296.945 37.9134C296.276 36.3266 295.789 34.6794 295.221 33.0524" fill="#292524"/> <path d="M338.496 29.9789C342.96 29.3763 347.87 29.6575 351.765 32.1483C351.157 33.8558 350.609 35.5832 349.98 37.2907C347.342 35.6435 344.177 34.8601 341.053 35.0208C339.328 35.1212 337.543 35.764 336.427 37.1099C335.007 38.7972 334.844 41.4085 336.163 43.1963C337.036 44.3211 338.314 45.0845 339.572 45.7072C342.432 47.0731 345.557 47.9569 348.194 49.7648C350.264 51.0905 351.948 53.0189 352.698 55.3691C353.875 59.2861 353.043 63.9463 350.02 66.8187C347.281 69.5104 343.386 70.575 339.633 70.7759C335.331 70.9567 330.908 70.113 327.135 68.024C327.723 66.2362 328.271 64.4284 328.9 62.6607C331.537 63.9864 334.378 65.1515 337.381 65.3122C339.693 65.4528 342.23 65.272 344.137 63.8458C346.267 62.259 346.734 59.1053 345.557 56.8153C344.989 55.6503 343.913 54.8468 342.818 54.204C340.383 52.7377 337.563 52.0949 335.068 50.7089C332.552 49.4032 330.198 47.515 329.001 44.9037C327.622 41.8705 328.129 38.2147 329.874 35.4426C331.74 32.4697 335.047 30.5816 338.476 29.9789" fill="#292524"/> <path d="M364.73 38.2951C362.762 40.565 361.747 43.4977 361.341 46.4304C368.382 46.4907 375.402 46.4304 382.442 46.4706C382.503 42.9152 381.468 39.0383 378.587 36.7283C376.578 35.0812 373.819 34.6594 371.283 34.9004C368.727 35.0812 366.332 36.3868 364.709 38.3152M360.144 34.9406C362.823 32.1485 366.515 30.3205 370.39 29.8987C373.92 29.5371 377.674 29.738 380.859 31.4454C384.592 33.3336 387.128 36.9895 388.346 40.8864C389.401 44.3213 389.786 47.9972 389.259 51.5526C379.946 51.6932 370.634 51.5526 361.321 51.6129C361.321 54.646 362.031 57.7796 363.857 60.2704C365.318 62.2792 367.489 63.7254 369.883 64.4486C372.054 65.1918 374.387 65.232 376.659 65.1516C379.845 65.0311 382.99 64.328 385.952 63.2032C386.398 64.9106 386.844 66.6381 387.25 68.3455C381.549 70.5751 375.219 71.459 369.132 70.3743C364.08 69.4703 359.394 66.3568 356.898 61.8774C354.362 57.3176 353.754 51.874 354.545 46.792C355.174 42.413 357 38.1344 360.124 34.9406" fill="#292524"/> <path d="M239.305 38.5762C242.044 38.5361 244.763 38.5762 247.501 38.5562C247.562 41.1876 247.501 43.8391 247.522 46.4705C244.783 46.4705 242.024 46.4705 239.285 46.4705C239.285 43.8391 239.285 41.2077 239.285 38.5762" fill="#292524"/> <path d="M138.734 12.1216C141.148 12.1216 143.583 12.1216 145.997 12.1216C145.997 18.8107 145.997 25.5198 145.997 32.2088C145.997 33.7354 145.957 35.262 146.078 36.7886C148.757 32.2489 154.072 29.4368 159.347 29.6778C162.776 29.7983 166.185 31.2446 168.518 33.7555C171.642 37.0899 172.657 41.7903 172.697 46.2095C172.738 54.1238 172.697 62.0582 172.697 69.9726C170.263 69.9726 167.848 69.9726 165.414 69.9726C165.414 62.4198 165.414 54.867 165.414 47.3143C165.353 44.241 164.947 40.9467 162.938 38.4559C161.234 36.3065 158.333 35.4428 155.675 35.6236C150.522 35.8646 146.078 40.5449 145.997 45.627C145.977 53.7422 145.997 61.8574 145.997 69.9525C143.563 69.9525 141.148 69.9525 138.714 69.9525C138.714 50.6688 138.714 31.3852 138.714 12.1016" fill="#292524"/> <path d="M215.019 12.1216C217.434 12.1216 219.848 12.1216 222.283 12.1216C222.283 31.4052 222.283 50.6889 222.283 69.9725C219.848 69.9725 217.434 69.9725 215.019 69.9725C215.019 50.6889 215.019 31.4052 215.019 12.1216Z" fill="#292524"/> <path d="M229.08 12.1216C231.494 12.1216 233.929 12.1216 236.343 12.1216C236.363 31.4052 236.343 50.6889 236.343 69.9926C233.908 69.9926 231.494 69.9926 229.059 69.9926C229.059 50.709 229.059 31.4253 229.059 12.1216" fill="#292524"/> <path d="M105.481 19.9958C108.565 16.5006 113.231 14.7129 117.837 14.3513C122.747 14.0098 127.839 14.6325 132.282 16.8421C131.633 18.8107 130.964 20.7591 130.314 22.7076C126.52 20.6587 122.118 19.8351 117.837 20.2569C115.321 20.5381 112.744 21.5626 111.101 23.5512C109.234 25.7608 108.89 28.9948 109.965 31.6262C110.918 33.9162 113.069 35.4227 115.199 36.5275C120.129 39.0986 125.831 40.4043 129.969 44.2811C136.32 49.8051 135.894 60.7928 129.584 66.1761C125.567 69.7315 119.987 70.8765 114.733 70.7961C109.945 70.6555 105.055 69.6713 100.916 67.2005C101.565 65.2521 102.194 63.2836 102.823 61.3351C107.165 63.8259 112.237 65.1115 117.248 64.7499C119.785 64.549 122.382 63.7857 124.329 62.0984C128.245 58.8041 128.184 52.0548 124.329 48.7405C120.15 45.0645 114.307 44.3615 109.681 41.4288C106.8 39.6812 104.223 37.2305 102.986 34.0769C101.18 29.3966 102.154 23.7722 105.501 19.9958" fill="#292524"/> <path d="M187.366 37.5719C184.952 39.902 183.755 43.1963 183.288 46.4504C190.349 46.4504 197.389 46.4504 204.449 46.4504C204.409 43.0959 203.577 39.4802 201.02 37.13C197.267 33.7554 190.896 34.0768 187.366 37.592M185.236 32.3895C189.496 29.6978 194.914 29.055 199.783 30.2602C203.617 31.2043 206.924 33.8759 208.791 37.3108C211.145 41.6496 211.895 46.7518 211.226 51.6128C201.893 51.6128 192.56 51.5927 183.248 51.6128C183.369 55.5298 184.587 59.728 187.792 62.2791C191.12 65.011 195.685 65.4529 199.844 65.0712C202.623 64.8503 205.362 64.2075 207.939 63.1428C208.385 64.8703 208.832 66.5777 209.258 68.3052C205.646 69.8319 201.751 70.6153 197.855 70.776C193.331 71.0371 188.604 70.3139 184.729 67.8834C180.854 65.5332 178.196 61.5359 177.06 57.2171C175.822 52.3561 176.045 47.1334 177.648 42.3728C179.028 38.3352 181.645 34.6593 185.297 32.3493" fill="#292524"/> <path d="M46.3191 38.6075H82.3518C82.9807 38.6075 83.5082 38.0249 83.5082 37.4022C81.9054 17.4557 65.8571 1.5668 45.7104 0H45.6901C45.0612 0 44.5337 0.56244 44.5337 1.18514V36.7996C44.5337 37.7839 45.3452 38.5874 46.3394 38.5874" fill="#F05325"/> <path d="M38.9948 36.8197V1.14497C38.9948 0.522265 38.4065 0 37.7775 0C17.6309 1.58688 1.58252 17.4959 0 37.4424C0 38.0852 0.568083 38.6075 1.19703 38.6075H37.1689C38.163 38.6075 38.9746 37.804 38.9746 36.8197" fill="#292524"/> <path d="M44.5337 46.12V81.7948C44.5337 82.4175 45.122 82.9397 45.751 82.9397C65.8976 81.3529 81.946 65.4438 83.5285 45.4973C83.5285 44.8545 82.9604 44.3323 82.3315 44.3323H46.3596C45.3655 44.3323 44.5742 45.1358 44.5742 46.12" fill="#292524"/> <path d="M37.1892 44.3323H1.15646C0.527506 44.3323 0 44.9148 0 45.5375C1.60281 65.484 17.6714 81.3729 37.8181 82.9397C38.4471 82.9397 38.9746 82.3773 38.9746 81.7546V46.1401C38.9746 45.1558 38.163 44.3524 37.1689 44.3524" fill="#292524"/> </g> <defs> <clipPath id="clip0_47_78"> <rect width="402" height="83" fill="white"/> </clipPath> </defs> </svg>`;
 $$('.logo').forEach(e=>e.innerHTML=LOGO_SVG);
 /* ---------- light / dark mode: same colours as the web app. Your choice is remembered; until you choose it follows the phone. ---------- */
