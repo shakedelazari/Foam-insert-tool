@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Best fit — Shell-Case</title>
+<script>document.documentElement.setAttribute('data-theme','light');</script>
 <script>(function(){var h=location.hash;if(!/^#phone=/.test(h)){location.replace('app.html');return;}var m=/&u=(in|mm)/.exec(h);window.__faUnit=m?m[1]:'mm';})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12611,13 +12612,25 @@ body.fitmode.nfhas #nfLid{display:block}
 body.fitmode:not(.nfhas) #nfNone{display:flex}
 body.fitmode:not(.nfhas) #nfAl{display:none}
 #fitBusy{background:#F1EEE5!important}
+.nfchip{position:relative}
+.nfchip.sel{outline:none}
+.nfchip.sel::after{content:'';position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid #292524;border-radius:50%;box-shadow:0 0 0 2px #fff}
+.nfchip.best.sel::after{border-color:#292524}
+#nfZoom{position:fixed;z-index:31;right:26px;bottom:calc(var(--nfb,330px) + 10px);display:none;gap:6px}
+body.fitmode.nfhas #nfZoom{display:flex}body.fitmode.nfred #nfZoom{display:none}
+#nfZoom button{width:40px;height:40px;border:2px solid #292524;border-radius:10px;background:#fff;font:700 20px Poppins,Arial,sans-serif;color:#292524;padding:0}
+#nfOver{position:fixed;left:16px;right:16px;top:var(--nft,118px);bottom:var(--nfb,330px);z-index:7;display:none;background:#fff;border:2px solid #C6B68D;border-radius:16px;overflow:hidden}
+body.fitmode.nfred #nfOver{display:block}body.fitmode.nfred #nfLid{display:none}
+#nfOver canvas{width:100%;height:100%;display:block}
+.nflinks{display:flex;justify-content:center;gap:18px}
+#v3 canvas{touch-action:none}
 body.fitmode #zoomBar,body.fitmode #layout .stage-note{display:none!important}
 `;document.head.appendChild(nfCss);
 const nfRoot=document.createElement('div');nfRoot.innerHTML=`<div id="nfTop"><div class="nfnav"><button id="nfBack">‹ Back</button><button id="nfFwd">Forward ›</button></div><h2 id="nfH">Best fit</h2></div>
-<button id="nfLid">Close lid</button><div id="nfNone">No STA-300 case fits these parts.<br>Send them to Shell-Case for a custom foam.</div>
+<button id="nfLid">Close lid</button><div id="nfZoom"><button id="nfZin" aria-label="Zoom in">+</button><button id="nfZout" aria-label="Zoom out">−</button></div><div id="nfOver"><canvas id="nfOverCv"></canvas></div><div id="nfNone">No STA-300 case fits these parts.<br>Send them to Shell-Case for a custom foam.</div>
 <div id="nfBot"><div class="nfchips" id="nfChips"></div><div id="nfWhy"></div>
 <div class="nfal" id="nfAl"><b>Alignment</b><div class="nfseg"><button data-al="auto">Auto</button><button data-al="straight">Straight</button><button data-al="tetris">Tetris</button></div></div>
-<button class="nfpri" id="nfSend">Send to computer</button><button class="nflink" id="nfEdit">Edit parts</button></div>`;document.body.appendChild(nfRoot);
+<button class="nfpri" id="nfSend">Send to computer</button><div class="nflinks"><button class="nflink" id="nfEdit">Edit parts</button><button class="nflink" id="nfVid">Download video</button></div></div>`;document.body.appendChild(nfRoot);
 const sizeOrder=()=>CASES.slice().sort((a,b)=>a.L*a.W-b.L*b.W);
 const nfMm=v=>NF.unit==='in'?(Math.ceil(v/25.4*10)/10)+' in':Math.ceil(v)+' mm';
 const nfEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -12640,6 +12653,47 @@ function alignIdx(id,al){const e=S.ladder&&S.ladder.find(x=>x.c.id===id);if(!e||
   const k=e.options.findIndex(o=>al==='straight'?o.kind==='straight':(o.kind!=='straight'&&o.kind!=='center'));return k>=0?k:null;}
 function applyAlign(){if(!NF.shown)return;const k=alignIdx(NF.shown,NF.align);if(k==null)return;applyCase(NF.shown,k);fit3d();}
 function nfLayout(){const t=q('#nfTop'),b=q('#nfBot');if(!t||!b)return;document.documentElement.style.setProperty('--nft',(t.offsetHeight+6)+'px');document.documentElement.style.setProperty('--nfb',(b.offsetHeight+8)+'px');}
+/* the case seen from the front, tilted, so the base and the open lid are both in view */
+function frontTilt(){if(typeof T3==='undefined'||!T3.ready)return;T3.az=-Math.PI/2;T3.el=0.55;camUpdate();}
+function zoomBy(k){if(typeof T3==='undefined'||!T3.ready)return;T3.dist=Math.max(60,Math.min(4000,T3.dist*k));camUpdate();}
+/* pinch with two fingers to zoom the 3D case */
+function pinchSetup(){if(typeof T3==='undefined'||!T3.ready||T3._pinch)return;T3._pinch=true;const el=T3.r.domElement,pts=new Map();let d0=0,dist0=0;
+  const dd=()=>{const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);};
+  el.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){d0=dd();dist0=T3.dist;e.stopImmediatePropagation();}},{capture:true});
+  el.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size>=2){e.stopImmediatePropagation();const d=dd();if(d0>10&&d>10){T3.dist=Math.max(60,Math.min(4000,dist0*d0/d));camUpdate();}}},{capture:true});
+  const end=e=>{pts.delete(e.pointerId);if(pts.size<2)d0=0;};el.addEventListener('pointerup',end,{capture:true});el.addEventListener('pointercancel',end,{capture:true});}
+/* a case that does not fit: draw it from the top with the parts laid in it; what sticks out is red */
+function drawOver(cs){const cv=q('#nfOverCv'),box=q('#nfOver');if(!cv||!box)return;const W=box.clientWidth,H=box.clientHeight,dpr=devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const wall=(S.set&&S.set.wall)||8,gap=6,lidBad=/lid/i.test((FIT.res&&FIT.res.why[cs.id])||''),list=S.parts.filter(p=>(p.side==='lid')===lidBad);
+  const items=list.map(p=>{let poly=(p.photo&&p.photo.outline)?p.photo.outline.map(a=>[a[0],a[1]]):null,e;try{e=getOriented(p,getR(p)).o.ext;}catch(x){e=[50,30,10];}
+    if(!poly)poly=[[0,0],[e[0],0],[e[0],e[1]],[0,e[1]]];let x0=Math.min(...poly.map(a=>a[0])),x1=Math.max(...poly.map(a=>a[0])),y0=Math.min(...poly.map(a=>a[1])),y1=Math.max(...poly.map(a=>a[1]));
+    const cx=(x0+x1)/2,cy=(y0+y1)/2;let circ=(p.fingers||[]).filter(f=>f.shape&&f.T===p.T).map(f=>[cx+f.ox,cy+f.oy,f.a]);
+    let bx0=Math.min(x0,...circ.map(c=>c[0]-c[2])),bx1=Math.max(x1,...circ.map(c=>c[0]+c[2])),by0=Math.min(y0,...circ.map(c=>c[1]-c[2])),by1=Math.max(y1,...circ.map(c=>c[1]+c[2]));
+    if(by1-by0>bx1-bx0){poly=poly.map(a=>[a[1],-a[0]]);circ=circ.map(c=>[c[1],-c[0],c[2]]);[bx0,bx1,by0,by1]=[by0,by1,-bx1,-bx0];} // long side along the case length
+    return {p,poly:poly.map(a=>[a[0]-bx0,a[1]-by0]),circ:circ.map(c=>[c[0]-bx0,c[1]-by0,c[2]]),w:bx1-bx0,h:by1-by0};}).sort((a,b)=>b.w*b.h-a.w*a.h);
+  let x=wall,y=wall,rowH=0;for(const it of items){if(x>wall&&x+it.w>cs.L-wall){x=wall;y+=rowH+gap;rowH=0;}it.x=x;it.y=y;x+=it.w+gap;rowH=Math.max(rowH,it.h);it.out=it.x+it.w>cs.L-wall+0.5||it.y+it.h>cs.W-wall+0.5;}
+  const mx=Math.max(cs.L,...items.map(i=>i.x+i.w))+10,my=Math.max(cs.W,...items.map(i=>i.y+i.h))+10,k=Math.min((W-28)/(mx+10),(H-60)/(my+10)),ox=(W-mx*k)/2+5*k,oy=40;
+  const X=v=>ox+v*k,Y=v=>oy+v*k,rr=(x0,y0,w,h,r)=>{g.beginPath();g.moveTo(X(x0+r),Y(y0));g.arcTo(X(x0+w),Y(y0),X(x0+w),Y(y0+h),r*k);g.arcTo(X(x0+w),Y(y0+h),X(x0),Y(y0+h),r*k);g.arcTo(X(x0),Y(y0+h),X(x0),Y(y0),r*k);g.arcTo(X(x0),Y(y0),X(x0+w),Y(y0),r*k);g.closePath();};
+  g.fillStyle='#292524';g.font='600 13px Poppins,Arial,sans-serif';g.textAlign='left';g.fillText(cs.name+(lidBad?' · lid':' · base')+' · '+cs.L+' × '+cs.W+' mm',14,24);
+  rr(0,0,cs.L,cs.W,cs.R||10);g.fillStyle='#e9e4da';g.fill();g.lineWidth=2;g.strokeStyle='#292524';g.stroke();
+  g.setLineDash([5,4]);g.strokeStyle='#8a8279';g.lineWidth=1;g.strokeRect(X(wall),Y(wall),(cs.L-2*wall)*k,(cs.W-2*wall)*k);g.setLineDash([]);
+  for(const it of items){const fill=it.out?'rgba(179,38,30,.78)':'#C6B68D';g.fillStyle=fill;for(const c of it.circ){g.beginPath();g.arc(X(it.x+c[0]),Y(it.y+(it.h-c[1])),c[2]*k,0,7);g.fill();}
+    g.beginPath();it.poly.forEach((a,i)=>{const px=X(it.x+a[0]),py=Y(it.y+(it.h-a[1]));i?g.lineTo(px,py):g.moveTo(px,py);});g.closePath();g.fill();g.lineWidth=1.5;g.strokeStyle='#292524';g.stroke();}}
+/* the packing as a video: the parts go into the case one by one */
+async function nfVideo(){if(typeof MediaRecorder==='undefined'||typeof THREE==='undefined'||!T3.ready){toast('Video is not available on this phone.');return;}if(!FIT.rec){toast('There is no case to show.');return;}
+  const mime=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m));if(!mime){toast('Video is not available on this phone.');return;}
+  busy(true,'Making the video…');await wait(80);
+  try{if((S.lidAng||0)<100){S.lidAng=120;S.dirty3=true;}build3D();frontTilt();const ms=T3.partMeshes.slice();
+    const cv=document.createElement('canvas');cv.width=1280;cv.height=720;const r2=new THREE.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true});r2.setSize(1280,720,false);r2.setClearColor(0xffffff,1);
+    const cam=T3.cam.clone();cam.aspect=16/9;cam.updateProjectionMatrix();const draw=()=>{cam.position.copy(T3.cam.position);cam.quaternion.copy(T3.cam.quaternion);r2.render(T3.scene,cam);};
+    const rec=new MediaRecorder(cv.captureStream(30),{mimeType:mime}),chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};const fin=new Promise(res=>{rec.onstop=res;});
+    ms.forEach(m=>{m.visible=false;});rec.start();draw();await wait(600);
+    await new Promise(res=>{const t0=performance.now();const step=now=>{const t=(now-t0)/1000;let done=true;ms.forEach((m,i)=>{const s=t-i*0.55;if(s<0){m.visible=false;done=false;return;}m.visible=true;const kk=Math.min(1,s/0.8),e=1-Math.pow(1-kk,3);m.position.z=m.userData.zFinal+(1-e)*140;if(kk<1)done=false;});camUpdate();draw();if(!done)requestAnimationFrame(step);else res();};requestAnimationFrame(step);});
+    const t1=performance.now();await new Promise(res=>{const st=now=>{draw();if(now-t1<1500)requestAnimationFrame(st);else res();};requestAnimationFrame(st);});
+    rec.stop();await fin;r2.dispose();ms.forEach(m=>{m.visible=true;m.position.z=m.userData.zFinal;});camUpdate();
+    const ext=/mp4/.test(mime)?'mp4':'webm',blob=new Blob(chunks,{type:mime.split(';')[0]}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Shell-Case_'+nm(FIT.rec.id)+'_packing.'+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+    busy(false);toast('Video saved: '+a.download);}
+  catch(e){console.error(e);busy(false);toast('The video could not be made: '+e.message);}}
 function render(){
   const bid=bestId(),rec=bid?CASES.find(c=>c.id===bid):null,ord=sizeOrder();if(!NF.sel)NF.sel=rec?rec.id:ord[ord.length-1].id;
   document.body.classList.toggle('nfhas',!!rec);
@@ -12651,6 +12705,7 @@ function render(){
     lines=nx?reasonFor(nx).slice(0,1).map(x=>'<b>'+nm(nx.id)+' is too small:</b> '+x):['<b>'+sel.name+'</b> is the smallest STA-300 case.'];}
   else lines=['<b>'+nm(sel.id)+'</b> fits too'+(rec?': a bigger case than '+nm(rec.id):'')+'.'];
   w.className=ss;w.innerHTML=lines.join('<br>');
+  document.body.classList.toggle('nfred',ss==='no');if(ss==='no')requestAnimationFrame(()=>drawOver(sel));
   const shown=NF.shown;q('#nfAl').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.al===NF.align);b.disabled=!shown||alignIdx(shown,b.dataset.al)==null;});
   q('#nfLid').textContent=(S.lidAng||0)>50?'Close lid':'Open lid';
   requestAnimationFrame(nfLayout);}
@@ -12659,12 +12714,13 @@ window.__startFit=function(){document.body.classList.add('fitmode');const sp=doc
   q('#nfBack').onclick=q('#nfEdit').onclick=()=>{location.href=APP+'#layout';};
   q('#nfFwd').onclick=q('#nfSend').onclick=()=>{location.href=APP+'#send';};
   q('#nfChips').onclick=async e=>{const b=e.target.closest('.nfchip');if(!b||FIT.busy)return;const id=b.dataset.id;NF.sel=id;
-    if(stat(id)!=='no'&&id!==NF.shown){NF.shown=id;await pickCase(id);if(NF.align!=='auto')applyAlign();}render();};
+    if(stat(id)!=='no'&&id!==NF.shown){NF.shown=id;await pickCase(id);if(NF.align!=='auto')applyAlign();setTimeout(frontTilt,900);}render();};
   q('#nfAl').onclick=e=>{const b=e.target.closest('button[data-al]');if(!b||b.disabled)return;NF.align=b.dataset.al;applyAlign();render();};
+  q('#nfZin').onclick=()=>zoomBy(0.82);q('#nfZout').onclick=()=>zoomBy(1.22);q('#nfVid').onclick=()=>nfVideo();
   q('#nfLid').onclick=()=>{const closing=(S.lidAng||0)>50;animLid(closing?0:120);q('#nfLid').textContent=closing?'Open lid':'Close lid';};
-  addEventListener('resize',()=>requestAnimationFrame(nfLayout));
+  addEventListener('resize',()=>{requestAnimationFrame(nfLayout);if(document.body.classList.contains('nfred')){const c=CASES.find(x=>x.id===NF.sel);if(c)requestAnimationFrame(()=>drawOver(c));}});
   busy(true,'Finding the best case… (1 of 3)');
-  fitRun().catch(e=>console.error(e)).then(()=>{NF.shown=bestId();NF.sel=null;render();if(FIT.rec)setTimeout(()=>{try{animLid(120);}catch(e){}render();},900);});};
+  fitRun().catch(e=>console.error(e)).then(()=>{NF.shown=bestId();NF.sel=null;render();if(FIT.rec)setTimeout(()=>{try{animLid(120);}catch(e){}render();setTimeout(()=>{frontTilt();pinchSetup();},500);},900);});};
 })();
 </script>
 
