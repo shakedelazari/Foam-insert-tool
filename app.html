@@ -48,23 +48,32 @@ p{margin:0}
 .sheetc.on{border:3px solid var(--fl)}
 .sheetc b{display:block;font:700 26px Antonio,sans-serif}
 .sheetc span{font-size:13px}
-/* camera */
-.camBox{position:relative;flex:1;min-height:0;background:var(--ink);border-radius:16px;overflow:hidden}
+/* camera: full screen */
+#sCam{padding:0;background:#3a3633}
 #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 50%}
-#camFrame{position:absolute;border:3px dashed var(--fl);border-radius:8px;pointer-events:none;box-shadow:0 0 0 2000px rgba(41,37,36,.28)}
-#lvl{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:104px;height:104px;pointer-events:none}
-#lvlTxt{position:absolute;top:118px;left:0;right:0;text-align:center;color:#fff;font:600 13px Poppins,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.6);pointer-events:none}
-.camChip{position:absolute;bottom:12px;background:rgba(41,37,36,.6);color:#fff;border:2px solid rgba(255,255,255,.7);border-radius:16px;padding:4px 12px;font:600 13px Poppins,sans-serif}
-#camMsg{position:absolute;left:16px;right:16px;top:45%;text-align:center;color:#fff;font-size:15px;display:none}
-.shutRow{display:flex;align-items:center;justify-content:center;gap:28px;flex:none}
-#shut{width:80px;height:80px;border-radius:50%;border:4px solid var(--ink);background:#fff;padding:8px}
+#camFrame{position:absolute;border:3px dashed var(--fl);border-radius:8px;pointer-events:none;box-shadow:0 0 0 2000px rgba(0,0,0,.16)}
+.camTop{position:absolute;left:16px;right:16px;top:calc(env(safe-area-inset-top) + 14px);z-index:3}
+.camChips{position:absolute;right:16px;top:calc(env(safe-area-inset-top) + 58px);z-index:3;display:flex;gap:8px}
+.camChip{background:rgba(41,37,36,.55);color:#fff;border:2px solid rgba(255,255,255,.75);border-radius:16px;padding:4px 12px;font:600 13px Poppins,sans-serif}
+#lvl{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;pointer-events:none;z-index:2;opacity:.92}
+#lvlTxt{position:absolute;left:0;right:0;text-align:center;color:#fff;font:600 13px Poppins,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:none;z-index:2}
+.gd{fill:#F05325;animation:gd 1.2s infinite}.gd.g2{animation-delay:.2s}.gd.g3{animation-delay:.4s}
+@keyframes gd{0%,100%{opacity:.25}50%{opacity:1}}
+#camMsg{position:absolute;left:24px;right:24px;top:40%;text-align:center;color:#fff;font-size:15px;display:none;z-index:2}
+.camBot{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px}
+.shutRow{display:flex;align-items:center;justify-content:center;gap:34px}
+#shut{width:64px;height:64px;border-radius:50%;border:3px solid #fff;background:rgba(255,255,255,.9);padding:6px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 #shut span{display:block;width:100%;height:100%;border-radius:50%;background:var(--fl)}
-.iconb{width:48px;height:48px;border-radius:50%;border:2px solid var(--ink);background:#fff;display:grid;place-items:center;padding:0}
-.iconb svg{width:24px;height:24px}
+.iconb{width:44px;height:44px;border-radius:50%;border:2px solid #fff;background:rgba(41,37,36,.55);color:#fff;display:grid;place-items:center;padding:0}
+.iconb svg{width:22px;height:22px}
+#camSheet{background:rgba(41,37,36,.55);color:#fff;border-radius:12px;padding:3px 12px;font:600 13px Poppins,sans-serif}
 /* canvases */
 .cvBox{position:relative;flex:1;min-height:0;background:#fff;border-radius:16px;border:2px solid var(--kh);overflow:hidden;touch-action:none}
 .cvBox canvas{position:absolute;inset:0;width:100%;height:100%}
-.ibtn{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:#fff;font:700 18px Poppins,sans-serif;flex:none}
+.ibtn{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:#fff;font:700 18px Poppins,sans-serif;flex:none;padding:0;display:grid;place-items:center;color:var(--ink)}
+.ibtn:disabled{opacity:.3;cursor:default}.ibtn svg{width:20px;height:20px}
+#olLoupe{position:absolute;width:150px;height:150px;border-radius:50%;border:3px solid var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.3);overflow:hidden;display:none;pointer-events:none;background:#fff;z-index:2}
+#olLoupe canvas{position:static;width:150px;height:150px}
 /* size */
 label.f{font-size:14px;font-weight:600;flex:1;min-width:0}
 label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);border-radius:10px;padding:0 12px;font:400 16px Poppins,sans-serif;background:#fff;margin-top:4px;color:var(--ink)}
@@ -96,6 +105,16 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
 #toast{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 90px);z-index:400;background:var(--ink);color:#fff;border-radius:12px;padding:12px 14px;font-size:14px;text-align:center;display:none}
 .modal{position:fixed;inset:0;z-index:200;background:rgba(41,37,36,.55);display:none;align-items:center;justify-content:center;padding:16px}
 .modal.on{display:flex}
+.stepn{width:26px;height:26px;border-radius:50%;background:var(--fl);color:#fff;display:grid;place-items:center;font:700 14px Poppins,sans-serif;flex:none}
+.shot{margin-top:8px;border:2px solid var(--kh);border-radius:10px;background:#fff;overflow:hidden;font-family:Poppins,sans-serif}
+.shbar{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #e4dfd3}
+.shlogo{font:700 11px Poppins,sans-serif;color:#292524}.shtitle{font:600 12px Antonio,sans-serif;color:#555;letter-spacing:.3px}
+.shrow{display:flex;gap:4px;padding:10px 12px 10px 6px;flex-wrap:nowrap}
+.shb{border:1.5px solid #292524;border-radius:999px;padding:3px 6px;font:600 8.5px Poppins,sans-serif;white-space:nowrap;color:#292524;position:relative}
+.shb.up{background:#F05325;border-color:#F05325;color:#fff}
+.shb .ring{position:absolute;left:-6px;right:-6px;top:-7px;bottom:-7px;border:3px solid #B3261E;border-radius:999px;animation:ring 1.2s infinite}
+@keyframes ring{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.6}}
+.shrow2{display:flex;gap:10px;padding:2px 8px 8px;font-size:9px;color:#8a8279}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -143,32 +162,30 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
 </section>
 
 <!-- 4 Take photo -->
-<section id="sCam" class="scr">
-  <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <h2>Take photo</h2>
-  <div class="camBox" id="camBox">
-    <video id="vid" playsinline muted autoplay></video>
-    <div id="camFrame"></div>
-    <svg id="lvl" viewBox="0 0 140 140" aria-label="Level: move the dot to the centre circle" role="img"><circle cx="70" cy="70" r="66" fill="rgba(41,37,36,0.35)" stroke="#fff" stroke-width="3"/><circle cx="70" cy="70" r="18" fill="none" stroke="#fff" stroke-width="3"/><circle id="lvlDot" cx="70" cy="70" r="11" fill="#F05325"/></svg>
-    <div id="lvlTxt"></div>
-    <div id="camMsg"></div>
-    <button class="camChip" id="zoomChip" style="left:12px">1.5×</button>
-    <button class="camChip" id="flashChip" style="right:12px;display:none">Flash: On</button>
+<section id="sCam" class="scr" aria-label="Take photo">
+  <video id="vid" playsinline muted autoplay></video>
+  <div id="camFrame"></div>
+  <svg id="lvl" viewBox="0 0 140 140" aria-label="Level: move the orange dot into the centre circle" role="img"><circle cx="70" cy="70" r="66" fill="rgba(41,37,36,0.30)" stroke="#fff" stroke-width="3"/><circle cx="70" cy="70" r="18" fill="none" stroke="#fff" stroke-width="3"/><g id="lvlGuide"><circle class="gd g1" r="4.5"/><circle class="gd g2" r="3.8"/><circle class="gd g3" r="3.1"/></g><circle id="lvlDot" cx="70" cy="70" r="11" fill="#F05325" stroke="#fff" stroke-width="2"/></svg>
+  <div id="lvlTxt"></div>
+  <div id="camMsg"></div>
+  <div class="nav camTop"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
+  <div class="camChips"><button class="camChip" id="zoomChip">1.5×</button><button class="camChip" id="flashChip" style="display:none">Flash: On</button></div>
+  <div class="camBot">
+    <div id="camSheet"></div>
+    <div class="shutRow">
+      <button class="iconb" id="camFile" aria-label="Choose a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></button>
+      <button id="shut" aria-label="Take photo"><span></span></button>
+      <div style="width:44px"></div>
+    </div>
   </div>
-  <div class="shutRow">
-    <button class="iconb" id="camFile" aria-label="Choose a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></button>
-    <button id="shut" aria-label="Take photo"><span></span></button>
-    <div style="width:48px"></div>
-  </div>
-  <div style="text-align:center;font-size:14px;font-weight:600" id="camSheet"></div>
   <input type="file" id="file" accept="image/*" style="display:none">
 </section>
 
 <!-- 5 Outline -->
 <section id="sOutline" class="scr">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <div class="row" style="justify-content:space-between"><h2>Outline</h2><button class="ibtn" id="olTips" aria-label="Tips">i</button></div>
-  <div class="cvBox" id="olBox"><canvas id="olCv"></canvas></div>
+  <div class="row" style="justify-content:space-between"><h2>Outline</h2><div class="row"><button class="ibtn" id="olUndo" aria-label="Undo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg></button><button class="ibtn" id="olRedo" aria-label="Redo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/></svg></button><button class="ibtn" id="olTips" aria-label="Tips">i</button></div></div>
+  <div class="cvBox" id="olBox"><canvas id="olCv"></canvas><div id="olLoupe"><canvas id="olLpCv" width="300" height="300"></canvas></div></div>
   <div class="row"><button class="sec" id="olAdd" style="flex:1;height:48px;font-size:14px">+ Add</button><button class="sec" id="olDel" style="flex:1;height:48px;font-size:14px">- Remove</button></div>
   <button class="pri" id="olGo">Continue</button>
 </section>
@@ -198,7 +215,7 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
   <h2>Layout</h2>
   <div class="lay" id="layList"></div>
   <button class="sec" id="layScan">+ Scan another part</button>
-  <button class="pri" id="layGo">Continue</button>
+  <button class="pri" id="layGo">Find my STA-300 case</button>
 </section>
 
 <!-- 8 Easy to lift -->
@@ -232,10 +249,9 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
 <section id="sSend" class="scr">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd" disabled>Forward ›</button></div>
   <h2>Send to computer</h2>
-  <div class="card"><b id="sendCount" style="font-size:15px"></b><span class="hint">On the computer: open the design page and press <b>Upload from phone</b>.</span></div>
+  <div class="card"><b id="sendCount" style="font-size:15px"></b><span class="hint">The outlines, sizes, notches, Base or Lid and photos go to the Shell-Case computer page.</span></div>
   <div class="grow"></div>
-  <button class="pri" id="sendScan">Scan code on computer</button>
-  <div class="hint" style="text-align:center;margin-top:-6px">Phone and computer on the same Wi-Fi.</div>
+  <button class="pri" id="sendScan">Transfer to my computer</button>
   <button class="sec" id="sendLink">Send link</button>
 </section>
 
@@ -254,13 +270,27 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
   </div>
  </div>
 </div>
+<div class="modal" id="mAdded"><div class="card" style="width:100%;max-width:380px;padding:20px;gap:12px"><h2 style="font-size:30px">Part added</h2><p style="font-size:15px">Part added to the library.<br>Would you like to scan another object?</p><button class="pri" id="addMore">Scan another object</button><button class="sec" id="addDone">No, go to layout</button></div></div>
+<div class="modal" id="mHowSend"><div class="card" style="width:100%;max-width:400px;padding:18px;gap:10px;max-height:92vh;overflow:auto">
+  <h2 style="font-size:28px">Transfer to computer</h2>
+  <div class="row" style="align-items:flex-start;gap:10px"><b class="stepn">1</b><div style="flex:1;min-width:0;font-size:14px">On the computer, open the design page:<div class="row" style="margin-top:6px"><span id="hsUrl" style="font-size:12px;color:var(--muted);word-break:break-all;flex:1"></span><button class="sm" id="hsCopy" style="height:30px;padding:0 10px;border:2px solid var(--ink);border-radius:10px;background:#fff;font:600 12px Poppins,sans-serif">Copy</button></div></div></div>
+  <div class="row" style="align-items:flex-start;gap:10px"><b class="stepn">2</b><div style="flex:1;min-width:0;font-size:14px">Press <b>Upload from phone</b> at the top:
+    <div class="shot" aria-label="Picture of the computer page: the orange Upload from phone button at the top left">
+      <div class="shbar"><span class="shlogo">Shell·Case</span><span class="shtitle">Foam Insert Tool</span></div>
+      <div class="shrow"><span class="shb">Phone Library</span><span class="shb">Saved products</span><span class="shb up">Upload from phone<i class="ring"></i></span></div>
+      <div class="shrow2"><span>1 Add parts</span><span>2 Compare</span><span>3 Layout</span></div>
+    </div></div></div>
+  <div class="row" style="align-items:flex-start;gap:10px"><b class="stepn">3</b><div style="flex:1;font-size:14px">Scan the code that shows on the computer.</div></div>
+  <div class="hint" style="text-align:center">Phone and computer on the same Wi-Fi.</div>
+  <button class="pri" id="hsGo">Open camera</button><button class="sec" id="hsNo">Cancel</button>
+</div></div>
 <div id="busy"><i></i><span id="busyT">Working…</span></div>
 <div id="toast"></div>
 
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.0 · 24 Nov 2026';
+const APP_VERSION='A1.1 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -282,7 +312,7 @@ const PHDB=(()=>{let dbp=null;const open=()=>dbp||(dbp=new Promise((res,rej)=>{c
     del:k=>open().then(d=>new Promise((res,rej)=>{const tx=d.transaction('ph','readwrite');tx.objectStore('ph').delete(k);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);}))};})();
 let PROJS=[];try{PROJS=JSON.parse(localStorage.getItem('fa_projects')||'[]');}catch(e){PROJS=[];}
 let P=null; // the open project
-function newProject(){const prev=PROJS.find(x=>x.id===(P&&P.id));P={id:'p'+Date.now().toString(36),at:Date.now(),sheet:prev?prev.sheet:(/-(US|CA|MX)$/i.test(navigator.language||'')?'letter':'a4'),unit:prev?prev.unit:'mm',parts:[]};PROJS.unshift(P);saveAll();}
+function newProject(){const prev=PROJS.find(x=>x.id===(P&&P.id));P={id:'p'+Date.now().toString(36),at:Date.now(),sheet:'a4',unit:'mm',parts:[]};PROJS.unshift(P);saveAll();}
 function saveAll(){try{const lite=PROJS.map(p=>({...p,parts:p.parts.map(q=>{const o={...q};delete o.ph;delete o._cut;return o;})}));localStorage.setItem('fa_projects',JSON.stringify(lite));if(P)localStorage.setItem('fa_cur',P.id);}catch(e){toast('The phone storage is full. Delete an old project.');}
   if(P)for(const q of P.parts){if(q.ph&&q._phSaved!==q.ph.j){const j=q.ph.j;PHDB.put('ph:'+q.id,q.ph).then(()=>{q._phSaved=j;}).catch(()=>{});}}}
 async function loadPhotos(p){for(const q of p.parts){if(!q.ph&&q.hasPh){try{const v=await PHDB.get('ph:'+q.id);if(v&&v.j){q.ph=v;q._phSaved=v.j;}}catch(e){}}}}
@@ -300,7 +330,8 @@ const ENTER={};
 
 /* ---------- 1 Home and Open project ---------- */
 $('#verTxt').textContent='Foam Insert '+APP_VERSION.split(' ')[0];
-$('#homeScan').onclick=()=>{newProject();CUR=null;let seen=false;try{seen=localStorage.getItem('fa_lvl_seen')==='1';}catch(e){}show(seen?'sSheet':'sLevel');};
+$('#homeScan').onclick=()=>{newProject();CUR=null;show('sSheet');};
+function afterSheet(){let seen=false;try{seen=localStorage.getItem('fa_lvl_seen')==='1';}catch(e){}show(seen?'sCam':'sLevel');}
 $('#homeOpen').onclick=()=>show('sProj');
 ENTER.sProj=()=>{const l=$('#projList');const list=PROJS.filter(p=>p.parts.length);
   l.innerHTML=list.length?list.map(p=>`<div class="pj"><div style="flex:1;min-width:0"><b>${esc(projName(p))}</b><span>${p.parts.length} part${p.parts.length===1?'':'s'} · ${new Date(p.at).toLocaleDateString()}</span></div><button class="op" data-op="${p.id}">Open</button><button class="dl" data-dl="${p.id}" aria-label="Delete">🗑</button></div>`).join(''):'<p class="hint" style="text-align:center;padding:30px 0">No projects yet. Scan a part first.</p>';};
@@ -309,34 +340,35 @@ $('#projList').onclick=async e=>{const o=e.target.closest('[data-op]'),d=e.targe
   if(d){const p=PROJS.find(x=>x.id===d.dataset.dl);if(!p||!confirm('Delete "'+projName(p)+'"? This cannot be undone.'))return;for(const q of p.parts)PHDB.del('ph:'+q.id).catch(()=>{});PROJS=PROJS.filter(x=>x!==p);if(P===p)P=null;saveAll();ENTER.sProj();}};
 
 /* ---------- 2 Allow level ---------- */
-FWD.sLevel=()=>()=>show('sSheet');
-$('#lvlAllow').onclick=async()=>{try{localStorage.setItem('fa_lvl_seen','1');}catch(e){}const DO=window.DeviceOrientationEvent;if(DO&&typeof DO.requestPermission==='function'){try{await DO.requestPermission();}catch(e){}}bindLevel();show('sSheet');};
-$('#lvlNo').onclick=()=>{try{localStorage.setItem('fa_lvl_seen','1');}catch(e){}show('sSheet');};
+FWD.sLevel=()=>()=>show('sCam');
+$('#lvlAllow').onclick=async()=>{try{localStorage.setItem('fa_lvl_seen','1');}catch(e){}const DO=window.DeviceOrientationEvent;if(DO&&typeof DO.requestPermission==='function'){try{await DO.requestPermission();}catch(e){}}bindLevel();show('sCam');};
+$('#lvlNo').onclick=()=>{try{localStorage.setItem('fa_lvl_seen','1');}catch(e){}show('sCam');};
 
 /* ---------- 3 Choose sheet and units ---------- */
 function paintSheet(){$$('[data-sheet]').forEach(b=>b.classList.toggle('on',b.dataset.sheet===P.sheet));$$('#unitSeg button').forEach(b=>b.classList.toggle('on',b.dataset.u===P.unit));}
 ENTER.sSheet=()=>{if(!P)newProject();paintSheet();};
-$$('[data-sheet]').forEach(b=>b.onclick=()=>{P.sheet=b.dataset.sheet;saveAll();paintSheet();});
+$$('[data-sheet]').forEach(b=>b.onclick=()=>{P.sheet=b.dataset.sheet;P.unit=P.sheet==='letter'?'in':'mm';saveAll();paintSheet();}); // Letter -> inches, A4 -> mm (can still be changed)
 $$('#unitSeg button').forEach(b=>b.onclick=()=>{P.unit=b.dataset.u;saveAll();paintSheet();});
-FWD.sSheet=()=>()=>show('sCam');$('#sheetGo').onclick=()=>show('sCam');
+FWD.sSheet=()=>()=>afterSheet();$('#sheetGo').onclick=()=>afterSheet();
 
 /* ---------- 4 Take photo: camera, level, zoom, flash ---------- */
 let stream=null,levelOn=false,hwZoom=1,digZoom=1,ZOOM=1.5,tiltNow=null,FLASH=true,torchOn=false,canFlash=false,shooting=false;
 try{const z=+localStorage.getItem('fa_zoom');if(z>=1&&z<=4)ZOOM=z;if(localStorage.getItem('fa_flash')==='off')FLASH=false;}catch(e){}
-function camFrame(){const box=$('#camBox'),f=$('#camFrame');if(!box||!P)return;const S0=SHEETS[P.sheet],r=S0.h/S0.w,W=box.clientWidth,H=box.clientHeight,top=96,availH=Math.max(80,H-top-56),w=Math.min(W*0.86,availH/r),h=w*r;
-  f.style.width=w+'px';f.style.height=h+'px';f.style.left=(W-w)/2+'px';f.style.top=(top+(availH-h)/2)+'px';$('#camSheet').textContent='Sheet: '+S0.n+' · '+S0.lab;}
+function camFrame(){const f=$('#camFrame');if(!f||!P)return;const S0=SHEETS[P.sheet],r=S0.h/S0.w,W=innerWidth,H=innerHeight,w=Math.min(W*0.92,H*0.8/r),h=w*r,top=Math.max(10,(H-h)/2-6),left=(W-w)/2;
+  f.style.width=w+'px';f.style.height=h+'px';f.style.left=left+'px';f.style.top=top+'px';
+  const lv=$('#lvl');lv.style.left=(left+w/2)+'px';lv.style.top=(top+h/2)+'px';$('#lvlTxt').style.top=(top+h/2+62)+'px';$('#camSheet').textContent='Sheet: '+S0.n+' · '+S0.lab;}
 addEventListener('resize',()=>{if(CURS==='sCam')camFrame();});
-ENTER.sCam=()=>{requestAnimationFrame(camFrame);};
+ENTER.sCam=()=>{requestAnimationFrame(camFrame);$('#lvlGuide').style.display='none';$('#lvlTxt').textContent='';};
 FWD.sCam=()=>CUR&&CUR.cut?()=>show('sOutline'):null;
 async function applyZoom(){const v=$('#vid'),tr=stream&&stream.getVideoTracks()[0];let caps={};try{caps=tr&&tr.getCapabilities?tr.getCapabilities():{};}catch(e){}hwZoom=1;
   if(caps&&caps.zoom){const z=Math.min(caps.zoom.max,Math.max(caps.zoom.min,ZOOM));try{await tr.applyConstraints({advanced:[{zoom:z}]});hwZoom=z;}catch(e){hwZoom=1;}}
   digZoom=Math.max(1,ZOOM/hwZoom);v.style.transform=digZoom>1.001?'scale('+digZoom+')':'none';$('#zoomChip').textContent=(Math.round(ZOOM*10)/10)+'×';}
-async function startCam(){if(stream)return;const msg=$('#camMsg');msg.style.display='none';
+async function startCam(){{const DO=window.DeviceOrientationEvent;if(!(DO&&typeof DO.requestPermission==='function'))bindLevel();}if(stream)return;const msg=$('#camMsg');msg.style.display='none';
   try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:3072}},audio:false});
     const v=$('#vid');v.srcObject=stream;await v.play().catch(()=>{});await applyZoom();
     const tr=stream.getVideoTracks()[0];let caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{};}catch(e){}canFlash=!!caps.torch;$('#flashChip').style.display=canFlash?'block':'none';flashLabel();
   }catch(e){stream=null;msg.style.display='block';msg.innerHTML='The camera is not available.<br>Allow the camera, or choose a photo.';}
-  const DO=window.DeviceOrientationEvent;if(!(DO&&typeof DO.requestPermission==='function'))bindLevel();}
+}
 function stopCam(){torchOn=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
 function flashLabel(){$('#flashChip').textContent='Flash: '+(FLASH?'On':'Off');}
 async function setTorch(on){const tr=stream&&stream.getVideoTracks()[0];if(!tr||on===torchOn)return;try{await tr.applyConstraints({advanced:[hwZoom>1?{zoom:hwZoom,torch:on}:{torch:on}]});torchOn=on;}catch(e){torchOn=false;}}
@@ -344,8 +376,10 @@ $('#flashChip').onclick=()=>{FLASH=!FLASH;try{localStorage.setItem('fa_flash',FL
 $('#zoomChip').onclick=async()=>{const L=[1,1.5,2,3];ZOOM=L[(L.indexOf(ZOOM)+1)%L.length]||1.5;try{localStorage.setItem('fa_zoom',ZOOM);}catch(e){}await applyZoom();};
 function bindLevel(){if(levelOn)return;levelOn=true;window.addEventListener('deviceorientation',onOri);}
 function onOri(e){if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),ok=t<=2,k=Math.min(1,t/12),ang=Math.atan2(e.beta,e.gamma);tiltNow=t;
-  const d=$('#lvlDot');d.setAttribute('cx',(70+Math.cos(ang)*44*k).toFixed(1));d.setAttribute('cy',(70+Math.sin(ang)*44*k).toFixed(1));d.setAttribute('fill',ok?'#2E7D32':'#F05325');
-  $('#lvlTxt').textContent=ok?'Level ✓':'Hold the phone flat';}
+  const dx=Math.cos(ang)*44*k,dy=Math.sin(ang)*44*k,d=$('#lvlDot');d.setAttribute('cx',(70+dx).toFixed(1));d.setAttribute('cy',(70+dy).toFixed(1));d.setAttribute('fill',ok?'#2E7D32':'#F05325');
+  /* small orange dots from the big dot to the centre: the way to tilt the phone */
+  const gd=$$('#lvlGuide circle'),show=!ok&&k>0.25;$('#lvlGuide').style.display=show?'':'none';if(show)[0.72,0.5,0.28].forEach((f,i)=>{gd[i].setAttribute('cx',(70+dx*f).toFixed(1));gd[i].setAttribute('cy',(70+dy*f).toFixed(1));});
+  $('#lvlTxt').textContent=ok?'Level ✓':'Move the dot to the centre';}
 function grabFrame(){const v=$('#vid'),vw=v.videoWidth,vh=v.videoHeight,W=v.clientWidth||innerWidth,H=v.clientHeight||innerHeight,s=Math.max(W/vw,H/vh);
   let cw=W/s/digZoom,ch=H/s/digZoom;cw=Math.min(cw,vw);ch=Math.min(ch,vh);const sx=(vw-cw)/2,sy=(vh-ch)/2,c=document.createElement('canvas');c.width=Math.round(cw);c.height=Math.round(ch);c.getContext('2d').drawImage(v,sx,sy,cw,ch,0,0,c.width,c.height);return c;}
 $('#shut').onclick=async()=>{const v=$('#vid');if(!stream||!v.videoWidth){toast('The camera is not ready.');return;}if(shooting)return;shooting=true;
@@ -495,8 +529,12 @@ async function processPhoto(src){busy(true,'Finding the sheet…');await new Pro
 function maskImg(sc,m,w,h){const sd=sc.getContext('2d').getImageData(0,0,w,h),d=sd.data;for(let i=0;i<w*h;i++)d[i*4+3]=m[i]?255:0;return sd;}
 
 /* ---------- 5 Outline: the part as a dashed orange top-view shape. + Add / - Remove paint the shape ---------- */
-let olMode=null,olGeo=null,olPaint=false;
-ENTER.sOutline=()=>{olMode=null;paintModes();requestAnimationFrame(drawOutline);};
+let olMode=null,olGeo=null,olPaint=false,olMaskCv=null;const OLU={undo:[],redo:[],cut:null};
+ENTER.sOutline=()=>{olMode=null;paintModes();if(CUR&&OLU.cut!==CUR.cut){OLU.undo=[];OLU.redo=[];OLU.cut=CUR?CUR.cut:null;}undoBtns();requestAnimationFrame(drawOutline);};
+function undoBtns(){$('#olUndo').disabled=!OLU.undo.length;$('#olRedo').disabled=!OLU.redo.length;}
+function olSet(m){const c=CUR.cut;c.m=m;c.ring=contour(m,c.w,c.h);c.img=maskImg(c.photo,m,c.w,c.h);c._cv=null;drawOutline();undoBtns();}
+$('#olUndo').onclick=()=>{if(!OLU.undo.length||!CUR)return;OLU.redo.push(CUR.cut.m);olSet(OLU.undo.pop());};
+$('#olRedo').onclick=()=>{if(!OLU.redo.length||!CUR)return;OLU.undo.push(CUR.cut.m);olSet(OLU.redo.pop());};
 FWD.sOutline=()=>CUR&&CUR.cut?()=>toSize():null;
 $('#olGo').onclick=()=>toSize();$('#olTips').onclick=()=>show('sTips');
 $('#tipsBack').onclick=()=>back();
@@ -508,13 +546,21 @@ function drawOutline(){const box=$('#olBox'),cv=$('#olCv');if(!CUR||!CUR.cut)ret
   const ring=simplify(c.ring,1.2);g.beginPath();ring.forEach((p,i)=>{const x=ox+p[0]*k,y=oy+p[1]*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();
   g.fillStyle='rgba(240,83,37,0.45)';g.fill();g.setLineDash([10,6]);g.lineWidth=4;g.strokeStyle='#F05325';g.stroke();g.setLineDash([]);}
 addEventListener('resize',()=>{if(CURS==='sOutline')drawOutline();if(CURS==='sLift')drawLift();});
-function olBrush(e){if(!olMode||!olGeo||!CUR)return;const c=CUR.cut,r=$('#olCv').getBoundingClientRect(),x=(e.clientX-r.left-olGeo.ox)/olGeo.k,y=(e.clientY-r.top-olGeo.oy)/olGeo.k,R=Math.max(4,Math.round(Math.max(c.w,c.h)*0.035)),v=olMode==='add'?1:0;
+function olBrush(e){if(!olMode||!olGeo||!CUR)return;const c=CUR.cut,r=$('#olCv').getBoundingClientRect(),x=(e.clientX-r.left-olGeo.ox)/olGeo.k,y=(e.clientY-r.top-olGeo.oy)/olGeo.k,R=Math.max(3,Math.round(Math.max(c.w,c.h)*0.025)),v=olMode==='add'?1:0;olLast={x,y,R,cx:e.clientX-r.left,cy:e.clientY-r.top};
   for(let j=Math.max(0,Math.floor(y-R));j<=Math.min(c.h-1,Math.ceil(y+R));j++)for(let i=Math.max(0,Math.floor(x-R));i<=Math.min(c.w-1,Math.ceil(x+R));i++){if((i-x)*(i-x)+(j-y)*(j-y)<=R*R)c.m[j*c.w+i]=v;}}
-function olFinish(){const c=CUR.cut,p=new Float32Array(c.w*c.h);for(let i=0;i<p.length;i++)p[i]=c.m[i];const r=cleanMask(p,c.w,c.h);if(r.area<0.002){toast('The shape is empty. Use + Add.');}c.m=r.m;c.ring=contour(r.m,c.w,c.h);c.img=maskImg(c.photo,c.m,c.w,c.h);c._cv=null;drawOutline();}
-(function(){const cv=$('#olCv');cv.addEventListener('pointerdown',e=>{if(!olMode)return;olPaint=true;cv.setPointerCapture(e.pointerId);olBrush(e);drawOutlineLive();});
-  cv.addEventListener('pointermove',e=>{if(!olPaint)return;olBrush(e);drawOutlineLive();});
+let olLast=null;
+/* the magnifier: shows the photo and the shape under the finger, 3 times bigger, away from the finger */
+function drawLoupe(){const lp=$('#olLoupe'),c=CUR&&CUR.cut;if(!olLast||!c){lp.style.display='none';return;}const box=$('#olBox'),W=box.clientWidth,g=$('#olLpCv').getContext('2d'),S0=300,z=3,span=S0/(olGeo.k*z*2);
+  lp.style.display='block';lp.style.left=(olLast.cx>W/2?12:W-162)+'px';lp.style.top='12px';
+  g.fillStyle='#fff';g.fillRect(0,0,S0,S0);const sx=olLast.x-span/2,sy=olLast.y-span/2;
+  try{g.drawImage(c.photo,sx,sy,span,span,0,0,S0,S0);if(olMaskCv)g.drawImage(olMaskCv,sx,sy,span,span,0,0,S0,S0);}catch(e){}
+  const rp=olLast.R*S0/span;g.lineWidth=3;g.strokeStyle=olMode==='add'?'#2E7D32':'#B3261E';g.beginPath();g.arc(S0/2,S0/2,rp,0,7);g.stroke();
+  g.strokeStyle='#292524';g.lineWidth=2;g.beginPath();g.moveTo(S0/2-10,S0/2);g.lineTo(S0/2+10,S0/2);g.moveTo(S0/2,S0/2-10);g.lineTo(S0/2,S0/2+10);g.stroke();}
+function olFinish(){const c=CUR.cut,p=new Float32Array(c.w*c.h);for(let i=0;i<p.length;i++)p[i]=c.m[i];const r=cleanMask(p,c.w,c.h);if(r.area<0.002){toast('The shape is empty. Use + Add.');}olSet(r.m);$('#olLoupe').style.display='none';olLast=null;}
+(function(){const cv=$('#olCv');cv.addEventListener('pointerdown',e=>{if(!olMode){toast('Choose <b>+ Add</b> or <b>- Remove</b> first.',1800);return;}olPaint=true;cv.setPointerCapture(e.pointerId);OLU.undo.push(CUR.cut.m.slice());if(OLU.undo.length>25)OLU.undo.shift();OLU.redo=[];olBrush(e);drawOutlineLive();drawLoupe();});
+  cv.addEventListener('pointermove',e=>{if(!olPaint)return;olBrush(e);drawOutlineLive();drawLoupe();});
   const up=()=>{if(!olPaint)return;olPaint=false;olFinish();};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);})();
-function drawOutlineLive(){const c=CUR.cut,cv=$('#olCv'),g=cv.getContext('2d');if(!olGeo)return;const t=document.createElement('canvas');t.width=c.w;t.height=c.h;const tg=t.getContext('2d'),im=tg.createImageData(c.w,c.h);for(let i=0;i<c.w*c.h;i++){if(c.m[i]){im.data[i*4]=240;im.data[i*4+1]=83;im.data[i*4+2]=37;im.data[i*4+3]=115;}}tg.putImageData(im,0,0);
+function drawOutlineLive(){const c=CUR.cut,cv=$('#olCv'),g=cv.getContext('2d');if(!olGeo)return;const t=document.createElement('canvas');t.width=c.w;t.height=c.h;const tg=t.getContext('2d'),im=tg.createImageData(c.w,c.h);for(let i=0;i<c.w*c.h;i++){if(c.m[i]){im.data[i*4]=240;im.data[i*4+1]=83;im.data[i*4+2]=37;im.data[i*4+3]=115;}}tg.putImageData(im,0,0);olMaskCv=t;
   const W=cv.clientWidth,H=cv.clientHeight;g.clearRect(0,0,W,H);g.globalAlpha=.35;g.drawImage(c.photo,olGeo.ox,olGeo.oy,c.w*olGeo.k,c.h*olGeo.k);g.globalAlpha=1;g.drawImage(t,olGeo.ox,olGeo.oy,c.w*olGeo.k,c.h*olGeo.k);}
 
 /* ---------- 6 Name & size: L and W from the sheet (estimate), depth typed. Confirm each. ---------- */
@@ -557,10 +603,12 @@ function savePart(){const d=dims(),B=SZ.base,name=$('#inName').value.trim();if(!
       q.ph={j:c.toDataURL('image/jpeg',0.72),x:r1((0-B.bx0)*sx),y:r1((B.by1-Pc.height)*sy),w:r1(Pc.width*sx),h:r1(Pc.height*sy)};q.hasPh=1;}}
   else if(!q.thumb)q.thumb=ringThumb(ring);
   if(resized&&q.notches.length)q.notches=q.notches.map(n=>({...n})); // positions follow the outline (stored along its length)
-  if(!old)P.parts.push(q);saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);}
+  if(!old)P.parts.push(q);saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);if(!old)$('#mAdded').classList.add('on');}
+$('#addMore').onclick=()=>{$('#mAdded').classList.remove('on');CUR=null;show('sCam');};
+$('#addDone').onclick=()=>{$('#mAdded').classList.remove('on');};
 
 /* ---------- 7 Layout: copies, Base or Lid, Easy to lift, In check ---------- */
-ENTER.sLayout=()=>renderLayout();
+ENTER.sLayout=()=>{$('#layGo').textContent=SHOW_FIT?'Find my STA-300 case':'Send to computer';renderLayout();};
 FWD.sLayout=()=>P&&P.parts.length?()=>layNext():null;
 function renderLayout(){const l=$('#layList');if(!P||!P.parts.length){l.innerHTML='<p class="hint" style="text-align:center;padding:30px 0">No parts yet. Scan a part.</p>';return;}
   l.innerHTML=P.parts.map(q=>`<div class="card pc${q.inCheck===false?' out':''}" data-id="${q.id}">
@@ -629,7 +677,10 @@ addEventListener('pageshow',()=>busy(false));
 ENTER.sSend=()=>{const n=P?P.parts.length:0;$('#sendCount').textContent=n+' part'+(n===1?'':'s')+' to send';};
 let sendLink='';
 async function makeLink(list){return packLink(DESKTOP_URL,list);}
-$('#sendScan').onclick=async()=>{if(!P||!P.parts.length){toast('No parts yet.');return;}await loadPhotos(P);sendLink=await makeLink(P.parts);openQrScanner(P.parts);};
+$('#sendScan').onclick=()=>{if(!P||!P.parts.length){toast('No parts yet.');return;}$('#hsUrl').textContent=DESKTOP_URL.replace(/^https?:\/\//,'');$('#mHowSend').classList.add('on');};
+$('#hsNo').onclick=()=>$('#mHowSend').classList.remove('on');
+$('#hsCopy').onclick=async()=>{try{await navigator.clipboard.writeText(DESKTOP_URL);toast('Link copied.');}catch(e){prompt('Copy this link:',DESKTOP_URL);}};
+$('#hsGo').onclick=async()=>{$('#mHowSend').classList.remove('on');await loadPhotos(P);sendLink=await makeLink(P.parts);openQrScanner(P.parts);};
 $('#sendLink').onclick=async()=>{if(!P||!P.parts.length){toast('No parts yet.');return;}const l=await makeLink(P.parts);
   if(navigator.share){try{await navigator.share({title:'Foam insert parts',url:l});return;}catch(e){if(e&&e.name==='AbortError')return;}}
   try{await navigator.clipboard.writeText(l);toast('Link copied. Open it on the computer.');}catch(e){prompt('Copy this link:',l);}};
