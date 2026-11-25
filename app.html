@@ -362,7 +362,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.8 · 25 Nov 2026';
+const APP_VERSION='A1.9 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -836,7 +836,8 @@ function notchesOf(q){if(!q.lift||!q.notches||!q.notches.length)return undefined
 
 /* ---------- 9 Best fit: opens app-fit.html (the fit engine of the computer tool) ---------- */
 const b64u=u8=>{let s='';u8.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');};
-function itemOf(q){return {i:q.id,n:q.name,q:q.qty||1,s:q.side==='lid'?'lid':q.side==='both'?'auto':'base',pl:q.side==='both'?undefined:1,h:r1(q.D),o:q.ring.reduce((a,p)=>a.concat([Math.round(p[0]*10),Math.round(p[1]*10)]),[]),nt:notchesOf(q),zr:turnsOf(q)};}
+function itemOf(q){return {i:q.id,n:q.name,q:q.qty||1,s:q.side==='lid'?'lid':q.side==='both'?'auto':'base',pl:q.side==='both'?undefined:1,h:r1(q.D),o:q.ring.reduce((a,p)=>a.concat([Math.round(p[0]*10),Math.round(p[1]*10)]),[]),nt:notchesOf(q),zr:turnsOf(q),xy:posOf(q)};}
+function posOf(q){try{const t=JSON.parse(localStorage.getItem('fa_pos')||'{}')[q.id];if(!t||typeof t.c!=='string'||!Array.isArray(t.p))return undefined;return {c:t.c,p:t.p.slice(0,q.qty||1)};}catch(e){return undefined;}}
 function turnsOf(q){try{const t=JSON.parse(localStorage.getItem('fa_turns')||'{}')[q.id];if(!Array.isArray(t)||!t.some(v=>v!=null))return undefined;return t.slice(0,q.qty||1);}catch(e){return undefined;}}
 async function packLink(base,list,extra){const txt=new TextEncoder().encode(JSON.stringify({v:1,items:list.map(itemOf)}));let tag='j.',body=txt;
   if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(txt);w.close();body=new Uint8Array(await new Response(cs.readable).arrayBuffer());tag='z.';}
@@ -909,7 +910,7 @@ function connectAndSend(sid,list){
     const t2=setTimeout(()=>{xfStep(2,'err','The computer did not answer');xfEnd(false,'Connect the phone to the same Wi-Fi as the computer, then try again. Keep the QR code showing on the computer. Or use Copy link (sends the outlines, not the photos).');},15000);
     conn.on('open',()=>{
       clearTimeout(t2);xfStep(2,'ok','Linked to the computer');xfStep(3,'run','Sending '+list.length+' part'+(list.length===1?'':'s'));
-      const items=list.map((it,k)=>({k,i:it.id,hp:(it.ph&&it.ph.j)?1:0,n:it.name||'Part',q:it.qty||1,s:it.side==='lid'?'lid':it.side==='both'?'auto':'base',pl:it.side==='both'?undefined:1,nt:notchesOf(it),zr:turnsOf(it),h:Math.round((+it.D||0)*10)/10,o:(it.ring||[]).map(p=>[Math.round(p[0]*10),Math.round(p[1]*10)])}));
+      const items=list.map((it,k)=>({k,i:it.id,hp:(it.ph&&it.ph.j)?1:0,n:it.name||'Part',q:it.qty||1,s:it.side==='lid'?'lid':it.side==='both'?'auto':'base',pl:it.side==='both'?undefined:1,nt:notchesOf(it),zr:turnsOf(it),xy:posOf(it),h:Math.round((+it.D||0)*10)/10,o:(it.ring||[]).map(p=>[Math.round(p[0]*10),Math.round(p[1]*10)])}));
       const lnk=(typeof sendLink==='string'&&sendLink)?sendLink:'';
       try{conn.send({type:'batch',v:2,av:APP_VERSION,items});items.forEach(it=>xfRow(it.k,'sent'));}
       catch(e){xfStep(3,'err','Could not send: '+e.message);xfEnd(false,'Try again or use Copy link.');return;}
