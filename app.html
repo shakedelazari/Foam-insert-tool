@@ -151,6 +151,14 @@ html[data-theme=dark] .homeVis img{filter:drop-shadow(0 0 1px rgba(241,238,229,.
 #sSize{overflow-y:auto}#sSize>*{flex-shrink:0}#sSize .grow{flex:1 0 0}
 #szCv{display:block;width:100%;height:140px}
 #nameHint{font-size:12px;color:var(--muted);margin-top:-8px;min-height:0}
+.lfTip{position:absolute;display:none;background:#292524;color:#fff;font:600 13px/1.3 Poppins,sans-serif;padding:7px 11px;border-radius:10px;max-width:210px;pointer-events:none;z-index:2;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
+.lfShape{display:flex;gap:8px;align-items:center}.lfShape .seg2{flex:1}.lfShape .seg2 button{height:40px;font-size:14px}
+.lfShape.off .seg2 button{opacity:.4}
+.lfLen{display:none;align-items:center;gap:4px}.lfLen.on{display:flex}
+.lfLen button{width:38px;height:40px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:700 18px Poppins,sans-serif}
+.lfLen span{min-width:62px;text-align:center;font:600 14px Poppins,sans-serif}
+.lfLg{display:flex;flex-direction:column;gap:2px;font-size:13px}.lfLg div{display:flex;align-items:center;gap:8px}.lfLg svg{flex:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -259,12 +267,13 @@ html[data-theme=dark] .homeVis img{filter:drop-shadow(0 0 1px rgba(241,238,229,.
 </section>
 
 <!-- 8 Easy to lift -->
-<section id="sLift" class="scr">
+<section id="sLift" class="scr" style="overflow-y:auto">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
   <h2>Easy to lift</h2>
-  <div class="cvBox" id="lfBox" style="flex:none;height:340px"><canvas id="lfCv"></canvas></div>
+  <div class="cvBox" id="lfBox" style="flex:1 0 250px;max-height:360px"><canvas id="lfCv"></canvas><div class="lfTip" id="lfTip"></div></div>
   <div style="font-size:14px;font-weight:600" id="lfCount">Notches: 0 of 4</div>
-  <div style="font-size:13px">Tap to add or remove. Drag to move.</div>
+  <div class="lfShape"><div class="seg2" id="lfShape"><button data-sh="round">Round</button><button data-sh="slot">Wide slot</button></div><div class="lfLen" id="lfLen"><button data-d="-10" aria-label="Shorter">−</button><span id="lfLenTxt"></span><button data-d="10" aria-label="Longer">+</button></div></div>
+  <div class="lfLg"><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#F05325" stroke-width="2.6"/><path d="M-6 0h12M-6 0l3-3M-6 0l3 3M6 0l-3-3M6 0l-3 3" stroke="#F05325" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drag to move it along the edge</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#292524" stroke-width="1.8" stroke-dasharray="3.5 2.5"/><path d="M-5 0h10M0 -5v10" stroke="#292524" stroke-width="2.2" stroke-linecap="round"/></svg>Tap to add a notch</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#F05325"/><path d="M-4.5 -4.5l9 9M4.5 -4.5l-9 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Tap a notch again to remove it</div></div>
   <div class="grow"></div>
   <button class="pri" id="lfDone">Done</button>
   <button class="sec" id="lfCancel">Cancel</button>
@@ -352,7 +361,7 @@ html[data-theme=dark] .homeVis img{filter:drop-shadow(0 0 1px rgba(241,238,229,.
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.4 · 25 Nov 2026';
+const APP_VERSION='A1.5 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -748,7 +757,11 @@ $('#layGo').onclick=()=>layNext();
 function layNext(){if(!LAY().length)return;if(SHOW_FIT)goFit();else show('sSend');}
 
 /* ---------- 8 Easy to lift: 4 places (2 on X, 2 on Y). Tap = open / remove, drag = move along the outline ---------- */
-const LF={id:null,slots:[],geo:null,drag:-1,moved:false,start:null,fresh:false};
+const LF={id:null,slots:[],geo:null,drag:-1,moved:false,start:null,fresh:false,sel:-1,ghost:null,demo:null,hint:false};
+const SLOT_MIN=2*NOTCH_R,SLOT_MAX=160;
+function ringTan(r,t){const L=ringLen(r)||1,d=3/L,a=ringAt(r,t-d),b=ringAt(r,t+d);return Math.atan2(b.y-a.y,b.x-a.x);}
+function slotAng(r,t,w){if(!(w>SLOT_MIN+0.5))return ringTan(r,t);const h=(w/2)/(ringLen(r)||1),a=ringAt(r,t-h),b=ringAt(r,t+h);return Math.atan2(b.y-a.y,b.x-a.x);}
+function lfFirstOpen(){return LF.slots.findIndex(z=>z.open);}
 function ringLen(r){let L=0;for(let i=0;i<r.length;i++){const a=r[i],b=r[(i+1)%r.length];L+=Math.hypot(b[0]-a[0],b[1]-a[1]);}return L;}
 function ringAt(r,t){const L=ringLen(r);let d=((t%1)+1)%1*L;for(let i=0;i<r.length;i++){const a=r[i],b=r[(i+1)%r.length],s=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<=s||i===r.length-1){const f=s?Math.min(1,d/s):0;return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f};}d-=s;}return {x:r[0][0],y:r[0][1]};}
 function ringT(r,x,y){const L=ringLen(r);let best=0,bd=1e18,acc=0;for(let i=0;i<r.length;i++){const a=r[i],b=r[(i+1)%r.length],dx=b[0]-a[0],dy=b[1]-a[1],s2=dx*dx+dy*dy,s=Math.sqrt(s2),f=s2?Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/s2)):0,px=a[0]+dx*f,py=a[1]+dy*f,d=(px-x)*(px-x)+(py-y)*(py-y);if(d<bd){bd=d;best=(acc+f*s)/L;}acc+=s;}return best;}
@@ -758,28 +771,66 @@ function slotTs(r){ // where a line through the middle meets the outline: left, 
   const L=hx.length?Math.min(...hx):x0,R=hx.length?Math.max(...hx):x1,B=vy.length?Math.min(...vy):y0,T=vy.length?Math.max(...vy):y1;
   return [ringT(r,L,cy),ringT(r,R,cy),ringT(r,cx,B),ringT(r,cx,T)];}
 function openLift(id,fresh){const q=P.parts.find(x=>x.id===id);if(!q)return;LF.id=id;LF.fresh=fresh;const ts=slotTs(q.ring);
-  LF.slots=ts.map((t,k)=>{const n=q.notches.find(z=>z.slot===k);return {t:n?n.t:t,open:!!n,home:t};});
+  LF.slots=ts.map((t,k)=>{const n=q.notches.find(z=>z.slot===k);return {t:n?n.t:t,open:!!n,home:t,w:n&&n.w>SLOT_MIN?n.w:SLOT_MIN};});
   if(fresh&&!q.notches.length)LF.slots[3].open=true; // start with one notch at the top
+  LF.sel=LF.slots[3].open?3:lfFirstOpen();LF.drag=-1;LF.ghost=null;LF.demo=null;
+  let seen=false;try{seen=localStorage.getItem('fa_lift_hint')==='1';}catch(e){}LF.hint=!seen;
   show('sLift');}
-ENTER.sLift=()=>requestAnimationFrame(drawLift);
+ENTER.sLift=()=>{requestAnimationFrame(drawLift);if(LF.hint&&LF.sel>=0)lfHint();};
+function lfHint(){const t0=performance.now();const step=now=>{if(!LF.hint||CURS!=='sLift'||LF.sel<0||LF.drag>=0){LF.demo=null;drawLift();return;}
+  const ph=(now-t0)/1000;LF.demo=0.035*Math.sin(ph*2.4)*Math.min(1,ph*1.5);drawLift();requestAnimationFrame(step);};requestAnimationFrame(step);}
 FWD.sLift=()=>()=>liftDone();
-function liftDone(){const q=P.parts.find(x=>x.id===LF.id);if(!q)return back();q.notches=LF.slots.map((s,k)=>s.open?{slot:k,t:+s.t.toFixed(4)}:null).filter(Boolean);q.lift=q.notches.length>0;saveAll();back();}
-$('#lfDone').onclick=liftDone;$('#lfCancel').onclick=()=>back();
+function liftDone(){const q=P.parts.find(x=>x.id===LF.id);if(!q)return back();LF.hint=false;q.notches=LF.slots.map((s,k)=>s.open?(s.w>SLOT_MIN+0.5?{slot:k,t:+s.t.toFixed(4),w:Math.round(s.w)}:{slot:k,t:+s.t.toFixed(4)}):null).filter(Boolean);q.lift=q.notches.length>0;saveAll();back();}
+$('#lfDone').onclick=liftDone;$('#lfCancel').onclick=()=>{LF.hint=false;back();};
+$('#lfShape').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;if(b.dataset.sh==='round')s.w=SLOT_MIN;else if(s.w<=SLOT_MIN+0.5)s.w=Math.min(SLOT_MAX,SLOT_MIN+30);drawLift();};
+$('#lfLen').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;s.w=Math.max(SLOT_MIN+10,Math.min(SLOT_MAX,s.w+(+b.dataset.d)));drawLift();};
 function drawLift(){const q=P.parts.find(x=>x.id===LF.id),box=$('#lfBox'),cv=$('#lfCv');if(!q)return;const r=q.ring,dpr=devicePixelRatio||1,W=box.clientWidth,H=box.clientHeight;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
   let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;r.forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
-  const k=Math.min((W-20)/(x1-x0+2*NOTCH_R),(H-20)/(y1-y0+2*NOTCH_R)),ox=(W-(x1-x0)*k)/2-x0*k,oy=(H+(y1-y0)*k)/2+y0*k,X=v=>ox+v*k,Y=v=>oy-v*k;LF.geo={k,X,Y,ox,oy};
+  const mx=Math.max(NOTCH_R,...LF.slots.filter(z=>z.open).map(z=>z.w/2)),k=Math.min((W-44)/(x1-x0+2*NOTCH_R),(H-44)/(y1-y0+2*NOTCH_R)),ox=(W-(x1-x0)*k)/2-x0*k,oy=(H+(y1-y0)*k)/2+y0*k,X=v=>ox+v*k,Y=v=>oy-v*k;LF.geo={k,X,Y,ox,oy};
   const path=()=>{g.beginPath();r.forEach((p,i)=>{i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1]));});g.closePath();};
-  LF.slots.forEach(s=>{const p=ringAt(r,s.t);g.beginPath();g.arc(X(p.x),Y(p.y),NOTCH_R*k,0,7);if(s.open){g.fillStyle='#F05325';g.fill();}else{g.fillStyle='#fff';g.fill();g.setLineDash([4,3]);g.lineWidth=2;g.strokeStyle='#292524';g.stroke();g.setLineDash([]);}});
+  const tOf=i=>{const s=LF.slots[i];return i===LF.sel&&LF.demo!=null?s.t+LF.demo:s.t;};
+  const stad=(s,t)=>{const p=ringAt(r,t),an=slotAng(r,t,s.w),b=NOTCH_R*k,a=Math.max(NOTCH_R,s.w/2)*k;g.save();g.translate(X(p.x),Y(p.y));g.rotate(-an);g.beginPath();g.moveTo(-a+b,-b);g.lineTo(a-b,-b);g.arc(a-b,0,b,-Math.PI/2,Math.PI/2);g.lineTo(-a+b,b);g.arc(-a+b,0,b,Math.PI/2,Math.PI*1.5);g.closePath();g.restore();};
+  // notch cuts (under the part, so only the part outside the outline shows)
+  LF.slots.forEach((s,i)=>{if(!s.open)return;stad(s,tOf(i));g.fillStyle='#F05325';g.fill();});
   path();g.fillStyle='#C6B68D';g.fill();g.lineWidth=2;g.strokeStyle='#292524';g.stroke();
-  const n=LF.slots.filter(s=>s.open).length;$('#lfCount').textContent='Notches: '+n+' of 4';}
+  // the rail: dotted orange line on the outline itself
+  path();g.save();g.setLineDash([2,7]);g.lineCap='round';g.lineWidth=3;g.strokeStyle='#F05325';g.globalAlpha=LF.drag>=0&&LF.moved?0.95:0.6;g.stroke();g.restore();
+  // where the dragged notch started
+  if(LF.ghost!=null&&LF.drag>=0&&LF.moved){const p=ringAt(r,LF.ghost);g.save();g.beginPath();g.arc(X(p.x),Y(p.y),15,0,7);g.setLineDash([4,3]);g.lineWidth=2;g.strokeStyle='rgba(240,83,37,.7)';g.stroke();g.restore();}
+  // empty spots: dashed + circle on the outline
+  LF.slots.forEach(s=>{if(s.open)return;const p=ringAt(r,s.home),cx=X(p.x),cy=Y(p.y);g.save();g.beginPath();g.arc(cx,cy,15,0,7);g.fillStyle='#fff';g.fill();g.setLineDash([4,3]);g.lineWidth=2;g.strokeStyle='#292524';g.stroke();g.setLineDash([]);g.lineCap='round';g.lineWidth=2.4;g.beginPath();g.moveTo(cx-6,cy);g.lineTo(cx+6,cy);g.moveTo(cx,cy-6);g.lineTo(cx,cy+6);g.stroke();g.restore();});
+  // handles
+  let hx=null,hy=null;
+  LF.slots.forEach((s,i)=>{if(!s.open)return;const t=tOf(i),p=ringAt(r,t),cx=X(p.x),cy=Y(p.y);g.save();g.translate(cx,cy);
+    if(i===LF.sel){hx=cx;hy=cy;const big=LF.drag===i&&LF.moved;if(big){g.beginPath();g.arc(0,0,27,0,7);g.fillStyle='rgba(240,83,37,.20)';g.fill();g.scale(1.25,1.25);}
+      g.beginPath();g.arc(0,0,17,0,7);g.fillStyle='#fff';g.fill();g.lineWidth=3;g.strokeStyle='#F05325';g.stroke();
+      g.rotate(-ringTan(r,t));g.lineWidth=2.4;g.lineCap='round';g.lineJoin='round';g.beginPath();g.moveTo(-9,0);g.lineTo(9,0);g.moveTo(-5,-4);g.lineTo(-9,0);g.lineTo(-5,4);g.moveTo(5,-4);g.lineTo(9,0);g.lineTo(5,4);g.stroke();}
+    else{g.beginPath();g.arc(0,0,8,0,7);g.fillStyle='#fff';g.fill();g.lineWidth=3;g.strokeStyle='#F05325';g.stroke();}
+    g.restore();});
+  // first-time hint: a finger sliding the notch
+  const tip=$('#lfTip');
+  if(LF.demo!=null&&hx!=null){g.save();g.translate(hx+14,hy+16);g.beginPath();g.arc(0,0,24,0,7);g.fillStyle='rgba(41,37,36,.10)';g.fill();g.beginPath();g.arc(0,0,17,0,7);g.fillStyle='rgba(41,37,36,.24)';g.fill();g.lineWidth=2;g.strokeStyle='#fff';g.stroke();g.restore();
+    tip.textContent='Drag the orange notch along the edge';tip.style.display='block';const tw=tip.offsetWidth,th=tip.offsetHeight;tip.style.left=Math.max(8,Math.min(W-tw-8,hx-30))+'px';tip.style.top=(hy+48+th<H?hy+48:Math.max(8,hy-48-th))+'px';}
+  else if(LF.drag>=0&&LF.moved&&hx!=null){tip.textContent='Let go to place it';tip.style.display='block';const tw=tip.offsetWidth,th=tip.offsetHeight;tip.style.left=Math.max(8,Math.min(W-tw-8,W/2-tw/2))+'px';tip.style.top=(hy>H/2?Math.min(hy-60-th,H/2-th/2):Math.max(hy+50,H/2-th/2))+'px';}
+  else tip.style.display='none';
+  const n=LF.slots.filter(s=>s.open).length;$('#lfCount').textContent='Notches: '+n+' of 4';lfUpd();}
+function lfUpd(){const s=LF.slots[LF.sel],on=!!(s&&s.open),slot=on&&s.w>SLOT_MIN+0.5;$('.lfShape').classList.toggle('off',!on);
+  $$('#lfShape button').forEach(b=>{const m=b.dataset.sh==='slot'?slot:on&&!slot;b.classList.toggle('on',m);b.disabled=!on;});
+  $('#lfLen').classList.toggle('on',slot);if(slot)$('#lfLenTxt').textContent=P&&P.unit==='in'?(s.w/25.4).toFixed(2)+' in':Math.round(s.w)+' mm';}
 (function(){const cv=$('#lfCv'),pt=e=>{const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
-  cv.addEventListener('pointerdown',e=>{const q=P&&P.parts.find(x=>x.id===LF.id);if(!q||!LF.geo)return;const [x,y]=pt(e);let best=-1,bd=1e9;
-    LF.slots.forEach((s,i)=>{const p=ringAt(q.ring,s.t),d=Math.hypot(LF.geo.X(p.x)-x,LF.geo.Y(p.y)-y);if(d<bd){bd=d;best=i;}});
-    if(best<0||bd>Math.max(26,NOTCH_R*LF.geo.k+8))return;LF.drag=best;LF.moved=false;LF.start=[x,y];cv.setPointerCapture(e.pointerId);});
-  cv.addEventListener('pointermove',e=>{if(LF.drag<0)return;const q=P.parts.find(x=>x.id===LF.id),[x,y]=pt(e);if(!LF.moved&&Math.hypot(x-LF.start[0],y-LF.start[1])<8)return;const s=LF.slots[LF.drag];if(!s.open)return;LF.moved=true;
+  const dist=(q,i,x,y)=>{const s=LF.slots[i],G=LF.geo;if(!s.open){const p=ringAt(q.ring,s.home);return Math.hypot(G.X(p.x)-x,G.Y(p.y)-y);}
+    const p=ringAt(q.ring,s.t),an=-slotAng(q.ring,s.t,s.w),dx=x-G.X(p.x),dy=y-G.Y(p.y),u=dx*Math.cos(an)+dy*Math.sin(an),v=-dx*Math.sin(an)+dy*Math.cos(an),hl=Math.max(0,(s.w/2-NOTCH_R)*G.k);return Math.hypot(Math.max(0,Math.abs(u)-hl),v);};
+  cv.addEventListener('pointerdown',e=>{const q=P&&P.parts.find(x=>x.id===LF.id);if(!q||!LF.geo)return;LF.hint=false;LF.demo=null;const [x,y]=pt(e);let best=-1,bd=1e9;
+    LF.slots.forEach((s,i)=>{const d=dist(q,i,x,y);if(d<bd){bd=d;best=i;}});
+    if(best<0||bd>Math.max(28,NOTCH_R*LF.geo.k+8)){drawLift();return;}LF.drag=best;LF.moved=false;LF.start=[x,y];LF.ghost=LF.slots[best].t;cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(LF.drag<0)return;const q=P.parts.find(x=>x.id===LF.id),[x,y]=pt(e);if(!LF.moved&&Math.hypot(x-LF.start[0],y-LF.start[1])<8)return;const s=LF.slots[LF.drag];if(!s.open)return;LF.moved=true;LF.sel=LF.drag;
     s.t=ringT(q.ring,(x-LF.geo.ox)/LF.geo.k,(LF.geo.oy-y)/LF.geo.k);drawLift();});
-  const up=()=>{if(LF.drag<0)return;const s=LF.slots[LF.drag];if(!LF.moved){s.open=!s.open;if(!s.open)s.t=s.home;}LF.drag=-1;drawLift();};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{LF.drag=-1;});})();
-function notchesOf(q){if(!q.lift||!q.notches||!q.notches.length)return undefined;return q.notches.map(n=>{const p=ringAt(q.ring,n.t);return [r1(p.x),r1(p.y),NOTCH_R];});}
+  const up=()=>{if(LF.drag<0)return;const i=LF.drag,s=LF.slots[i];
+    if(!LF.moved){if(!s.open){s.open=true;s.w=SLOT_MIN;LF.sel=i;}else if(LF.sel!==i){LF.sel=i;}else{s.open=false;s.t=s.home;s.w=SLOT_MIN;LF.sel=lfFirstOpen();}}
+    else{try{localStorage.setItem('fa_lift_hint','1');}catch(e){}}
+    LF.drag=-1;LF.ghost=null;drawLift();};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{LF.drag=-1;LF.ghost=null;drawLift();});})();
+function notchesOf(q){if(!q.lift||!q.notches||!q.notches.length)return undefined;return q.notches.map(n=>{const p=ringAt(q.ring,n.t);return n.w>SLOT_MIN+0.5?[r1(p.x),r1(p.y),NOTCH_R,r1(n.w/2),Math.round(slotAng(q.ring,n.t,n.w)*180/Math.PI)]:[r1(p.x),r1(p.y),NOTCH_R];});}
 
 /* ---------- 9 Best fit: opens app-fit.html (the fit engine of the computer tool) ---------- */
 const b64u=u8=>{let s='';u8.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');};
