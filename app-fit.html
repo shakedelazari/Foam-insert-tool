@@ -472,7 +472,7 @@ body{overflow:hidden}
 <style>.tickwrap{position:relative;width:130px;height:130px}.tickwrap svg{position:absolute;left:0;top:0;width:100%;height:100%}.tickwrap .tb path{fill:#292524}.tickwrap .ov path{fill:#f05325}.tickwrap .ov{opacity:0;will-change:opacity;animation:tickop 1.6s steps(1,end) infinite}.tickwrap .ov.br{animation-delay:.4s}.tickwrap .ov.bl{animation-delay:.8s}.tickwrap .ov.tl{animation-delay:1.2s}@keyframes tickop{0%{opacity:1}25%{opacity:0}100%{opacity:0}}
 #fitSplash{display:flex;position:fixed;inset:0;z-index:100000;background:#f0ede4;align-items:center;justify-content:center;flex-direction:column;gap:16px;font:600 18px Poppins,Arial,sans-serif;color:#292524}
 .busy.full{position:fixed;inset:0;z-index:5000;background:#f0ede4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font:600 18px Poppins,Arial,sans-serif;color:#292524;margin:0;padding:0}.busy.full p{margin:0}</style>
-<div id="fitSplash"><div class="tickwrap"><svg class="tb" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg><svg class="ov tr" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/></svg><svg class="ov br" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/></svg><svg class="ov bl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/></svg><svg class="ov tl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg></div><span id="fitSplashT">Finding the best case…</span></div>
+<div id="fitSplash"><div class="tickwrap"><svg class="tb" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg><svg class="ov tr" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/></svg><svg class="ov br" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/></svg><svg class="ov bl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/></svg><svg class="ov tl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg></div><span id="fitSplashT">Loading the fit tool…</span><div id="fitSplashB" style="display:none;gap:10px;margin-top:6px"><button type="button" onclick="location.href='app.html#layout'" style="height:44px;padding:0 16px;border:2px solid #292524;border-radius:12px;background:#fff;color:#292524;font:600 15px Poppins,sans-serif">‹ Back to the app</button><button type="button" onclick="location.reload()" style="height:44px;padding:0 16px;border:0;border-radius:12px;background:#292524;color:#fff;font:600 15px Poppins,sans-serif">Try again</button></div></div><script>(function(){const t0=Date.now();let b0=0;const iv=setInterval(function(){const sp=document.getElementById("fitSplash"),T=document.getElementById("fitSplashT"),B=document.getElementById("fitSplashB"),s=(Date.now()-t0)/1000;if(sp&&T&&!T.dataset.fixed)T.textContent=s<5?"Loading the fit tool…":s<12?"Loading the 3D view…":"Still loading… a slow connection can take a minute.";if(sp&&B&&s>12)B.style.display="flex";const fb=document.getElementById("fitBusy");if(!sp&&fb){const on=fb.style.display==="flex";if(!on){b0=0;const x=document.getElementById("fitBusyB");if(x)x.remove();}else{if(!b0)b0=Date.now();if(Date.now()-b0>25000&&!document.getElementById("fitBusyB")){const d=document.createElement("div");d.id="fitBusyB";d.style.cssText="display:flex;gap:10px;margin-top:10px";d.innerHTML=B?B.innerHTML:"";fb.appendChild(d);}}}if(!sp&&!fb)clearInterval(iv);},500);})();</script>
 <script>
 /* ===== PeerJS receiver (desktop) ===== */
 (function(){
@@ -9506,7 +9506,7 @@ function build3D(){
       off+=d.L+50;});
     const tl=over?maxL:off-50;T3.t.set(tl/2,maxW/2,30);if(S.fit3){T3.dist=Math.max(tl,maxW)*1.9;T3.d0=T3.dist;S.fit3=false;}S.dirty3=false;resize3D();return;}
   const Hf=S.Hf;g.add(foamObj(S.L,f,0,0,1,null));
-  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,(p.noFit||p.tooTall)?'#B3261E':null,1),z=p.noFit?0:(p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H);m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
+  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,(p.noFit||p.tooTall||p.badFit)?'#B3261E':null,1),z=p.noFit?0:(p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H);m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
   const lh=f.mode==='sta'?f.lid:S.set.lidH,pivot=new THREE.Group();pivot.position.set(0,f.W,Hf);pivot.rotation.x=-S.lidAng*Math.PI/180;
   const lg=new THREE.ExtrudeGeometry(rrShape(f.L,f.W,f.R),{depth:lh,bevelEnabled:false});lg.translate(0,-f.W,0);
   pivot.add(new THREE.Mesh(lg,new THREE.MeshBasicMaterial({color:0xC6B68D,transparent:true,opacity:0.14,depthWrite:false})));pivot.add(new THREE.LineSegments(new THREE.EdgesGeometry(lg,30),new THREE.LineBasicMaterial({color:0x8a8070})));{const li=lidInner();if(li){if(pivot.children[0])pivot.children[0].visible=false;li.g.rotation.x=Math.PI;li.g.position.set(0,0,li.lh);pivot.add(li.g);}}g.add(pivot);T3.pivot=pivot;
@@ -10368,7 +10368,7 @@ function build3D(){
   if(!init3D())return;const g=T3.group;while(g.children.length){const o=g.children.pop();if(o.geometry&&!o.userData.keep)o.geometry.dispose();}T3.partMeshes=[];
   const f=S.foam,Hf=S.Hf;
   if(S.vec){try{g.add(foamVecObj(1));}catch(e){console.error(e);g.add(foamObj(S.L,f,0,0,1,null));}}else g.add(foamObj(S.L,f,0,0,1,null));
-  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,(p.noFit||p.tooTall)?'#B3261E':null,1),z=p.noFit?0:(p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H);m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
+  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,(p.noFit||p.tooTall||p.badFit)?'#B3261E':null,1),z=p.noFit?0:(p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H);m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
   const lh=lidHOf(f),pivot=new THREE.Group();pivot.position.set(0,f.W,Hf);pivot.rotation.x=-S.lidAng*Math.PI/180;
   const lg=new THREE.ExtrudeGeometry(rrShape(f.L,f.W,Math.min(f.R,40)),{depth:lh,bevelEnabled:false});lg.translate(0,-f.W,0);
   pivot.add(new THREE.Mesh(lg,new THREE.MeshBasicMaterial({color:0xC6B68D,transparent:true,opacity:0.12,depthWrite:false})));pivot.add(new THREE.LineSegments(new THREE.EdgesGeometry(lg,30),new THREE.LineBasicMaterial({color:0x8a8070})));{const li=lidInner();if(li){if(pivot.children[0])pivot.children[0].visible=false;li.g.rotation.x=Math.PI;li.g.position.set(0,0,li.lh);pivot.add(li.g);}}g.add(pivot);T3.pivot=pivot;
@@ -12472,7 +12472,7 @@ window.PP={_narrow:()=>{const w=layNarrow();const ppm=PPM/(st.k||1);return w?w.m
 /* link from the phone: #phone=z.<data> opens the parts that were traced on the phone */
 (function(){const m=/^#phone=([jz])\.([A-Za-z0-9_-]+)(?:&(.*))?$/.exec(location.hash);if(!m)return;
   const wait=(n)=>{if(window.__importOutline&&typeof renderAll==='function'&&typeof S!=='undefined'&&S.parts)return run();if(n>1200){const sp=document.getElementById('fitSplash');if(sp)sp.remove();alert('The tool took too long to open. Go back to the phone app and try again.');return;}setTimeout(()=>wait(n+1),150);};
-  async function run(){try{let b=m[2].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';const bin=atob(b),u8=Uint8Array.from(bin,c=>c.charCodeAt(0));let txt;
+  async function run(){try{{const T=document.getElementById('fitSplashT');if(T){T.dataset.fixed=1;T.textContent='Reading your parts…';}}let b=m[2].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';const bin=atob(b),u8=Uint8Array.from(bin,c=>c.charCodeAt(0));let txt;
     if(m[1]==='z'){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(u8);w.close();txt=await new Response(ds.readable).text();}else txt=new TextDecoder().decode(u8);
     const data=JSON.parse(txt);let n=0;for(const it of data.items||[]){const ring=[];for(let i=0;i+1<it.o.length;i+=2)ring.push([it.o[i]/10,it.o[i+1]/10]);if(it.s)window.__fitPlaced=true;if(window.__importOutline(it.n||'Phone part',ring,+it.h,+it.q||1,it.s,{id:it.i,nt:it.nt,pl:it.pl,zr:it.zr,xy:it.xy}))n+=Math.max(1,Math.min(20,Math.round(+it.q||1)));}
     history.replaceState(null,'',location.pathname+location.search);
@@ -12742,7 +12742,14 @@ body.fitmode #zoomBar,body.fitmode #layout .stage-note{display:none!important}
 html[data-theme=dark] .tmSide{border-color:#EDE8DD}html[data-theme=dark] .tmSide button{background:#2b2826;color:#EDE8DD}
 html[data-theme=dark] .tmSide button+button{border-left-color:#EDE8DD}html[data-theme=dark] .tmSide button.on{background:#F05325;color:#fff}
 html[data-theme=dark] .tmAng{background:#2b2826;color:#EDE8DD}html[data-theme=dark] .tmAng small{color:#aaa196}
-body.fitmode.nfreal #checksList{display:none!important}
+body.fitmode #rotBar,body.fitmode #ctxMenu,body.fitmode #checksList{display:none!important}
+.nfchip.best{background:#2E7D32;color:#fff}
+.nfchips.few .nfchip:not(.best):not(.sel):not(.more){display:none}
+.nfchips.few .nfchip.best{flex:2.2}
+.nfchips.few .nfchip.sel::after{display:none}
+.nfchip.more{flex:1.4;background:#fff;color:#292524;border:2px solid #292524;font-size:12px}
+html[data-theme=dark] .nfchip.more{background:#2b2826;color:#EDE8DD;border-color:#EDE8DD}
+#nfWhy.best{border-left-color:#2E7D32}
 html[data-theme=dark] #tmOver{background:#1d1b1a;color:#EDE8DD}
 html[data-theme=dark] .tmTop button,html[data-theme=dark] .tmBar .tb:not(.o),html[data-theme=dark] .nfsec,html[data-theme=dark] .tmTag{background:#2b2826;color:#EDE8DD;border-color:#EDE8DD}
 html[data-theme=dark] .tmTop .dk{background:#EDE8DD;color:#1d1b1a}
@@ -12780,9 +12787,9 @@ function applyAlign(){if(!NF.shown)return;const k=alignIdx(NF.shown,NF.align);if
 /* ---------- Turn & move parts (top view only: parts turn flat, the outline is cut into the foam the same way) ---------- */
 const TMV={side:'base',on:false,sel:null,drag:null,undo:[],snap0:null,geo:null,img:new WeakMap(),fmC:null,fmK:null,msg:null};
 const tmParts=()=>S.parts.filter(p=>p.where==='base'&&p.cur&&p.cur.cav);
-function tmSnap(){return {parts:S.parts.map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,lock:!!p.rotLock,st:p.stick,pl:p.allow?p.allow.plus:null,side:p.side,where:p.where,lp:!!p.lidPlaced})),view:S.side,cs:S.foam.caseId,res:FIT.res,rec:FIT.rec,lad:S.ladder,meta:S.meta,shown:NF.shown,sel:NF.sel};}
+function tmSnap(){return {parts:S.parts.map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,lock:!!p.rotLock,st:p.stick,pl:p.allow?p.allow.plus:null,side:p.side,where:p.where,lp:!!p.lidPlaced,nf:!!p.noFit,tt:!!p.tooTall})),view:S.side,cs:S.foam.caseId,res:FIT.res,rec:FIT.rec,lad:S.ladder,meta:S.meta,shown:NF.shown,sel:NF.sel};}
 function tmRestore(sn){if(!sn)return;FIT.res=sn.res;FIT.rec=sn.rec;S.ladder=sn.lad;S.meta=sn.meta;NF.shown=sn.shown;NF.sel=sn.sel;tmGoSide('base',true);if(sn.cs&&sn.cs!==S.foam.caseId)setCase(sn.cs);
-  for(const o of sn.parts){const p=o.p;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.rotLock=o.lock;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.side=o.side;p.lidPlaced=o.lp;}tmGoSide(sn.view||'base',true);}
+  for(const o of sn.parts){const p=o.p;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.rotLock=o.lock;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.side=o.side;p.lidPlaced=o.lp;p.noFit=!!o.nf;p.tooTall=!!o.tt;}tmGoSide(sn.view||'base',true);}
 /* show the base or the lid foam (the engine lays out one side at a time) */
 function tmGoSide(side,quiet){S.side=side==='lid'?'lid':'base';applySideFoam();syncWhere();if(S.side==='lid'&&!quiet)autoLidLayout();recalc();TMV.side=S.side;}
 function tmAngTo(p,z){const [cx,cy]=center(p);p.ang.z=((Math.round(z)%360)+360)%360;p.rotLock=true;const h=getOriented(p).hm;p.x=Math.round(cx-h.w/2);p.y=Math.round(cy-h.h/2);}
@@ -12815,15 +12822,17 @@ function tmUpd(){const has=!!TMV.sel,lidSide=S.side==='lid',mine=p=>((p.side||'b
   else if(bad){st.className='tmStat bad';st.textContent='✗ '+bad.t.replace(/\s*\(.*?\)\s*/g,' ').trim()+' Tap Auto organize.';}
   else if(!tmParts().length){st.className='tmStat';st.textContent=lidSide?'No parts in the lid.':'No parts in the base.';}
   else{st.className='tmStat ok';st.textContent='✓ '+(lidSide?'The lid fits':'Fits')+' in '+(cs?nm(cs):'this case')+'.';}}
-function tmOpen(){if(!NF.shown||FIT.busy||!S.fm){toast('Pick a case that fits first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;if(S.side!=='base')tmGoSide('base',true);TMV.snap0=tmSnap();recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
+function tmOpen(){if(!NF.shown||FIT.busy||!S.fm){toast('Pick a case that fits first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;if(S.side!=='base')tmGoSide('base',true);TMV.snap0=tmSnap();if(NF.redFor&&nfBringIn())TMV.msg={c:'bad',t:'The red parts did not fit. Drag and turn them to try, or tap Auto organize.'};recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
 function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')||'{}'),by={};for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;(by[id]=by[id]||[]).push(p.rotLock?Math.round(p.ang.z):null);}
   for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}
   try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);const lid=p.side==='lid';(by[id]=by[id]||[]).push(lid?(p.lidPlaced?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2),1]:null):[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]);}
   for(const id in by)all[id]={c:cs,p:by[id]};localStorage.setItem('fa_pos',JSON.stringify(all));}catch(e){}}
-function tmClose(keep){TMV.on=false;TMV.drag=null;try{q('#tmAng').blur();}catch(e){}q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{const lb=S.side==='lid'&&S.flags&&S.flags.some(x=>x.lv==='bad');tmGoSide('base',true);tmSaveTurns();if(lb)toast('Some lid parts overlap or are outside the lid foam. Open Turn & move, pick Lid and tap Auto organize.',4200);if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
+function tmClose(keep){TMV.on=false;TMV.drag=null;try{q('#tmAng').blur();}catch(e){}q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{const lb=S.side==='lid'&&S.flags&&S.flags.some(x=>x.lv==='bad');tmGoSide('base',true);if(NF.redFor)nfRedMark();else tmSaveTurns();if(lb)toast('Some lid parts overlap or are outside the lid foam. Open Turn & move, pick Lid and tap Auto organize.',4200);if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
   after();render();setTimeout(()=>{try{frontTilt();}catch(e){}},250);}
 function tmTurn(d){const p=TMV.sel;if(!p)return;TMV.undo.push(tmSnap());TMV.msg=null;tmAngTo(p,p.ang.z+d);recalc();tmDraw();tmUpd();}
 async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=null;
+  if(NF.redFor&&S.side!=='lid'){const cs=CASES.find(c=>c.id===NF.redFor);if(reset)S.parts.forEach(p=>{if(p.side!=='lid')p.rotLock=false;});nfRedPack(cs);const n=S.parts.filter(p=>p.noFit).length;nfBringIn();recalc();
+    TMV.msg=n?{c:'bad',t:'✗ '+n+' part'+(n>1?'s':'')+' still do'+(n>1?'':'es')+' not fit '+nm(cs.id)+'. '+(n>1?'They are':'It is')+' on top, in red: try turning '+(n>1?'them':'it')+'.'}:{c:'ok',t:'✓ Organized in '+nm(cs.id)+'.'};TMV.sel=null;tmDraw();tmUpd();return;}
   if(S.side==='lid'){const lp=S.parts.filter(p=>p.side==='lid');lp.forEach(p=>{if(reset)p.rotLock=false;p.lidPlaced=false;});autoLidLayout();recalc();
     TMV.msg=S.flags&&S.flags.some(x=>x.lv==='bad')?{c:'bad',t:'✗ The lid parts do not fit the lid like this. Tap Undo or Reset turns.'}:{c:'ok',t:'✓ Lid organized. Spacing adjusted from the centre.'};
     TMV.sel=TMV.sel&&S.parts.includes(TMV.sel)?TMV.sel:null;tmDraw();tmUpd();return;}
@@ -12852,11 +12861,15 @@ async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=
   addEventListener('resize',()=>{if(TMV.on)tmDraw();});})();
 
 /* ---------- a case that does not fit: same 3D view as a good case; the parts that fit are laid in it (centred, spread), the rest wait in red next to the case ---------- */
-function nfRedClear(){if(!NF.redFor)return;const sn=NF.goodSnap;NF.redFor=null;NF.redInfo=null;S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;});const ks=NF.sel;if(sn)tmRestore(sn);NF.sel=ks;NF.goodSnap=null;S.dirty3=true;after();}
+const nfFlagsOff=()=>S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;p.badFit=false;});
+function nfRedClear(){if(!NF.redFor)return;const sn=NF.goodSnap;NF.redFor=null;NF.redInfo=null;nfFlagsOff();const ks=NF.sel;if(sn)tmRestore(sn);NF.sel=ks;NF.goodSnap=null;S.dirty3=true;after();}
 function nfRedShow(cs){if(NF.redFor===cs.id)return;
-  if(!NF.redFor)NF.goodSnap=tmSnap();else{S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;});const ks=NF.sel;tmRestore(NF.goodSnap);NF.sel=ks;}
+  if(!NF.redFor)NF.goodSnap=tmSnap();else{nfFlagsOff();const ks=NF.sel;tmRestore(NF.goodSnap);NF.sel=ks;}
   NF.redFor=cs.id;setCase(cs.id);S.fit3=true;S.side='base';applySideFoam();syncWhere();S.parts.forEach(p=>{if(p.side==='lid')p.lidPlaced=false;});recalc();
-  const fm=S.fm,set=S.set,al=allowedMask(fm,set.edge),avail=cs.base-set.floor,bs=S.parts.filter(p=>p.where==='base'),fixed=[],out=[],tall=[];
+  nfRedPack(cs);S.dirty3=true;after();setTimeout(nfRedFrame,80);setTimeout(nfRedFrame,700);}
+/* lay in what fits (biggest first, each in the first spot it fits), the rest waits next to the case */
+function nfRedPack(cs){nfFlagsOff();recalc();
+  const fm=S.fm,set=S.set,al=allowedMask(fm,set.edge),avail=cs.base-set.floor,bs=S.parts.filter(p=>p.where==='base'),fixed=[],out=[];
   const order=bs.map(p=>{let a=0;try{const e=getOriented(p,getR(p)).o.ext;a=e[0]*e[1];}catch(x){}return {p,a};}).sort((u,v)=>v.a-u.a).map(o=>o.p);
   for(const p of order){const rots=[],ms=[];
     for(const T of allowedTs(p))for(let z=0;z<4;z++){const zd=p.rotLock?p.ang.z:(p.ang.z+90*z)%360;try{const R=mmul(rotMat('z',zd),mmul(rotMat('y',p.ang.y),mmul(rotMat('x',p.ang.x),mmul(TM[T],p.R0)))),c=getOriented(p,R),H=c.o.ext[2],st=stickFor(p,T),cv=getCavity(p,c,H,st),pr=padRegion(p,cv,zd);rots.push({region:pr.region,w:pr.w,h:pr.h,H,st});ms.push({T,zd,off:pr.off});}catch(x){}}
@@ -12864,19 +12877,27 @@ function nfRedShow(cs){if(NF.redFor===cs.id)return;
     let ok=rots.map((r,k)=>k).filter(k=>rots[k].H<=avail+(rots[k].st||0)+1e-6);const deep=!ok.length;if(deep)ok=rots.map((r,k)=>k);
     let res=null;try{res=packParts([{id:p.id,rots:ok.map(k=>({region:rots[k].region,w:rots[k].w,h:rots[k].h}))}],fm.w,fm.h,al,set.wall,fixed);}catch(x){console.error(x);}
     if(res&&res.ok&&res.placed&&res.placed.length){const q2=res.placed[0],k=ok[q2.k],m=ms[k];p.T=m.T;p.stick=stickFor(p,m.T);if(p.allow)p.allow.plus=Math.max(0,p.stick);p.ang.z=m.zd;p.x=q2.x+m.off;p.y=q2.y+m.off;
-      fixed.push({region:rots[k].region,w:rots[k].w,h:rots[k].h,x:q2.x,y:q2.y});if(deep){p.tooTall=true;tall.push(p);}}
+      fixed.push({region:rots[k].region,w:rots[k].w,h:rots[k].h,x:q2.x,y:q2.y});if(deep)p.tooTall=true;}
     else{p.noFit=true;out.push(p);}}
-  recalc();let ox=fm.w+45,oy=0,colW=0;
-  for(const p of out){const h=getOriented(p).hm;if(oy>0&&oy+h.h>fm.h){ox+=colW+20;oy=0;colW=0;}p.x=ox;p.y=fm.h-oy-h.h;oy+=h.h+20;colW=Math.max(colW,h.w);}
-  recalc();if(window.spreadParts)window.spreadParts();S.dirty3=true;after();
-  const names=a=>[...new Set(a.map(p=>p.name))].map(n=>[n,a.filter(p=>p.name===n).length]);
-  NF.redInfo={out:names(out),tall:[...new Set(tall.map(p=>p.name))],fingers:out.concat(tall).some(p=>(p.fingers||[]).some(f=>f.shape)),n:out.length};
-  setTimeout(nfRedFrame,80);setTimeout(nfRedFrame,700);}
+  recalc();nfParkOut();recalc();if(window.spreadParts)window.spreadParts();NF.redInfo=nfRedInfo();}
+function nfParkOut(){const fm=S.fm;let ox=fm.w+45,oy=0,colW=0;for(const p of S.parts.filter(q=>q.noFit)){const h=getOriented(p).hm;if(oy>0&&oy+h.h>fm.h){ox+=colW+20;oy=0;colW=0;}p.x=ox;p.y=fm.h-oy-h.h;oy+=h.h+20;colW=Math.max(colW,h.w);}}
+/* Turn & move on a red case: the parts waiting outside come into the foam (on top, in red) so they can be moved and turned */
+function nfBringIn(){const fm=S.fm;let n=0;for(const p of S.parts.filter(q=>q.noFit)){p.noFit=false;const h=getOriented(p).hm;p.x=Math.round(fm.w/2-h.w/2)+n*12;p.y=Math.round(fm.h/2-h.h/2)-n*12;n++;}if(n)recalc();return n;}
+function nfRedMark(){S.parts.forEach(p=>{p.badFit=false;});try{for(const p of tmBad())p.badFit=true;}catch(e){}NF.redInfo=nfRedInfo();S.dirty3=true;}
+const nfNames=a=>[...new Set(a.map(p=>p.name))].map(n=>[n,a.filter(p=>p.name===n).length]);
+function nfRedInfo(){const out=S.parts.filter(p=>p.noFit),tall=S.parts.filter(p=>p.tooTall&&!p.noFit),bad=S.parts.filter(p=>p.badFit&&!p.noFit);
+  return {out:nfNames(out),n:out.length,tall:[...new Set(tall.map(p=>p.name))],bad:nfNames(bad),nb:bad.length,fingers:out.concat(tall,bad).some(p=>(p.fingers||[]).some(f=>f.shape))};}
 function nfRedFrame(){try{frontTilt();const ps=S.parts.filter(p=>p.noFit);if(!ps.length||typeof T3==='undefined'||!T3.ready)return;const f=S.foam;let mx=f.L;for(const p of ps){const h=getOriented(p).hm;mx=Math.max(mx,p.x+h.w+30);}T3.t.x=mx/2;T3.dist*=Math.max(1,mx/f.L)*0.86;camUpdate();}catch(e){}}
-function nfRedLines(cs){const I=NF.redInfo,L=[],lst=a=>a.map(([n,c])=>'<b>'+nfEsc(n)+'</b>'+(c>1?' ×'+c:'')).join(', ');
-  if(I.out.length)L.push('<b>'+nm(cs.id)+':</b> '+lst(I.out)+(I.n===1?' does':' do')+' not fit (red, next to the case).');
-  if(I.tall.length)L.push((I.out.length?'':'<b>'+nm(cs.id)+':</b> ')+I.tall.map(n=>'<b>'+nfEsc(n)+'</b>').join(', ')+(I.tall.length>1?' are':' is')+' too deep (red in the case).');
-  L.push(I.fingers?'Tip: fewer or smaller finger notches save room.':'Tip: turn the parts, or put one in the lid.');return L.slice(0,3);}
+function nfRedLines(cs){const I=NF.redInfo||nfRedInfo(),L=[],c='<b>'+nm(cs.id)+':</b> ',lst=a=>a.map(([n,k])=>'<b>'+nfEsc(n)+'</b>'+(k>1?' ×'+k:'')).join(', ');
+  if(I.n)L.push(c+lst(I.out)+(I.n===1?' does':' do')+' not fit (red, next to the case).');
+  else if(I.nb)L.push(c+lst(I.bad)+(I.nb===1?' overlaps or sticks out':' overlap or stick out')+' (red).');
+  if(I.tall.length)L.push((L.length?'':c)+I.tall.map(n=>'<b>'+nfEsc(n)+'</b>').join(', ')+(I.tall.length>1?' are':' is')+' too deep (red in the case).');
+  if(!L.length){const b=(S.flags||[]).find(x=>x.lv==='bad');L.push(c+(b?nfEsc(b.t):'✓ No overlaps like this. Check the depth before you choose it.'));}
+  else L.push('Try it: tap Turn &amp; move.'+(I.fingers?' Fewer or smaller finger notches save room.':''));
+  return L.slice(0,3);}
+/* lid: closed -> open -> fully open (flat, 180°) -> closed */
+function nfLidLab(a){return a<50?'Open lid':a<150?'Open flat':'Close lid';}
+function nfLidFrame(a){try{frontTilt();if(a>=150&&typeof T3!=='undefined'&&T3.ready){const f=S.foam;T3.t.y=f.W;T3.dist*=1.4;camUpdate();}}catch(e){}}
 function nfLayout(){const t=q('#nfTop'),b=q('#nfBot');if(!t||!b)return;document.documentElement.style.setProperty('--nft',(t.offsetHeight+6)+'px');document.documentElement.style.setProperty('--nfb',(b.offsetHeight+8)+'px');}
 /* the case seen from the front, tilted, so the base and the open lid are both in view */
 function frontTilt(){if(typeof T3==='undefined'||!T3.ready)return;T3.az=-Math.PI/2;T3.el=0.55;try{const f=S.foam,hf=2*Math.atan(Math.tan(T3.cam.fov*Math.PI/360)*T3.cam.aspect),vf=T3.cam.fov*Math.PI/180;T3.t.set(f.L/2,f.W/2,(S.Hf||30)/2);T3.dist=Math.max(f.L*1.5/(2*Math.tan(hf/2)),f.W*2.2/(2*Math.tan(vf/2)));}catch(e){}camUpdate();}
@@ -12967,23 +12988,23 @@ function render(){
   const bid=bestId(),rec=bid?CASES.find(c=>c.id===bid):null,ord=sizeOrder();if(!NF.sel)NF.sel=rec?rec.id:ord[ord.length-1].id;
   document.body.classList.toggle('nfhas',!!rec);
   q('#nfH').textContent=rec?'Best fit: '+nm(rec.id):'No case fits';
-  q('#nfChips').innerHTML=ord.map(c=>{const s=stat(c.id),lab={no:'NO',yes:'YES',best:'BEST'}[s];return `<button class="nfchip ${s}${NF.sel===c.id?' sel':''}" data-id="${c.id}" aria-label="${nm(c.id)} ${lab}">${nm(c.id)}<span>${lab}</span></button>`;}).join('');
+  q('#nfChips').innerHTML=ord.map(c=>{const s=stat(c.id),lab={no:'NO',yes:'YES',best:'BEST'}[s];return `<button class="nfchip ${s}${NF.sel===c.id?' sel':''}" data-id="${c.id}" aria-label="${nm(c.id)} ${lab}">${nm(c.id)}<span>${lab}</span></button>`;}).join('');{const ch=q('#nfChips');ch.classList.toggle('few',!NF.all&&!!rec);if(rec)ch.insertAdjacentHTML('beforeend','<button class="nfchip more" data-more="1">'+(NF.all?'Fewer ▴':'Other cases ▾')+'</button>');}
   const sel=CASES.find(c=>c.id===NF.sel),ss=stat(NF.sel),w=q('#nfWhy');let lines;
   const lidOnly=ss==='no'&&/lid/i.test((FIT.res&&FIT.res.why[sel.id])||''),realRed=ss==='no'&&!lidOnly&&!!NF.shown;if(NF.redFor&&!realRed)nfRedClear();if(realRed)nfRedShow(sel);
-  if(ss==='no')lines=(realRed&&NF.redInfo&&(NF.redInfo.out.length||NF.redInfo.tall.length))?nfRedLines(sel):reasonFor(sel).map((x,i)=>i?x:'<b>'+nm(sel.id)+':</b> '+x);
+  if(ss==='no')lines=(realRed&&NF.redInfo)?nfRedLines(sel):reasonFor(sel).map((x,i)=>i?x:'<b>'+nm(sel.id)+':</b> '+x);
   else if(ss==='best'){const smaller=ord.filter(c=>c.L*c.W<sel.L*sel.W&&stat(c.id)==='no'),nx=smaller[smaller.length-1];
     lines=nx?reasonFor(nx).slice(0,1).map(x=>'<b>'+nm(nx.id)+' is too small:</b> '+x):['<b>'+sel.name+'</b> is the smallest STA-300 case.'];}
   else lines=['<b>'+nm(sel.id)+'</b> fits too'+(rec?': a bigger case than '+nm(rec.id):'')+'.'];
   w.className=ss;w.innerHTML=lines.join('<br>');
   document.body.classList.toggle('nfred',ss==='no'&&!realRed);document.body.classList.toggle('nfreal',!!realRed);if(ss==='no'&&!realRed)requestAnimationFrame(()=>drawOver(sel));
   const shown=NF.shown;q('#nfAl').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.al===NF.align);b.disabled=!shown||!!NF.redFor||alignIdx(shown,b.dataset.al)==null;});
-  q('#nfLid').textContent=(S.lidAng||0)>50?'Close lid':'Open lid';q('#nfTurn').disabled=!shown||!!NF.redFor;
+  q('#nfLid').textContent=nfLidLab(S.lidAng||0);q('#nfTurn').disabled=!shown;
   requestAnimationFrame(nfLayout);}
 window.__startFit=function(){document.body.classList.add('fitmode');const sp=document.getElementById('fitSplash');if(sp)sp.remove();const nb=q('#btnNext');if(nb&&nb.parentElement)nb.parentElement.classList.add('fithide');
   S.parts.forEach(p=>{if(!p.fitSide)p.fitSide='auto';});
   q('#nfBack').onclick=q('#nfEdit').onclick=()=>{location.href=APP+'#layout';};
   q('#nfFwd').onclick=q('#nfSend').onclick=()=>{location.href=APP+'#send';};
-  q('#nfChips').onclick=async e=>{const b=e.target.closest('.nfchip');if(!b||FIT.busy)return;const id=b.dataset.id;NF.sel=id;
+  q('#nfChips').onclick=async e=>{const b=e.target.closest('.nfchip');if(!b||FIT.busy)return;if(b.dataset.more){NF.all=!NF.all;render();return;}const id=b.dataset.id;NF.sel=id;
     if(stat(id)!=='no'&&NF.redFor){nfRedClear();if(id===NF.shown)setTimeout(frontTilt,300);}
     if(stat(id)!=='no'&&id!==NF.shown){NF.shown=id;await pickCase(id);if(NF.align!=='auto')applyAlign();setTimeout(frontTilt,900);}render();};
   q('#nfTurn').onclick=()=>tmOpen();
@@ -12993,7 +13014,7 @@ window.__startFit=function(){document.body.classList.add('fitmode');const sp=doc
     if(k==='dark'){const d=document.documentElement.getAttribute('data-theme')!=='dark';document.documentElement.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('fa_theme',d?'dark':'light');}catch(x){}q('#nfDarkSw').classList.toggle('on',d);try{drawCube();camUpdate();}catch(x){}if(document.body.classList.contains('nfred')){const c=CASES.find(x=>x.id===NF.sel);if(c)ovShow(c);}return;}
     location.href=APP+({home:'',lib:'#library',lay:'#layout'}[k]||'');};
   q('#nfZin').onclick=()=>zoomBy(0.82);q('#nfZout').onclick=()=>zoomBy(1.22);q('#nfVid').onclick=()=>nfVideo();
-  q('#nfLid').onclick=()=>{const closing=(S.lidAng||0)>50;animLid(closing?0:120);q('#nfLid').textContent=closing?'Open lid':'Close lid';};
+  q('#nfLid').onclick=()=>{const a=S.lidAng||0,t=a<50?120:a<150?180:0;animLid(t);q('#nfLid').textContent=nfLidLab(t);setTimeout(()=>nfLidFrame(t),850);};
   addEventListener('resize',()=>{requestAnimationFrame(nfLayout);if(document.body.classList.contains('nfred')){const c=CASES.find(x=>x.id===NF.sel);if(c)requestAnimationFrame(()=>drawOver(c));}});
   busy(true,'Finding the best case… (1 of 3)');
   fitRun().catch(e=>console.error(e)).then(()=>{NF.shown=bestId();NF.sel=null;render();if(FIT.rec)setTimeout(()=>{try{animLid(120);}catch(e){}render();setTimeout(()=>{frontTilt();pinchSetup();},500);},900);});};
