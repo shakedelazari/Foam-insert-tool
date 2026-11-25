@@ -135,6 +135,10 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
 .pc .bl button.on i{background:#fff;color:var(--fl);border-color:#fff}
 .pc .blh{font-size:12px;color:var(--muted);margin-top:-4px}
 .seg2 button.on{background:var(--fl)!important;border-color:var(--fl)!important;color:#fff!important}
+.homeVis{position:relative;min-height:120px;margin:6px 0}
+.homeVis img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 12px rgba(41,37,36,.18))}
+html[data-theme=dark] .homeVis{background:radial-gradient(closest-side,rgba(241,238,229,.30),rgba(241,238,229,0))}
+html[data-theme=dark] .homeVis img{filter:drop-shadow(0 0 1px rgba(241,238,229,.6)) drop-shadow(0 0 14px rgba(241,238,229,.25))}
 /* library */
 .lb{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:8px 10px;border:2px solid transparent}
 .lb.on{border-color:var(--fl)}
@@ -156,9 +160,9 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
 <section id="sHome" class="scr">
   <div class="row" style="justify-content:space-between"><div class="brand">SHELL-CASE</div><button class="nb menuB" data-menu aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   <h1>Foam<br>Insert</h1>
-  <p style="font-size:16px">Scan a part. Get your foam.</p>
-  <div class="grow"></div>
-  <button class="pri" id="homeScan">Scan object</button>
+  <p style="font-size:16px">Scan your product. Get the best case fit.</p>
+  <div class="grow homeVis"><img src="case-family.webp" alt="Shell-Case cases"></div>
+  <button class="pri" id="homeScan" style="background:var(--fl);border-color:var(--fl);color:#fff">Scan object</button>
   <button class="sec" id="homeOpen">Open library</button>
   <div class="hint" style="text-align:center" id="verTxt"></div>
 </section>
@@ -348,7 +352,7 @@ label.f input{display:block;width:100%;height:48px;border:2px solid var(--ink);b
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.3 · 25 Nov 2026';
+const APP_VERSION='A1.4 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
