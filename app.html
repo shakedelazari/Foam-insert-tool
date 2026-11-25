@@ -222,7 +222,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <section id="sCam" class="scr" aria-label="Take photo">
   <video id="vid" playsinline muted autoplay></video>
   <div id="camFrame"></div>
-  <svg id="lvl" viewBox="0 0 300 300" aria-label="Level: move the bubble into the centre ring" role="img"><circle id="lvlDisk" cx="150" cy="150" r="70" fill="rgba(41,37,36,0.30)" stroke="#fff" stroke-width="3"/><g id="lvlGuide"><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/></g><circle id="lvlIn" cx="150" cy="150" r="13" fill="none" stroke="#fff" stroke-width="2.5"/><circle id="lvlDot" cx="150" cy="150" r="10" fill="#fff" stroke="#fff" stroke-width="2.5"/></svg>
+  <svg id="lvl" viewBox="0 0 300 300" aria-label="Level: tilt the phone until the bubble is in the centre ring" role="img"><circle id="lvlDisk" cx="150" cy="150" r="70" fill="rgba(41,37,36,0.30)" stroke="#fff" stroke-width="3"/><g id="lvlGuide"><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/></g><circle id="lvlIn" cx="150" cy="150" r="13" fill="none" stroke="#fff" stroke-width="2.5"/><circle id="lvlDot" cx="150" cy="150" r="10" fill="#fff" stroke="#fff" stroke-width="2.5"/></svg>
   <div id="lvlTxt"></div>
   <div id="camMsg"></div>
   <div class="nav camTop"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
@@ -371,7 +371,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.15 · 25 Nov 2026';
+const APP_VERSION='A1.16 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -512,7 +512,7 @@ function lvlPaint(){const c=LV.D/2,col=LV_C(LV.t),d=$('#lvlDot');d.setAttribute(
 function lvlLoop(){cancelAnimationFrame(LV.raf);const step=()=>{if(CURS!=='sCam')return;lvlPaint();LV.raf=requestAnimationFrame(step);};LV.raf=requestAnimationFrame(step);}
 
 /* ---------- level hint ---------- */
-function lvlMsg(){$('#lvlTxt').textContent=LV.t>=90?'':LV.ok?'Level ✓':'Move the bubble to the centre';}
+function lvlMsg(){$('#lvlTxt').textContent=LV.t>=90?'':LV.ok?'Level with the object ✓':'Tilt the phone to level it with the object';}
 
 /* ---------- voice: say "snap" (or photo, shoot, cheese...) to take the photo with one hand ---------- */
 let VOICE=false,REC=null,recOn=false,lastSnap=0;try{VOICE=localStorage.getItem('fa_voice')==='on';}catch(e){}
