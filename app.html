@@ -160,6 +160,12 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 .lfLen span{min-width:62px;text-align:center;font:600 14px Poppins,sans-serif}
 .lfLg{display:flex;flex-direction:column;gap:2px;font-size:13px}.lfLg div{display:flex;align-items:center;gap:8px}.lfLg svg{flex:none}
 .lb .ed{height:34px;padding:0 10px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:600 13px Poppins,sans-serif;flex:none}
+.shSub{margin:-6px 0 0;font-size:14px;line-height:1.35;color:var(--muted)}
+.shEx{flex:1;min-height:120px;position:relative;border-radius:16px;overflow:hidden;background:#8f7b62 repeating-linear-gradient(176deg,rgba(255,255,255,.07) 0 6px,transparent 6px 27px)}
+.shEx svg{position:absolute;inset:0;width:100%;height:100%}
+.shEx span{position:absolute;left:10px;top:10px;z-index:1;background:#fff;color:#292524;border-radius:999px;padding:3px 12px;font:600 12px Poppins,sans-serif}
+.shLbl{font:700 12px Poppins,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:-6px}
+.shCards{display:flex;gap:10px}.shCards .sheetc{flex:1;padding:10px 13px}.shCards .sheetc.on{padding:9px 12px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -201,11 +207,12 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <!-- 3 Choose sheet -->
 <section id="sSheet" class="scr">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <h2>Choose sheet</h2>
-  <button class="sheetc" data-sheet="a4"><b>A4</b><span>210 × 297 mm</span></button>
-  <button class="sheetc" data-sheet="letter"><b>Letter</b><span>8.5 × 11 in</span></button>
+  <h2>Your sheet of paper</h2>
+  <p class="shSub">Put your product on a plain white sheet. The app uses the sheet to measure it.</p>
+  <div class="shEx" id="shEx" role="img"><span>Example</span><svg viewBox="0 0 300 340" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg></div>
+  <div class="shLbl">Which paper do you have?</div>
+  <div class="shCards"><button class="sheetc" data-sheet="a4"><b>A4</b><span>210 × 297 mm</span></button><button class="sheetc" data-sheet="letter"><b>Letter</b><span>8.5 × 11 in</span></button></div>
   <div class="seg2" id="unitSeg"><button data-u="mm">mm</button><button data-u="in">in</button></div>
-  <div class="grow"></div>
   <button class="pri" id="sheetGo">Continue</button>
 </section>
 
@@ -362,7 +369,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.10 · 25 Nov 2026';
+const APP_VERSION='A1.11 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -440,7 +447,24 @@ $('#lvlAllow').onclick=async()=>{try{localStorage.setItem('fa_lvl_seen','1');}ca
 $('#lvlNo').onclick=()=>{try{localStorage.setItem('fa_lvl_seen','1');}catch(e){}show('sCam');};
 
 /* ---------- 3 Choose sheet and units ---------- */
-function paintSheet(){$$('[data-sheet]').forEach(b=>b.classList.toggle('on',b.dataset.sheet===P.sheet));$$('#unitSeg button').forEach(b=>b.classList.toggle('on',b.dataset.u===P.unit));}
+/* example picture on the sheet page: the chosen paper (dashed line + its size) with a product on it */
+function sheetEx(){const box=document.getElementById('shEx');if(!box)return;const S0=SHEETS[P.sheet]||SHEETS.a4,r=S0.h/S0.w;
+  const VW=300,VH=340,sh=262,sw=sh/r,sx=(VW-sw)/2+8,sy=(VH-sh)/2+8,m=8;
+  const px=sx+sw/2-38,py=sy+sh/2-66,pw=76,ph=132,cx=px+pw/2;
+  const lx=sx-m-14,ly=sy+sh/2;
+  box.querySelector('svg').innerHTML=
+    '<rect x="'+(sx+4)+'" y="'+(sy+5)+'" width="'+sw+'" height="'+sh+'" rx="2" fill="rgba(0,0,0,.25)"/>'+
+    '<rect x="'+sx+'" y="'+sy+'" width="'+sw+'" height="'+sh+'" rx="2" fill="#fff"/>'+
+    '<rect x="'+(sx-m)+'" y="'+(sy-m)+'" width="'+(sw+2*m)+'" height="'+(sh+2*m)+'" rx="4" fill="none" stroke="#fff" stroke-width="2.2" stroke-dasharray="8 6"/>'+
+    '<g transform="translate('+lx+' '+ly+') rotate(-90)"><rect x="-62" y="-11" width="124" height="22" rx="11" fill="#292524"/><text x="0" y="4.5" text-anchor="middle" fill="#fff" font-family="Poppins,sans-serif" font-size="12"><tspan font-weight="700">'+S0.n+'</tspan> · '+S0.lab+'</text></g>'+
+    '<rect x="'+(px-7)+'" y="'+(py-7)+'" width="'+(pw+14)+'" height="'+(ph+14)+'" rx="21" fill="none" stroke="#F05325" stroke-width="2.4" stroke-dasharray="6 5"/>'+
+    '<rect x="'+(px+3)+'" y="'+(py+5)+'" width="'+pw+'" height="'+ph+'" rx="15" fill="rgba(0,0,0,.18)"/>'+
+    '<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" rx="15" fill="#3a3532"/>'+
+    '<rect x="'+(px+11)+'" y="'+(py+13)+'" width="'+(pw-22)+'" height="34" rx="5" fill="#cfe3ff"/>'+
+    '<circle cx="'+cx+'" cy="'+(py+84)+'" r="20" fill="#F05325"/><circle cx="'+cx+'" cy="'+(py+84)+'" r="8" fill="#3a3532"/>'+
+    [-20,0,20].map(d=>'<circle cx="'+(cx+d)+'" cy="'+(py+118)+'" r="4.5" fill="#cfcac2"/>').join('');
+  box.setAttribute('aria-label','Example: a product lying on a white '+S0.n+' sheet ('+S0.lab+')');}
+function paintSheet(){sheetEx();$$('[data-sheet]').forEach(b=>b.classList.toggle('on',b.dataset.sheet===P.sheet));$$('#unitSeg button').forEach(b=>b.classList.toggle('on',b.dataset.u===P.unit));}
 ENTER.sSheet=()=>{paintSheet();};
 $$('[data-sheet]').forEach(b=>b.onclick=()=>{P.sheet=b.dataset.sheet;P.unit=P.sheet==='letter'?'in':'mm';saveAll();paintSheet();}); // Letter -> inches, A4 -> mm (can still be changed)
 $$('#unitSeg button').forEach(b=>b.onclick=()=>{P.unit=b.dataset.u;saveAll();paintSheet();});
