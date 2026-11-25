@@ -530,7 +530,7 @@ function setupPeer(){
           try{const ring=(it.o||[]).map(p=>[p[0]/10,p[1]/10]);
             if(ring.length>=3&&typeof window.__importOutline==='function'){
               upd=!!(it.i&&window.__hasPhonePart&&window.__hasPhonePart(it.i));
-              ok=!!window.__importOutline(it.n||'Phone part',ring,+it.h||20,+it.q||1,it.s||'auto',{id:it.i,nt:it.nt,pl:it.pl,zr:it.zr});}
+              ok=!!window.__importOutline(it.n||'Phone part',ring,+it.h||20,+it.q||1,it.s||'auto',{id:it.i,nt:it.nt,pl:it.pl,zr:it.zr,xy:it.xy});}
             if(ok){n++;gotKeys.push(it.k);
               window.__libPut({id:it.i?'ph-'+it.i:newLibId(),pid:it.i||null,name:it.n||'Phone part',ring,h:+it.h||20,q:+it.q||1,s:it.s||'auto',at:Date.now()});}
           }catch(e){console.error('[PeerJS] import error',e);}
@@ -9189,7 +9189,7 @@ function applyOption(i){const o=S.opts&&S.opts[i];if(!o)return;
   applyPlaced(o);S.sel=null;
   if(hasLock){recalc();if(S.flags.filter(x=>x.lv==='bad').length>badBefore){for(const s of snap){s.p.x=s.x;s.p.y=s.y;s.p.T=s.T;s.p.ang.z=s.z;s.p.stick=s.st;s.p.allow.plus=s.pl;}recalc();toast('This layout option does not fit around the locked part(s). They stay where they are.');after();return;}}
   centerLayout();S.optIdx=i;S.optSig=layoutSig();after();}
-function applyCase(id,idx){const e=S.ladder&&S.ladder.find(x=>x.c.id===id),ok=!!(idx&&e&&e.options&&e.options[idx]);setCase(id);S.fit3=true;if(e&&e.fit)applyPlaced(ok?e.options[idx]:e.placed);S.sel=null;centerLayout();S.opts=e&&e.fit&&e.options&&e.options.length>1?e.options:null;S.optIdx=ok?idx:0;S.optSig=layoutSig();after();}
+function applyCase(id,idx){const e=S.ladder&&S.ladder.find(x=>x.c.id===id),ok=!!(idx&&e&&e.options&&e.options[idx]);setCase(id);S.fit3=true;if(e&&e.fit)applyPlaced(ok?e.options[idx]:e.placed);S.sel=null;centerLayout();S.opts=e&&e.fit&&e.options&&e.options.length>1?e.options:null;S.optIdx=ok?idx:0;if(window.phonePosTry)window.phonePosTry(id);S.optSig=layoutSig();after();}
 function applyCustom(){const c=S.custom;if(!c)return;setCase('custom');S.fit3=true;const f=S.foam;f.L=c.L;f.W=c.W;f.R=S.set.cornerR;f.autoH=true;applyPlaced(c.placed);centerLayout();S.opts=null;after();}
 /* ---------- add parts ---------- */
 const CAD={files:[]};
@@ -12411,6 +12411,13 @@ window.__attachPhoto=function(id,d){return Promise.resolve((()=>{try{
       ph.thumbPh=cv.toDataURL('image/jpeg',0.8);clearTimeout(window.__phRT);window.__phRT=setTimeout(()=>{if(typeof renderAll==='function')renderAll();},400);}catch(e){console.error(e);}};img.src=d.j;
   return true;}catch(e){console.error(e);return false;}})());};
 /* notches from the new phone app (app.html): [x, y, r] in the same mm as the outline. Each one is a round finger notch, centre on the outline. */
+function phonePos(p,xy){const g=S.parts.filter(z=>z.gid===p.gid),ok=!!(xy&&typeof xy.c==='string'&&Array.isArray(xy.p));g.forEach((q,i)=>{const v=ok?xy.p[i]:null;q.phXY=Array.isArray(v)&&v.length===2&&v.every(n=>isFinite(+n))?[+v[0],+v[1]]:null;});if(ok&&g.some(q=>q.phXY))S.phPos={c:xy.c};}
+window.phonePosTry=function(id){const P=S.phPos;if(!P||P.c!==id)return;S.phPos=null;
+  const bs=S.parts.filter(p=>p.where==='base');if(!bs.length||bs.some(p=>!p.phXY))return;
+  const nBad=()=>(S.flags||[]).filter(x=>x.lv==='bad').length,snap=bs.map(p=>[p,p.x,p.y]);recalc();const b0=nBad(),fm=S.fm;
+  for(const p of bs){const h=getOriented(p).hm;p.x=Math.round(fm.w/2+p.phXY[0]-h.w/2);p.y=Math.round(fm.h/2+p.phXY[1]-h.h/2);}
+  recalc();if(nBad()>b0){snap.forEach(([p,x,y])=>{p.x=x;p.y=y;});recalc();setTimeout(()=>toast('The layout from the phone does not fit here, so the parts were arranged again.'),60);return;}
+  setTimeout(()=>toast('Parts placed as on the phone.'),60);};
 function phoneTurns(p,zr){const g=S.parts.filter(z=>z.gid===p.gid);g.forEach((q,i)=>{const v=Array.isArray(zr)?zr[i]:null;if(v!=null&&isFinite(+v)){q.ang.z=((Math.round(+v)%360)+360)%360;q.rotLock=true;}else if(Array.isArray(zr)){q.rotLock=false;}});}
 function phoneNotches(p,nt,x0,y0,bw,bh){if(!Array.isArray(nt))return;const fl=[];for(const c of nt.slice(0,4)){if(!Array.isArray(c)||c.length<2||!isFinite(+c[0])||!isFinite(+c[1]))continue;const r=Math.max(3,Math.min(60,+c[2]||25));
   const hl=+c[3]>r+0.5?Math.min(120,+c[3]):0;fl.push({shape:hl?'rect':'circle',ox:+(+c[0]-x0-bw/2).toFixed(2),oy:+(1*(+c[1]-y0-bh/2)).toFixed(2),a:hl||r,b:r,rad:hl?r:undefined,rot:hl?(+c[4]||0):0,dep:0,ang0:p.ang.z||0,T:p.T,kind:'finger'});}
@@ -12429,10 +12436,10 @@ window.__importOutline=function(name,ring,H,qty,side,opts){try{
     if(ex){ /* same part sent again from the phone: update it (outline, depth, name, photo). Quantity and Base/Lid stay as set on the computer. */
       if(ex.photo.edit&&(ex.photo.edit.bg||ex.photo.edit.pb)&&JSON.stringify(ex.photo.outline)===JSON.stringify(photo.outline)&&JSON.stringify(ex.photo.pbox)===JSON.stringify(photo.pbox)){if(ex.photo.edit.bg)photo.edit.bg=ex.photo.edit.bg;if(ex.photo.edit.pb)photo.edit.pb=ex.photo.edit.pb;if(ex.photo.thumbPh)photo.thumbPh=ex.photo.thumbPh;photo.hasPhoto=true;} // same outline, no new photo: keep the photo we already have
       for(const q of S.parts.filter(z=>String(z.gid)===String(ex.gid))){q.pos=pos;q.st=stt;q.sample=pos;q.photo=photo;q.name=name;q.kind='photo';const al=allowedTs(q);if(al&&al.length&&!al.includes(q.T))q.T=al[0];}
-      if(opts.nt)phoneNotches(ex,opts.nt,x0,y0,bw,bh);phoneTurns(ex,opts.zr);if(opts.pl&&(side==='base'||side==='lid'))S.parts.filter(q=>q.gid===ex.gid).forEach(q=>{q.side=side;});
+      if(opts.nt)phoneNotches(ex,opts.nt,x0,y0,bw,bh);phoneTurns(ex,opts.zr);phonePos(ex,opts.xy);if(opts.pl&&(side==='base'||side==='lid'))S.parts.filter(q=>q.gid===ex.gid).forEach(q=>{q.side=side;});
       S.cache.clear();S.cav.clear();S.vecC.clear();S.ladder=null;S.custom=null;S.dirty3=true;S.vec=null;S.vecWant=true;
       if(typeof renderAll==='function')renderAll();return ex;}}
-  const p=newPart({name,pos,st:stt,R0:RI,box:true,simple:true,kind:'photo',sample:pos});p.photo=photo;placeNew(p);S.parts.push(p);S.sel=p.id;S.open=new Set([p.gid]);S.ladder=null;S.custom=null;try{if(qty>1&&typeof setQty==='function')setQty(p.gid,Math.min(20,Math.round(qty)));}catch(e){console.error(e);}if(side==='base'||side==='lid'||side==='auto')S.parts.filter(q=>q.gid===p.gid).forEach(q=>{q.fitSide=side;});if(opts&&opts.nt)phoneNotches(p,opts.nt,x0,y0,bw,bh);if(opts)phoneTurns(p,opts.zr);if(opts&&opts.pl&&(side==='base'||side==='lid'))S.parts.filter(q=>q.gid===p.gid).forEach(q=>{q.side=side;});return p;
+  const p=newPart({name,pos,st:stt,R0:RI,box:true,simple:true,kind:'photo',sample:pos});p.photo=photo;placeNew(p);S.parts.push(p);S.sel=p.id;S.open=new Set([p.gid]);S.ladder=null;S.custom=null;try{if(qty>1&&typeof setQty==='function')setQty(p.gid,Math.min(20,Math.round(qty)));}catch(e){console.error(e);}if(side==='base'||side==='lid'||side==='auto')S.parts.filter(q=>q.gid===p.gid).forEach(q=>{q.fitSide=side;});if(opts&&opts.nt)phoneNotches(p,opts.nt,x0,y0,bw,bh);if(opts){phoneTurns(p,opts.zr);phonePos(p,opts.xy);}if(opts&&opts.pl&&(side==='base'||side==='lid'))S.parts.filter(q=>q.gid===p.gid).forEach(q=>{q.side=side;});return p;
 }catch(e){console.error(e);return null;}};
 /* a visible "working" window while the outline editor opens (big parts can take a few seconds) */
 function busyOpen(fn){let el=document.getElementById('ppBusyOv');
@@ -12463,7 +12470,7 @@ window.PP={_narrow:()=>{const w=layNarrow();const ppm=PPM/(st.k||1);return w?w.m
   const wait=(n)=>{if(window.__importOutline&&typeof renderAll==='function'&&typeof S!=='undefined'&&S.parts)return run();if(n>1200){const sp=document.getElementById('fitSplash');if(sp)sp.remove();alert('The tool took too long to open. Go back to the phone app and try again.');return;}setTimeout(()=>wait(n+1),150);};
   async function run(){try{let b=m[2].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';const bin=atob(b),u8=Uint8Array.from(bin,c=>c.charCodeAt(0));let txt;
     if(m[1]==='z'){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(u8);w.close();txt=await new Response(ds.readable).text();}else txt=new TextDecoder().decode(u8);
-    const data=JSON.parse(txt);let n=0;for(const it of data.items||[]){const ring=[];for(let i=0;i+1<it.o.length;i+=2)ring.push([it.o[i]/10,it.o[i+1]/10]);if(it.s)window.__fitPlaced=true;if(window.__importOutline(it.n||'Phone part',ring,+it.h,+it.q||1,it.s,{id:it.i,nt:it.nt,pl:it.pl,zr:it.zr}))n+=Math.max(1,Math.min(20,Math.round(+it.q||1)));}
+    const data=JSON.parse(txt);let n=0;for(const it of data.items||[]){const ring=[];for(let i=0;i+1<it.o.length;i+=2)ring.push([it.o[i]/10,it.o[i+1]/10]);if(it.s)window.__fitPlaced=true;if(window.__importOutline(it.n||'Phone part',ring,+it.h,+it.q||1,it.s,{id:it.i,nt:it.nt,pl:it.pl,zr:it.zr,xy:it.xy}))n+=Math.max(1,Math.min(20,Math.round(+it.q||1)));}
     history.replaceState(null,'',location.pathname+location.search);
     // save to the phone library
     try{for(const it of (data.items||[]).slice().reverse()){const ring=[];for(let i=0;i+1<it.o.length;i+=2)ring.push([it.o[i]/10,it.o[i+1]/10]);window.__libPut({id:it.i?'ph-'+it.i:Date.now()+'-'+Math.random().toString(36).slice(2),pid:it.i||null,name:it.n||'Phone part',ring,h:+it.h,q:+it.q||1,s:it.s||'auto',at:Date.now()});}}catch(e){console.error('phone lib save',e);}
@@ -12745,7 +12752,9 @@ function tmUpd(){const has=!!TMV.sel;q('#tmL').disabled=q('#tmR').disabled=!has;
   else{st.className='tmStat ok';st.textContent='✓ Fits in '+(cs?nm(cs):'this case')+'.';}}
 function tmOpen(){if(!NF.shown||FIT.busy||!S.fm){toast('Pick a case that fits first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;TMV.snap0=tmSnap();recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
 function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')||'{}'),by={};for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;(by[id]=by[id]||[]).push(p.rotLock?Math.round(p.ang.z):null);}
-  for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}}
+  for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}
+  try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);(by[id]=by[id]||[]).push(p.where==='base'?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]:null);}
+  for(const id in by)all[id]={c:cs,p:by[id]};localStorage.setItem('fa_pos',JSON.stringify(all));}catch(e){}}
 function tmClose(keep){TMV.on=false;TMV.drag=null;q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{tmSaveTurns();if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
   after();render();setTimeout(()=>{try{frontTilt();}catch(e){}},250);}
 function tmTurn(d){const p=TMV.sel;if(!p)return;TMV.undo.push(tmSnap());TMV.msg=null;const [cx,cy]=center(p);p.ang.z=((p.ang.z+d)%360+360)%360;p.rotLock=true;const h=getOriented(p).hm;p.x=Math.round(cx-h.w/2);p.y=Math.round(cy-h.h/2);recalc();tmDraw();tmUpd();}
