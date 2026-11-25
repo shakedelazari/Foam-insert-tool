@@ -296,7 +296,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <div class="cvBox" id="lfBox" style="flex:1 0 250px;max-height:360px"><canvas id="lfCv"></canvas><span class="lfAddL">Add a notch</span><button class="lfAdd" id="lfAdd" type="button" aria-label="Add a notch">+</button><div class="lfTip" id="lfTip"></div></div>
   <div style="font-size:14px;font-weight:600" id="lfCount">Notches: 0 of 4</div>
   <div class="lfShape"><div class="seg2" id="lfShape"><button data-sh="round">Round</button><button data-sh="slot">Wide slot</button></div><div class="lfLen" id="lfLen"><button data-d="-10" aria-label="Shorter">−</button><span id="lfLenTxt"></span><button data-d="10" aria-label="Longer">+</button></div></div>
-  <div class="lfLg"><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#F05325" stroke-width="2.6"/><path d="M-6 0h12M-6 0l3-3M-6 0l3 3M6 0l-3-3M6 0l-3 3" stroke="#F05325" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drag to move it along the edge</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#292524" stroke-width="1.8" stroke-dasharray="3.5 2.5"/><path d="M-5 0h10M0 -5v10" stroke="#292524" stroke-width="2.2" stroke-linecap="round"/></svg>Tap to add a notch</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#F05325"/><path d="M-4.5 -4.5l9 9M4.5 -4.5l-9 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Tap a notch again to remove it</div></div>
+  <div class="lfLg"><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#F05325" stroke-width="2.6"/><path d="M-6 0h12M-6 0l3-3M-6 0l3 3M6 0l-3-3M6 0l-3 3" stroke="#F05325" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drag to move it along the edge</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#F05325"/><path d="M-5 0h10M0 -5v10" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Tap + to add a notch</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#F05325"/><path d="M-4.5 -4.5l9 9M4.5 -4.5l-9 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Tap a notch again to remove it</div></div>
   <div class="grow"></div>
   <button class="pri" id="lfDone">Done</button>
   <button class="sec" id="lfCancel">Cancel</button>
@@ -384,7 +384,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.17 · 25 Nov 2026';
+const APP_VERSION='A1.18 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -846,7 +846,7 @@ function slotTs(r){ // where a line through the middle meets the outline: left, 
 function lfOrder(q){const xs=q.ring.map(p=>p[0]),ys=q.ring.map(p=>p[1]);return (Math.max(...xs)-Math.min(...xs))>=(Math.max(...ys)-Math.min(...ys))?[3,2,0,1]:[0,1,3,2];}
 function openLift(id,fresh){const q=P.parts.find(x=>x.id===id);if(!q)return;LF.id=id;LF.fresh=fresh;const ts=slotTs(q.ring);
   LF.slots=ts.map((t,k)=>{const n=q.notches.find(z=>z.slot===k);return {t:n?n.t:t,open:!!n,home:t,w:n&&n.w>SLOT_MIN?n.w:SLOT_MIN};});
-  if(fresh&&!q.notches.length){const o=lfOrder(q);LF.slots[o[0]].open=true;LF.slots[o[1]].open=true;} // start with 2 notches on the long sides
+  if(fresh&&!q.notches.length){LF.slots[lfOrder(q)[0]].open=true;} // start with 1 notch on a long side
   LF.sel=LF.slots[3].open?3:lfFirstOpen();LF.drag=-1;LF.ghost=null;LF.demo=null;
   let seen=false;try{seen=localStorage.getItem('fa_lift_hint')==='1';}catch(e){}LF.hint=!seen;
   show('sLift');}
@@ -856,7 +856,7 @@ function lfHint(){const t0=performance.now();const step=now=>{if(!LF.hint||CURS!
 FWD.sLift=()=>()=>liftDone();
 function liftDone(){const q=P.parts.find(x=>x.id===LF.id);if(!q)return back();LF.hint=false;q.notches=LF.slots.map((s,k)=>s.open?(s.w>SLOT_MIN+0.5?{slot:k,t:+s.t.toFixed(4),w:Math.round(s.w)}:{slot:k,t:+s.t.toFixed(4)}):null).filter(Boolean);q.lift=q.notches.length>0;saveAll();back();}
 $('#lfDone').onclick=liftDone;
-$('#lfAdd').onclick=()=>{const q=P.parts.find(x=>x.id===LF.id);if(!q)return;const k=lfOrder(q).find(i=>!LF.slots[i].open);if(k==null){toast('Up to 4 notches.');return;}const s=LF.slots[k];s.open=true;s.t=s.home;s.w=SLOT_MIN;LF.sel=k;LF.hint=false;drawLift();};$('#lfCancel').onclick=()=>{LF.hint=false;back();};
+$('#lfAdd').onclick=()=>{const q=P.parts.find(x=>x.id===LF.id);if(!q)return;const o=lfOrder(q),k=o.find(i=>!LF.slots[i].open);if(k==null){toast('Up to 4 notches.');return;}const s=LF.slots[k],t0=LF.slots[o[0]].home,near=t=>LF.slots.some(z=>z.open&&Math.min(Math.abs(z.t-t),1-Math.abs(z.t-t))<0.03);let t=t0,n=0;while(near(t)&&n<12){n++;t=(t0+0.06*n)%1;}s.open=true;s.t=t;s.w=SLOT_MIN;LF.sel=k;LF.hint=false;drawLift();};$('#lfCancel').onclick=()=>{LF.hint=false;back();};
 $('#lfShape').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;if(b.dataset.sh==='round')s.w=SLOT_MIN;else if(s.w<=SLOT_MIN+0.5)s.w=Math.min(SLOT_MAX,SLOT_MIN+30);drawLift();};
 $('#lfLen').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;s.w=Math.max(SLOT_MIN+10,Math.min(SLOT_MAX,s.w+(+b.dataset.d)));drawLift();};
 function drawLift(){const q=P.parts.find(x=>x.id===LF.id),box=$('#lfBox'),cv=$('#lfCv');if(!q)return;const r=q.ring,dpr=devicePixelRatio||1,W=box.clientWidth,H=box.clientHeight;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
@@ -873,7 +873,7 @@ function drawLift(){const q=P.parts.find(x=>x.id===LF.id),box=$('#lfBox'),cv=$('
   // where the dragged notch started
   if(LF.ghost!=null&&LF.drag>=0&&LF.moved){const p=ringAt(r,LF.ghost);g.save();g.beginPath();g.arc(X(p.x),Y(p.y),15,0,7);g.setLineDash([4,3]);g.lineWidth=2;g.strokeStyle='rgba(240,83,37,.7)';g.stroke();g.restore();}
   // empty spots: dashed + circle on the outline
-  LF.slots.forEach(s=>{if(s.open)return;const p=ringAt(r,s.home),cx=X(p.x),cy=Y(p.y);g.save();g.beginPath();g.arc(cx,cy,15,0,7);g.fillStyle='#fff';g.fill();g.setLineDash([4,3]);g.lineWidth=2;g.strokeStyle='#292524';g.stroke();g.setLineDash([]);g.lineCap='round';g.lineWidth=2.4;g.beginPath();g.moveTo(cx-6,cy);g.lineTo(cx+6,cy);g.moveTo(cx,cy-6);g.lineTo(cx,cy+6);g.stroke();g.restore();});
+  // (no empty spots: notches are added with the + button)
   // handles
   let hx=null,hy=null;
   LF.slots.forEach((s,i)=>{if(!s.open)return;const t=tOf(i),p=ringAt(r,t),cx=X(p.x),cy=Y(p.y);g.save();g.translate(cx,cy);
@@ -893,7 +893,7 @@ function lfUpd(){const s=LF.slots[LF.sel],on=!!(s&&s.open),slot=on&&s.w>SLOT_MIN
   $$('#lfShape button').forEach(b=>{const m=b.dataset.sh==='slot'?slot:on&&!slot;b.classList.toggle('on',m);b.disabled=!on;});
   $('#lfLen').classList.toggle('on',slot);if(slot)$('#lfLenTxt').textContent=P&&P.unit==='in'?(s.w/25.4).toFixed(2)+' in':Math.round(s.w)+' mm';}
 (function(){const cv=$('#lfCv'),pt=e=>{const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
-  const dist=(q,i,x,y)=>{const s=LF.slots[i],G=LF.geo;if(!s.open){const p=ringAt(q.ring,s.home);return Math.hypot(G.X(p.x)-x,G.Y(p.y)-y);}
+  const dist=(q,i,x,y)=>{const s=LF.slots[i],G=LF.geo;if(!s.open)return 1e9;
     const p=ringAt(q.ring,s.t),an=-slotAng(q.ring,s.t,s.w),dx=x-G.X(p.x),dy=y-G.Y(p.y),u=dx*Math.cos(an)+dy*Math.sin(an),v=-dx*Math.sin(an)+dy*Math.cos(an),hl=Math.max(0,(s.w/2-NOTCH_R)*G.k);return Math.hypot(Math.max(0,Math.abs(u)-hl),v);};
   cv.addEventListener('pointerdown',e=>{const q=P&&P.parts.find(x=>x.id===LF.id);if(!q||!LF.geo)return;LF.hint=false;LF.demo=null;const [x,y]=pt(e);let best=-1,bd=1e9;
     LF.slots.forEach((s,i)=>{const d=dist(q,i,x,y);if(d<bd){bd=d;best=i;}});

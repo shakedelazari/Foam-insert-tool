@@ -12743,7 +12743,7 @@ body.fitmode #zoomBar,body.fitmode #layout .stage-note{display:none!important}
 html[data-theme=dark] .tmSide{border-color:#EDE8DD}html[data-theme=dark] .tmSide button{background:#2b2826;color:#EDE8DD}
 html[data-theme=dark] .tmSide button+button{border-left-color:#EDE8DD}html[data-theme=dark] .tmSide button.on{background:#F05325;color:#fff}
 html[data-theme=dark] .tmAng{background:#2b2826;color:#EDE8DD}html[data-theme=dark] .tmAng small{color:#aaa196}
-body.fitmode #rotBar,body.fitmode #ctxMenu,body.fitmode #checksList{display:none!important}
+body.fitmode #rotBar,body.fitmode #ctxMenu,body.fitmode #checksList{display:none!important}.nfdot{position:absolute;right:3px;top:3px;width:9px;height:9px;border-radius:50%;background:#FFD54A;border:1.5px solid #fff}body.nfreal #nfWhy{max-height:6.2em;overflow-y:auto}#nfWhy u{cursor:pointer;font-weight:700}#rsOver{position:fixed;inset:0;z-index:60;background:rgba(41,37,36,.35);display:none;align-items:flex-end}#rsOver.on{display:flex}.rsSheet{width:100%;background:#fff;border-radius:22px 22px 0 0;padding:16px 18px calc(env(safe-area-inset-bottom) + 16px);display:flex;flex-direction:column;gap:10px;font-family:Poppins,sans-serif;color:#292524;box-sizing:border-box}.rsSheet h4{margin:0;font:700 22px Antonio,sans-serif;text-transform:uppercase}.rsSheet p{margin:0;font-size:13px;line-height:1.4;color:#57504a}.rsStep{display:flex;gap:8px}.rsStep button{width:48px;height:48px;border:2px solid #292524;border-radius:12px;background:#fff;font:700 22px Poppins,sans-serif;color:#292524}#rsV{flex:1;height:48px;border:2px solid #F05325;border-radius:12px;display:grid;place-items:center;font:700 18px Poppins,sans-serif}#rsApply{height:50px;border:0;border-radius:12px;background:#2E7D32;color:#fff;font:600 16px Poppins,sans-serif}#rsCancel{height:32px;border:0;background:none;text-decoration:underline;font:600 14px Poppins,sans-serif;color:inherit}html[data-theme=dark] .rsSheet{background:#2b2826;color:#EDE8DD}html[data-theme=dark] .rsSheet p{color:#aaa196}html[data-theme=dark] .rsStep button{background:#1d1b1a;color:#EDE8DD;border-color:#EDE8DD}
 .nfchip.best{background:#2E7D32;color:#fff}
 .nfchips.few .nfchip:not(.best):not(.sel):not(.more){display:none}
 .nfchips.few .nfchip.best{flex:2.2}
@@ -12788,9 +12788,9 @@ function applyAlign(){if(!NF.shown)return;const k=alignIdx(NF.shown,NF.align);if
 /* ---------- Turn & move parts (top view only: parts turn flat, the outline is cut into the foam the same way) ---------- */
 const TMV={side:'base',on:false,sel:null,drag:null,undo:[],snap0:null,geo:null,img:new WeakMap(),fmC:null,fmK:null,msg:null};
 const tmParts=()=>S.parts.filter(p=>p.where==='base'&&p.cur&&p.cur.cav);
-function tmSnap(){return {parts:S.parts.map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,lock:!!p.rotLock,st:p.stick,pl:p.allow?p.allow.plus:null,side:p.side,where:p.where,lp:!!p.lidPlaced,nf:!!p.noFit,tt:!!p.tooTall})),view:S.side,cs:S.foam.caseId,res:FIT.res,rec:FIT.rec,lad:S.ladder,meta:S.meta,shown:NF.shown,sel:NF.sel};}
+function tmSnap(){return {parts:S.parts.map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,lock:!!p.rotLock,st:p.stick,pl:p.allow?p.allow.plus:null,side:p.side,where:p.where,lp:!!p.lidPlaced,nf:!!p.noFit,tt:!!p.tooTall,sb:p.stickBy?{...p.stickBy}:null,rz:p.raised||0})),view:S.side,cs:S.foam.caseId,res:FIT.res,rec:FIT.rec,lad:S.ladder,meta:S.meta,shown:NF.shown,sel:NF.sel};}
 function tmRestore(sn){if(!sn)return;FIT.res=sn.res;FIT.rec=sn.rec;S.ladder=sn.lad;S.meta=sn.meta;NF.shown=sn.shown;NF.sel=sn.sel;tmGoSide('base',true);if(sn.cs&&sn.cs!==S.foam.caseId)setCase(sn.cs);
-  for(const o of sn.parts){const p=o.p;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.rotLock=o.lock;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.side=o.side;p.lidPlaced=o.lp;p.noFit=!!o.nf;p.tooTall=!!o.tt;}tmGoSide(sn.view||'base',true);}
+  for(const o of sn.parts){const p=o.p;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.rotLock=o.lock;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.side=o.side;p.lidPlaced=o.lp;p.noFit=!!o.nf;p.tooTall=!!o.tt;p.stickBy=o.sb?{...o.sb}:undefined;p.raised=o.rz||0;}tmGoSide(sn.view||'base',true);}
 /* show the base or the lid foam (the engine lays out one side at a time) */
 function tmGoSide(side,quiet){S.side=side==='lid'?'lid':'base';applySideFoam();syncWhere();if(S.side==='lid'&&!quiet)autoLidLayout();recalc();TMV.side=S.side;}
 function tmAngTo(p,z){const [cx,cy]=center(p);p.ang.z=((Math.round(z)%360)+360)%360;p.rotLock=true;const h=getOriented(p).hm;p.x=Math.round(cx-h.w/2);p.y=Math.round(cy-h.h/2);}
@@ -12828,7 +12828,7 @@ function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')
   for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}
   try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);const lid=p.side==='lid';(by[id]=by[id]||[]).push(lid?(p.lidPlaced?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2),1]:null):[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]);}
   for(const id in by)all[id]={c:cs,p:by[id]};localStorage.setItem('fa_pos',JSON.stringify(all));}catch(e){}}
-function tmClose(keep){TMV.on=false;TMV.drag=null;try{q('#tmAng').blur();}catch(e){}q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{const lb=S.side==='lid'&&S.flags&&S.flags.some(x=>x.lv==='bad');tmGoSide('base',true);if(NF.redFor)nfRedMark();else tmSaveTurns();if(lb)toast('Some lid parts overlap or are outside the lid foam. Open Turn & move, pick Lid and tap Auto organize.',4200);if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
+function tmClose(keep){TMV.on=false;TMV.drag=null;try{q('#tmAng').blur();}catch(e){}q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{const lb=S.side==='lid'&&S.flags&&S.flags.some(x=>x.lv==='bad');tmGoSide('base',true);if(NF.redFor){nfRedMark();nfRedSave();}else tmSaveTurns();if(lb)toast('Some lid parts overlap or are outside the lid foam. Open Turn & move, pick Lid and tap Auto organize.',4200);if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
   after();render();setTimeout(()=>{try{frontTilt();}catch(e){}},250);}
 function tmTurn(d){const p=TMV.sel;if(!p)return;TMV.undo.push(tmSnap());TMV.msg=null;tmAngTo(p,p.ang.z+d);recalc();tmDraw();tmUpd();}
 async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=null;
@@ -12862,12 +12862,32 @@ async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=
   addEventListener('resize',()=>{if(TMV.on)tmDraw();});})();
 
 /* ---------- a case that does not fit: same 3D view as a good case; the parts that fit are laid in it (centred, spread), the rest wait in red next to the case ---------- */
-const nfFlagsOff=()=>S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;p.badFit=false;});
+const nfFlagsOff=()=>S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;p.badFit=false;p.raised=0;});
 function nfRedClear(){if(!NF.redFor)return;const sn=NF.goodSnap;NF.redFor=null;NF.redInfo=null;nfFlagsOff();const ks=NF.sel;if(sn)tmRestore(sn);NF.sel=ks;NF.goodSnap=null;S.dirty3=true;after();}
 function nfRedShow(cs){if(NF.redFor===cs.id)return;
   if(!NF.redFor)NF.goodSnap=tmSnap();else{nfFlagsOff();const ks=NF.sel;tmRestore(NF.goodSnap);NF.sel=ks;}
-  NF.redFor=cs.id;setCase(cs.id);S.fit3=true;S.side='base';applySideFoam();syncWhere();S.parts.forEach(p=>{if(p.side==='lid')p.lidPlaced=false;});recalc();
-  nfRedPack(cs);S.dirty3=true;after();setTimeout(nfRedFrame,80);setTimeout(nfRedFrame,700);}
+  NF.redFor=cs.id;NF.redSaved=NF.redSaved||{};nfRedInit();
+  if(NF.redSaved[cs.id]){const ks=NF.sel;tmRestore(NF.redSaved[cs.id]);NF.sel=ks;NF.redInfo=nfRedInfo();setTimeout(()=>toast('Your changes in '+nm(cs.id)+' are kept'),120);}
+  else{setCase(cs.id);S.fit3=true;S.side='base';applySideFoam();syncWhere();S.parts.forEach(p=>{if(p.side==='lid')p.lidPlaced=false;});recalc();nfRedPack(cs);}
+  S.dirty3=true;after();setTimeout(nfRedFrame,80);setTimeout(nfRedFrame,700);}
+function nfRedSave(){if(!NF.redFor)return;NF.redSaved=NF.redSaved||{};NF.redSaved[NF.redFor]=tmSnap();}
+function nfRedReset(){const id=NF.redFor;if(!id)return;delete NF.redSaved[id];const ks=NF.sel;nfFlagsOff();tmRestore(NF.goodSnap);NF.sel=ks;NF.redFor=null;nfRedShow(CASES.find(c=>c.id===id));render();}
+function nfRedInit(){if(NF._rsInit)return;NF._rsInit=1;
+  q('#nfWhy').addEventListener('click',e=>{const t=e.target.closest('[data-raise],[data-reset]');if(!t||!NF.redFor)return;if(t.dataset.reset){nfRedReset();return;}nfRaiseOpen(S.parts.find(p=>String(p.id)===t.dataset.raise));});
+  try{T3.r.domElement.addEventListener('pointerup',()=>setTimeout(()=>{if(!NF.redFor||!S.sel)return;const p=S.parts.find(x=>x.id===S.sel);S.sel=null;if(p&&p.tooTall)nfRaiseOpen(p);},90),true);}catch(e){}}
+/* a part that is too tall: raise it (sits higher, goes up into the lid foam) for this layout only. The library depth stays. */
+function nfRaiseOpen(p){if(!p||!NF.redFor)return;recalc();if(!p.cur)return;const cs=CASES.find(c=>c.id===NF.redFor),need=Math.max(1,Math.ceil(p.cur.sNeed||0)),now=Math.max(0,stickFor(p,p.T)||0),over=Math.max(1,Math.ceil((p.cur.sNeed||0)-now));
+  NF.rs={p,v:Math.max(need,now)};const o=nfRsEl();q('#rsT').textContent=p.name+' · '+over+' mm too tall for '+nm(cs.id);
+  q('#rsP').innerHTML='Raise the part so it sits higher in the foam and goes up into the lid foam. <b>Only for this layout in '+nm(cs.id)+'.</b> The part in your library stays '+Math.round(p.cur.H)+' mm deep.';
+  q('#rsN').textContent=need+' mm is what this case needs. The lid foam above it is cut deeper to match.';nfRsUpd();o.classList.add('on');}
+function nfRsUpd(){q('#rsV').textContent='Raise '+NF.rs.v+' mm';}
+function nfRsEl(){let o=q('#rsOver');if(o)return o;o=document.createElement('div');o.id='rsOver';
+  o.innerHTML='<div class="rsSheet" role="dialog" aria-label="Raise the part"><h4 id="rsT"></h4><p id="rsP"></p><div class="rsStep"><button id="rsM" type="button" aria-label="Less">−</button><div id="rsV"></div><button id="rsPl" type="button" aria-label="More">+</button></div><p id="rsN" class="rsn"></p><button id="rsApply" type="button">Apply to this layout</button><button id="rsCancel" type="button">Cancel</button></div>';document.body.appendChild(o);
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');});q('#rsCancel').onclick=()=>o.classList.remove('on');
+  q('#rsM').onclick=()=>{NF.rs.v=Math.max(0,NF.rs.v-1);nfRsUpd();};q('#rsPl').onclick=()=>{NF.rs.v=Math.min(80,NF.rs.v+1);nfRsUpd();};q('#rsApply').onclick=nfRaiseApply;return o;}
+function nfRaiseApply(){const p=NF.rs&&NF.rs.p,v=NF.rs?NF.rs.v:0;q('#rsOver').classList.remove('on');if(!p)return;setStick(p,p.T,v);recalc();p.raised=v;p.tooTall=!!(p.cur&&p.cur.sNeed>p.allow.plus+1e-6);
+  nfRedMark();nfRedSave();S.dirty3=true;after();render();const lid=(S.flags||[]).some(x=>x.lv==='bad'&&/lid/i.test(x.t)&&x.t.indexOf(p.name)===0);
+  toast(p.tooTall?p.name+' needs a bit more: raise it more.':lid?p.name+' raised '+v+' mm, but the lid may not close. Check the lid space.':p.name+' raised '+v+' mm for this layout.',3600);}
 /* lay in what fits (biggest first, each in the first spot it fits), the rest waits next to the case */
 function nfRedPack(cs){nfFlagsOff();recalc();
   const fm=S.fm,set=S.set,al=allowedMask(fm,set.edge),avail=cs.base-set.floor,bs=S.parts.filter(p=>p.where==='base'),fixed=[],out=[];
@@ -12886,16 +12906,18 @@ function nfParkOut(){const fm=S.fm;let ox=fm.w+45,oy=0,colW=0;for(const p of S.p
 function nfBringIn(){const fm=S.fm;let n=0;for(const p of S.parts.filter(q=>q.noFit)){p.noFit=false;const h=getOriented(p).hm;p.x=Math.round(fm.w/2-h.w/2)+n*12;p.y=Math.round(fm.h/2-h.h/2)-n*12;n++;}if(n)recalc();return n;}
 function nfRedMark(){S.parts.forEach(p=>{p.badFit=false;});try{for(const p of tmBad())p.badFit=true;}catch(e){}NF.redInfo=nfRedInfo();S.dirty3=true;}
 const nfNames=a=>[...new Set(a.map(p=>p.name))].map(n=>[n,a.filter(p=>p.name===n).length]);
-function nfRedInfo(){const out=S.parts.filter(p=>p.noFit),tall=S.parts.filter(p=>p.tooTall&&!p.noFit),bad=S.parts.filter(p=>p.badFit&&!p.noFit);
-  return {out:nfNames(out),n:out.length,tall:[...new Set(tall.map(p=>p.name))],bad:nfNames(bad),nb:bad.length,fingers:out.concat(tall,bad).some(p=>(p.fingers||[]).some(f=>f.shape))};}
+function nfRedInfo(){const out=S.parts.filter(p=>p.noFit),tall=S.parts.filter(p=>p.tooTall&&!p.noFit),bad=S.parts.filter(p=>p.badFit&&!p.noFit),rz=S.parts.filter(p=>p.raised>0&&!p.tooTall&&!p.noFit),first=a=>{const m=new Map();for(const p of a)if(!m.has(p.name))m.set(p.name,p);return [...m.values()];};
+  return {out:nfNames(out),n:out.length,tall:[...new Set(tall.map(p=>p.name))],tallP:first(tall).map(p=>[p.name,p.id]),raised:first(rz).map(p=>[p.name,p.raised]),bad:nfNames(bad),nb:bad.length,fingers:out.concat(tall,bad).some(p=>(p.fingers||[]).some(f=>f.shape))};}
 function nfRedFrame(){try{frontTilt();const ps=S.parts.filter(p=>p.noFit);if(!ps.length||typeof T3==='undefined'||!T3.ready)return;const f=S.foam;let mx=f.L;for(const p of ps){const h=getOriented(p).hm;mx=Math.max(mx,p.x+h.w+30);}T3.t.x=mx/2;T3.dist*=Math.max(1,mx/f.L)*0.86;camUpdate();}catch(e){}}
 function nfRedLines(cs){const I=NF.redInfo||nfRedInfo(),L=[],c='<b>'+nm(cs.id)+':</b> ',lst=a=>a.map(([n,k])=>'<b>'+nfEsc(n)+'</b>'+(k>1?' ×'+k:'')).join(', ');
-  if(I.n)L.push(c+lst(I.out)+(I.n===1?' does':' do')+' not fit (red, next to the case).');
+  if(I.n)L.push(c+lst(I.out)+(I.n===1?' does':' do')+' not fit in length or width (red, beside the case).');
   else if(I.nb)L.push(c+lst(I.bad)+(I.nb===1?' overlaps or sticks out':' overlap or stick out')+' (red).');
-  if(I.tall.length)L.push((L.length?'':c)+I.tall.map(n=>'<b>'+nfEsc(n)+'</b>').join(', ')+(I.tall.length>1?' are':' is')+' too deep (red in the case).');
+  const tp=I.tallP||[];if(tp.length)L.push((L.length?'':c)+tp.map(([n,id])=>'<u data-raise="'+id+'">'+nfEsc(n)+'</u>').join(', ')+(tp.length>1?' are':' is')+' too tall (red, in the case): tap '+(tp.length>1?'a name':'it')+' to raise it.');
+  const rz=I.raised||[];if(rz.length&&!tp.length)L.push((L.length?'':c)+rz.map(([n,v])=>'<b>'+nfEsc(n)+'</b> raised '+v+' mm ✓').join(', ')+'.');
   if(!L.length){const b=(S.flags||[]).find(x=>x.lv==='bad');L.push(c+(b?nfEsc(b.t):'✓ No overlaps like this. Check the depth before you choose it.'));}
-  else L.push('Try it: tap Turn &amp; move.'+(I.fingers?' Fewer or smaller finger notches save room.':''));
-  return L.slice(0,3);}
+  else if(I.n||I.nb)L.push('Try it: tap Turn &amp; move.'+(I.fingers?' Fewer or smaller finger notches save room.':''));
+  if(NF.redSaved&&NF.redSaved[cs.id])L.push('<u data-reset="1">Start this case again</u>');
+  return L.slice(0,4);}
 /* lid: closed -> open -> fully open (flat, 180°) -> closed */
 function nfLidLab(a){return a<50?'Open lid':a<150?'Open flat':'Close lid';}
 function nfLidFrame(a){try{frontTilt();if(a>=150&&typeof T3!=='undefined'&&T3.ready){const f=S.foam;T3.t.y=f.W;T3.dist*=1.4;camUpdate();}}catch(e){}}
@@ -12989,7 +13011,7 @@ function render(){
   const bid=bestId(),rec=bid?CASES.find(c=>c.id===bid):null,ord=sizeOrder();if(!NF.sel)NF.sel=rec?rec.id:ord[ord.length-1].id;
   document.body.classList.toggle('nfhas',!!rec);
   q('#nfH').textContent=rec?'Best fit: '+nm(rec.id):'No case fits';
-  q('#nfChips').innerHTML=ord.map(c=>{const s=stat(c.id),lab={no:'NO',yes:'YES',best:'BEST'}[s];return `<button class="nfchip ${s}${NF.sel===c.id?' sel':''}" data-id="${c.id}" aria-label="${nm(c.id)} ${lab}">${nm(c.id)}<span>${lab}</span></button>`;}).join('');{const ch=q('#nfChips');ch.classList.toggle('few',!NF.all&&!!rec);if(rec)ch.insertAdjacentHTML('beforeend','<button class="nfchip more" data-more="1">'+(NF.all?'Fewer ▴':'Other cases ▾')+'</button>');}
+  q('#nfChips').innerHTML=ord.map(c=>{const s=stat(c.id),lab={no:'NO',yes:'YES',best:'BEST'}[s];return `<button class="nfchip ${s}${NF.sel===c.id?' sel':''}" data-id="${c.id}" aria-label="${nm(c.id)} ${lab}">${nm(c.id)}<span>${lab}</span>${NF.redSaved&&NF.redSaved[c.id]?'<i class="nfdot" title="You changed this case"></i>':''}</button>`;}).join('');{const ch=q('#nfChips');ch.classList.toggle('few',!NF.all&&!!rec);if(rec)ch.insertAdjacentHTML('beforeend','<button class="nfchip more" data-more="1">'+(NF.all?'Fewer ▴':'Other cases ▾')+'</button>');}
   const sel=CASES.find(c=>c.id===NF.sel),ss=stat(NF.sel),w=q('#nfWhy');let lines;
   const lidOnly=ss==='no'&&/lid/i.test((FIT.res&&FIT.res.why[sel.id])||''),realRed=ss==='no'&&!lidOnly&&!!NF.shown;if(NF.redFor&&!realRed)nfRedClear();if(realRed)nfRedShow(sel);
   if(ss==='no')lines=(realRed&&NF.redInfo)?nfRedLines(sel):reasonFor(sel).map((x,i)=>i?x:'<b>'+nm(sel.id)+':</b> '+x);
