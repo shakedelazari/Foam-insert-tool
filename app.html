@@ -57,9 +57,9 @@ p{margin:0}
 .camTop{position:absolute;left:16px;right:16px;top:calc(env(safe-area-inset-top) + 14px);z-index:3}
 .camChips{position:absolute;right:16px;top:calc(env(safe-area-inset-top) + 58px);z-index:3;display:flex;gap:8px}
 .camChip{background:rgba(41,37,36,.55);color:#fff;border:2px solid rgba(255,255,255,.75);border-radius:16px;padding:4px 12px;font:600 13px Poppins,sans-serif}
-#lvl{position:absolute;width:112px;height:112px;margin:-56px 0 0 -56px;pointer-events:none;z-index:2;opacity:.92}
+#lvl{position:absolute;width:300px;height:300px;margin:-150px 0 0 -150px;overflow:visible;pointer-events:none;z-index:2;opacity:.92}
 #lvlTxt{position:absolute;left:0;right:0;text-align:center;color:#fff;font:600 13px Poppins,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:none;z-index:2}
-.gd{fill:#F05325;animation:gd 1.2s infinite}.gd.g2{animation-delay:.2s}.gd.g3{animation-delay:.4s}
+.gd{fill:#fff;stroke:rgba(41,37,36,.55);stroke-width:1}.gd.g2{animation-delay:.2s}.gd.g3{animation-delay:.4s}
 @keyframes gd{0%,100%{opacity:.25}50%{opacity:1}}
 #camMsg{position:absolute;left:24px;right:24px;top:40%;text-align:center;color:#fff;font-size:15px;display:none;z-index:2}
 .camBot{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -166,6 +166,8 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 .shEx span{position:absolute;left:10px;top:10px;z-index:1;background:#fff;color:#292524;border-radius:999px;padding:3px 12px;font:600 12px Poppins,sans-serif}
 .shLbl{font:700 12px Poppins,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:-6px}
 .shCards{display:flex;gap:10px}.shCards .sheetc{flex:1;padding:10px 13px}.shCards .sheetc.on{padding:9px 12px}
+.camChip.on{background:rgba(46,125,50,.85);border-color:#fff}
+#shut.heard{box-shadow:0 0 0 7px rgba(46,125,50,.85)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -220,11 +222,11 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <section id="sCam" class="scr" aria-label="Take photo">
   <video id="vid" playsinline muted autoplay></video>
   <div id="camFrame"></div>
-  <svg id="lvl" viewBox="0 0 140 140" aria-label="Level: move the orange dot into the centre circle" role="img"><circle cx="70" cy="70" r="66" fill="rgba(41,37,36,0.30)" stroke="#fff" stroke-width="3"/><circle cx="70" cy="70" r="18" fill="none" stroke="#fff" stroke-width="3"/><g id="lvlGuide"><circle class="gd g1" r="4.5"/><circle class="gd g2" r="3.8"/><circle class="gd g3" r="3.1"/></g><circle id="lvlDot" cx="70" cy="70" r="11" fill="#F05325" stroke="#fff" stroke-width="2"/></svg>
+  <svg id="lvl" viewBox="0 0 300 300" aria-label="Level: move the white bubble into the centre circle" role="img"><circle id="lvlOut" cx="150" cy="150" r="147" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" stroke-dasharray="1 8" stroke-linecap="round"/><circle id="lvlIn" cx="150" cy="150" r="24" fill="rgba(41,37,36,.30)" stroke="#fff" stroke-width="3"/><g id="lvlGuide"><circle class="gd" r="4"/><circle class="gd" r="4"/><circle class="gd" r="4"/><circle class="gd" r="4"/><circle class="gd" r="4"/><circle class="gd" r="4"/></g><circle id="lvlDot" cx="150" cy="150" r="14" fill="#fff" stroke="#292524" stroke-width="3"/></svg>
   <div id="lvlTxt"></div>
   <div id="camMsg"></div>
   <div class="nav camTop"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <div class="camChips"><button class="camChip" id="zoomChip">1.5×</button><button class="camChip" id="flashChip" style="display:none">Flash: On</button></div>
+  <div class="camChips"><button class="camChip" id="voiceChip" style="display:none">🎤 Voice: Off</button><button class="camChip" id="zoomChip">1.5×</button><button class="camChip" id="flashChip" style="display:none">Flash: On</button></div>
   <div class="camBot">
     <div id="camSheet"></div>
     <div class="shutRow">
@@ -369,7 +371,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.12 · 25 Nov 2026';
+const APP_VERSION='A1.13 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -477,9 +479,9 @@ let stream=null,levelOn=false,hwZoom=1,digZoom=1,ZOOM=1.5,tiltNow=null,FLASH=tru
 try{const z=+localStorage.getItem('fa_zoom');if(z>=1&&z<=4)ZOOM=z;if(localStorage.getItem('fa_flash')==='off')FLASH=false;}catch(e){}
 function camFrame(){const f=$('#camFrame');if(!f||!P)return;const S0=SHEETS[P.sheet],r=S0.h/S0.w,W=innerWidth,H=innerHeight,w=Math.min(W*0.92,H*0.8/r),h=w*r,top=Math.max(10,(H-h)/2-6),left=(W-w)/2;
   f.style.width=w+'px';f.style.height=h+'px';f.style.left=left+'px';f.style.top=top+'px';
-  const lv=$('#lvl');lv.style.left=(left+w/2)+'px';lv.style.top=(top+h/2)+'px';$('#lvlTxt').style.top=(top+h/2+62)+'px';$('#camSheet').textContent='Sheet: '+S0.n+' · '+S0.lab;}
+  const lv=$('#lvl');lv.style.left=(left+w/2)+'px';lv.style.top=(top+h/2)+'px';lvlSize(w);$('#lvlTxt').style.top=(top+h/2+LV.D/2+8)+'px';$('#camSheet').textContent='Sheet: '+S0.n+' · '+S0.lab;}
 addEventListener('resize',()=>{if(CURS==='sCam')camFrame();});
-ENTER.sCam=()=>{requestAnimationFrame(camFrame);$('#lvlGuide').style.display='none';$('#lvlTxt').textContent='';};
+ENTER.sCam=()=>{requestAnimationFrame(camFrame);LV.show=false;$('#lvlGuide').style.display='none';$('#lvlTxt').textContent='';lvlLoop();voiceAuto();};
 FWD.sCam=()=>CUR&&CUR.cut?()=>show('sOutline'):null;
 async function applyZoom(){const v=$('#vid'),tr=stream&&stream.getVideoTracks()[0];let caps={};try{caps=tr&&tr.getCapabilities?tr.getCapabilities():{};}catch(e){}hwZoom=1;
   if(caps&&caps.zoom){const z=Math.min(caps.zoom.max,Math.max(caps.zoom.min,ZOOM));try{await tr.applyConstraints({advanced:[{zoom:z}]});hwZoom=z;}catch(e){hwZoom=1;}}
@@ -490,17 +492,34 @@ async function startCam(){{const DO=window.DeviceOrientationEvent;if(!(DO&&typeo
     const tr=stream.getVideoTracks()[0];let caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{};}catch(e){}canFlash=!!caps.torch;$('#flashChip').style.display=canFlash?'block':'none';flashLabel();
   }catch(e){stream=null;msg.style.display='block';msg.innerHTML='The camera is not available.<br>Allow the camera, or choose a photo.';}
 }
-function stopCam(){torchOn=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
+function stopCam(){voiceStop();torchOn=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
 function flashLabel(){$('#flashChip').textContent='Flash: '+(FLASH?'On':'Off');}
 async function setTorch(on){const tr=stream&&stream.getVideoTracks()[0];if(!tr||on===torchOn)return;try{await tr.applyConstraints({advanced:[hwZoom>1?{zoom:hwZoom,torch:on}:{torch:on}]});torchOn=on;}catch(e){torchOn=false;}}
 $('#flashChip').onclick=()=>{FLASH=!FLASH;try{localStorage.setItem('fa_flash',FLASH?'on':'off');}catch(e){}flashLabel();};
 $('#zoomChip').onclick=async()=>{const L=[1,1.5,2,3];ZOOM=L[(L.indexOf(ZOOM)+1)%L.length]||1.5;try{localStorage.setItem('fa_zoom',ZOOM);}catch(e){}await applyZoom();};
+/* ---------- level: a big gauge (about the width of the frame). The white bubble shows the tilt; small dots flow from it to the centre ---------- */
+let LV={D:300,dx:0,dy:0,ok:false,show:false,raf:0};
+function lvlSize(w){const D=Math.round(Math.max(160,Math.min(w,innerWidth-16))),lv=$('#lvl'),c=D/2;LV.D=D;lv.setAttribute('viewBox','0 0 '+D+' '+D);lv.style.width=lv.style.height=D+'px';lv.style.margin=(-c)+'px 0 0 '+(-c)+'px';
+  const o=$('#lvlOut'),i=$('#lvlIn');o.setAttribute('cx',c);o.setAttribute('cy',c);o.setAttribute('r',c-3);i.setAttribute('cx',c);i.setAttribute('cy',c);lvlPaint();}
+function lvlPaint(){const c=LV.D/2,d=$('#lvlDot');d.setAttribute('cx',(c+LV.dx).toFixed(1));d.setAttribute('cy',(c+LV.dy).toFixed(1));d.setAttribute('fill',LV.ok?'#2E7D32':'#fff');d.setAttribute('stroke',LV.ok?'#fff':'#292524');
+  const g=$('#lvlGuide');g.style.display=LV.show?'':'none';if(!LV.show)return;const ph=(performance.now()/1100)%1,gs=$$('#lvlGuide circle');
+  gs.forEach((e,i)=>{const f=1-((i/gs.length+ph)%1),fr=0.14+f*0.78;e.setAttribute('cx',(c+LV.dx*fr).toFixed(1));e.setAttribute('cy',(c+LV.dy*fr).toFixed(1));e.setAttribute('opacity',(0.3+0.7*(1-f)).toFixed(2));e.setAttribute('r',(2.5+3*(1-f)).toFixed(1));});}
+function lvlLoop(){cancelAnimationFrame(LV.raf);const step=()=>{if(CURS!=='sCam')return;lvlPaint();LV.raf=requestAnimationFrame(step);};LV.raf=requestAnimationFrame(step);}
+/* ---------- voice: say "snap" (or photo, shoot, cheese...) to take the photo with one hand ---------- */
+let VOICE=false,REC=null,recOn=false,lastSnap=0;try{VOICE=localStorage.getItem('fa_voice')==='on';}catch(e){}
+const SRC=window.SpeechRecognition||window.webkitSpeechRecognition,SNAP_W=['snap','photo','picture','shoot','capture','cheese','click','take it','צלם','תצלם','צילום','קליק'];
+function voiceLabel(){const c=$('#voiceChip');if(!c)return;c.style.display=SRC?'':'none';c.textContent=VOICE?'🎤 Say “snap”':'🎤 Voice: Off';c.classList.toggle('on',VOICE);}
+function voiceStart(){if(!SRC||!VOICE||recOn||CURS!=='sCam')return;try{REC=new SRC();REC.continuous=true;REC.interimResults=true;REC.lang=navigator.language||'en-US';
+  REC.onresult=ev=>{for(let i=ev.resultIndex;i<ev.results.length;i++){const t=String(ev.results[i][0].transcript||'').toLowerCase();if(SNAP_W.some(w=>t.includes(w))&&Date.now()-lastSnap>2500&&CURS==='sCam'){lastSnap=Date.now();try{REC.abort();}catch(x){}voiceSnap();return;}}};
+  REC.onerror=ev=>{if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){VOICE=false;try{localStorage.setItem('fa_voice','off');}catch(x){}voiceLabel();toast('The microphone is blocked. Allow it in the browser to use voice.');}};
+  REC.onend=()=>{recOn=false;if(VOICE&&CURS==='sCam')setTimeout(voiceStart,300);};REC.start();recOn=true;}catch(e){recOn=false;}}
+function voiceStop(){try{if(REC)REC.abort();}catch(e){}recOn=false;REC=null;}
+function voiceAuto(){voiceLabel();if(VOICE)setTimeout(voiceStart,400);}
+function voiceSnap(){const s=$('#shut');s.classList.add('heard');setTimeout(()=>s.classList.remove('heard'),600);s.click();}
+$('#voiceChip').onclick=()=>{if(!SRC){toast('Voice is not supported in this browser.');return;}VOICE=!VOICE;try{localStorage.setItem('fa_voice',VOICE?'on':'off');}catch(e){}voiceLabel();if(VOICE){voiceStart();toast('Say “snap” to take the photo.',2600);}else voiceStop();};
+voiceLabel();
 function bindLevel(){if(levelOn)return;levelOn=true;window.addEventListener('deviceorientation',onOri);}
-function onOri(e){if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),ok=t<=2,k=Math.min(1,t/12),ang=Math.atan2(e.beta,e.gamma);tiltNow=t;
-  const dx=Math.cos(ang)*44*k,dy=Math.sin(ang)*44*k,d=$('#lvlDot');d.setAttribute('cx',(70+dx).toFixed(1));d.setAttribute('cy',(70+dy).toFixed(1));d.setAttribute('fill',ok?'#2E7D32':'#F05325');
-  /* small orange dots from the big dot to the centre: the way to tilt the phone */
-  const gd=$$('#lvlGuide circle'),show=!ok&&k>0.25;$('#lvlGuide').style.display=show?'':'none';if(show)[0.72,0.5,0.28].forEach((f,i)=>{gd[i].setAttribute('cx',(70+dx*f).toFixed(1));gd[i].setAttribute('cy',(70+dy*f).toFixed(1));});
-  $('#lvlTxt').textContent=ok?'Level ✓':'Move the dot to the centre';}
+function onOri(e){if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),ok=t<=2,k=Math.min(1,t/15),ang=Math.atan2(e.beta,e.gamma),R=LV.D/2-18;tiltNow=t;LV.ok=ok;LV.dx=Math.cos(ang)*R*k;LV.dy=Math.sin(ang)*R*k;LV.show=!ok&&k>0.1;$('#lvlTxt').textContent=ok?'Level ✓':'Move the bubble to the centre';}
 function grabFrame(){const v=$('#vid'),vw=v.videoWidth,vh=v.videoHeight,W=v.clientWidth||innerWidth,H=v.clientHeight||innerHeight,s=Math.max(W/vw,H/vh);
   let cw=W/s/digZoom,ch=H/s/digZoom;cw=Math.min(cw,vw);ch=Math.min(ch,vh);const sx=(vw-cw)/2,sy=(vh-ch)/2,c=document.createElement('canvas');c.width=Math.round(cw);c.height=Math.round(ch);c.getContext('2d').drawImage(v,sx,sy,cw,ch,0,0,c.width,c.height);return c;}
 $('#shut').onclick=async()=>{const v=$('#vid');if(!stream||!v.videoWidth){toast('The camera is not ready.');return;}if(shooting)return;shooting=true;
