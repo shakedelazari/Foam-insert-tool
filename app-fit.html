@@ -12412,7 +12412,7 @@ window.__attachPhoto=function(id,d){return Promise.resolve((()=>{try{
   return true;}catch(e){console.error(e);return false;}})());};
 /* notches from the new phone app (app.html): [x, y, r] in the same mm as the outline. Each one is a round finger notch, centre on the outline. */
 function phoneNotches(p,nt,x0,y0,bw,bh){if(!Array.isArray(nt))return;const fl=[];for(const c of nt.slice(0,4)){if(!Array.isArray(c)||c.length<2||!isFinite(+c[0])||!isFinite(+c[1]))continue;const r=Math.max(3,Math.min(60,+c[2]||25));
-  fl.push({shape:'circle',ox:+(+c[0]-x0-bw/2).toFixed(2),oy:+(1*(+c[1]-y0-bh/2)).toFixed(2),a:r,b:r,rot:0,dep:0,ang0:p.ang.z||0,T:p.T,kind:'finger'});}
+  const hl=+c[3]>r+0.5?Math.min(120,+c[3]):0;fl.push({shape:hl?'rect':'circle',ox:+(+c[0]-x0-bw/2).toFixed(2),oy:+(1*(+c[1]-y0-bh/2)).toFixed(2),a:hl||r,b:r,rad:hl?r:undefined,rot:hl?(+c[4]||0):0,dep:0,ang0:p.ang.z||0,T:p.T,kind:'finger'});}
   for(const q of S.parts.filter(z=>z.gid===p.gid))q.fingers=fl;}
 window.__importOutline=function(name,ring,H,qty,side,opts){try{
   if(!ring||ring.length<3||!(H>0))return null;let ar=0;for(let i=0;i<ring.length;i++){const u=ring[i],v=ring[(i+1)%ring.length];ar+=u[0]*v[1]-v[0]*u[1];}if(ar<0)ring=ring.slice().reverse();
