@@ -168,8 +168,6 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 .shCards{display:flex;gap:10px}.shCards .sheetc{flex:1;padding:10px 13px}.shCards .sheetc.on{padding:9px 12px}
 .camChip.on{background:rgba(46,125,50,.85);border-color:#fff}
 #shut.heard{box-shadow:0 0 0 7px rgba(46,125,50,.85)}
-#sheetOv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
-.camChipsL{position:absolute;left:16px;top:calc(env(safe-area-inset-top) + 58px);z-index:3;display:flex;gap:8px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -223,12 +221,12 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <!-- 4 Take photo -->
 <section id="sCam" class="scr" aria-label="Take photo">
   <video id="vid" playsinline muted autoplay></video>
-  <canvas id="sheetOv"></canvas><div id="camFrame"></div>
+  <div id="camFrame"></div>
   <svg id="lvl" viewBox="0 0 300 300" aria-label="Level: move the bubble into the centre ring" role="img"><circle id="lvlDisk" cx="150" cy="150" r="70" fill="rgba(41,37,36,0.30)" stroke="#fff" stroke-width="3"/><g id="lvlGuide"><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/><circle class="gd" r="3"/></g><circle id="lvlIn" cx="150" cy="150" r="13" fill="none" stroke="#fff" stroke-width="2.5"/><circle id="lvlDot" cx="150" cy="150" r="10" fill="#fff" stroke="#fff" stroke-width="2.5"/></svg>
   <div id="lvlTxt"></div>
   <div id="camMsg"></div>
   <div class="nav camTop"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <div class="camChipsL"><button class="camChip on" id="autoChip">Auto: On</button></div><div class="camChips"><button class="camChip" id="voiceChip" style="display:none">🎤 Off</button><button class="camChip" id="zoomChip">1.5×</button><button class="camChip" id="flashChip" style="display:none">Flash: On</button></div>
+  <div class="camChips"><button class="camChip" id="voiceChip" style="display:none">🎤 Off</button><button class="camChip" id="zoomChip">1.5×</button><button class="camChip" id="flashChip" style="display:none">Flash: On</button></div>
   <div class="camBot">
     <div id="camSheet"></div>
     <div class="shutRow">
@@ -373,7 +371,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.14 · 25 Nov 2026';
+const APP_VERSION='A1.15 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -483,7 +481,7 @@ function camFrame(){const f=$('#camFrame');if(!f||!P)return;const S0=SHEETS[P.sh
   f.style.width=w+'px';f.style.height=h+'px';f.style.left=left+'px';f.style.top=top+'px';
   const lv=$('#lvl');lv.style.left=(left+w/2)+'px';lv.style.top=(top+h/2)+'px';lvlSize(w);$('#lvlTxt').style.top=(top+h/2+80)+'px';$('#camSheet').textContent='Sheet: '+S0.n+' · '+S0.lab;}
 addEventListener('resize',()=>{if(CURS==='sCam')camFrame();});
-ENTER.sCam=()=>{requestAnimationFrame(camFrame);$('#lvlGuide').style.display='none';$('#lvlTxt').textContent='';lvlLoop();voiceAuto();acStart();};
+ENTER.sCam=()=>{requestAnimationFrame(camFrame);$('#lvlGuide').style.display='none';$('#lvlTxt').textContent='';lvlLoop();voiceAuto();};
 FWD.sCam=()=>CUR&&CUR.cut?()=>show('sOutline'):null;
 async function applyZoom(){const v=$('#vid'),tr=stream&&stream.getVideoTracks()[0];let caps={};try{caps=tr&&tr.getCapabilities?tr.getCapabilities():{};}catch(e){}hwZoom=1;
   if(caps&&caps.zoom){const z=Math.min(caps.zoom.max,Math.max(caps.zoom.min,ZOOM));try{await tr.applyConstraints({advanced:[{zoom:z}]});hwZoom=z;}catch(e){hwZoom=1;}}
@@ -494,7 +492,7 @@ async function startCam(){{const DO=window.DeviceOrientationEvent;if(!(DO&&typeo
     const tr=stream.getVideoTracks()[0];let caps={};try{caps=tr.getCapabilities?tr.getCapabilities():{};}catch(e){}canFlash=!!caps.torch;$('#flashChip').style.display=canFlash?'block':'none';flashLabel();
   }catch(e){stream=null;msg.style.display='block';msg.innerHTML='The camera is not available.<br>Allow the camera, or choose a photo.';}
 }
-function stopCam(){voiceStop();acStop();torchOn=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
+function stopCam(){voiceStop();torchOn=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}}
 function flashLabel(){$('#flashChip').textContent='Flash: '+(FLASH?'On':'Off');}
 async function setTorch(on){const tr=stream&&stream.getVideoTracks()[0];if(!tr||on===torchOn)return;try{await tr.applyConstraints({advanced:[hwZoom>1?{zoom:hwZoom,torch:on}:{torch:on}]});torchOn=on;}catch(e){torchOn=false;}}
 $('#flashChip').onclick=()=>{FLASH=!FLASH;try{localStorage.setItem('fa_flash',FLASH?'on':'off');}catch(e){}flashLabel();};
@@ -513,32 +511,8 @@ function lvlPaint(){const c=LV.D/2,col=LV_C(LV.t),d=$('#lvlDot');d.setAttribute(
     e.setAttribute('cx',(c+LV.dx*(1-f)).toFixed(1));e.setAttribute('cy',(c+LV.dy*(1-f)).toFixed(1));e.setAttribute('r',(2.5+(LV_RING-2.5)*f).toFixed(1));e.setAttribute('fill',col);e.setAttribute('opacity',(0.55-0.3*f).toFixed(2));});}
 function lvlLoop(){cancelAnimationFrame(LV.raf);const step=()=>{if(CURS!=='sCam')return;lvlPaint();LV.raf=requestAnimationFrame(step);};LV.raf=requestAnimationFrame(step);}
 
-/* ---------- live sheet finder: outline on the paper, a hint what to fix, and (Auto on) the photo is taken by itself when the sheet and the level are good ---------- */
-let AUTO=true;try{AUTO=localStorage.getItem('fa_auto')!=='off';}catch(e){}
-const AC={timer:0,good:0,st:'none',cv:null};
-function autoLabel(){const c=$('#autoChip');if(!c)return;c.textContent=AUTO?'Auto: On':'Auto: Off';c.classList.toggle('on',AUTO);}
-$('#autoChip').onclick=()=>{AUTO=!AUTO;try{localStorage.setItem('fa_auto',AUTO?'on':'off');}catch(e){}AC.good=0;autoLabel();lvlMsg();
-  toast(AUTO?'The photo is taken by itself when the whole sheet is in view and the bubble is green.':'Auto photo is off. Press the button or say “snap”.',3200);};
-function acStart(){clearInterval(AC.timer);AC.good=0;AC.st='none';AC.timer=setInterval(acTick,350);}
-function acStop(){clearInterval(AC.timer);AC.timer=0;AC.good=0;sheetOv(null);}
-function acFrame(){const v=$('#vid');if(!stream||!v.videoWidth)return null;const vw=v.videoWidth,vh=v.videoHeight,W=v.clientWidth||innerWidth,H=v.clientHeight||innerHeight,s=Math.max(W/vw,H/vh);
-  const cw=Math.min(W/s/digZoom,vw),ch=Math.min(H/s/digZoom,vh),k=Math.min(1,360/Math.max(cw,ch)),c=AC.cv||(AC.cv=document.createElement('canvas'));c.width=Math.max(8,Math.round(cw*k));c.height=Math.max(8,Math.round(ch*k));
-  c.getContext('2d').drawImage(v,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,c.width,c.height);return c;}
-function sheetCheck(c){let det=null;try{det=detectSheet(c);}catch(e){}if(!det)return {st:'none',q:null};const o=orderQuad(det.map(p=>p.slice())),g=sheetGuess(det,c);if(!g.ok)return {st:'none',q:null};
-  const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),T=d(o[0],o[1]),B=d(o[3],o[2]),Lf=d(o[0],o[3]),R=d(o[1],o[2]),hor=(T+B)/2,ver=(Lf+R)/2,ratio=Math.max(hor,ver)/Math.min(hor,ver);
-  const S0=SHEETS[P.sheet],want=S0.h/S0.w,area=quadArea(o)/(c.width*c.height),m=Math.min(c.width,c.height)*0.015,inside=o.every(p=>p[0]>m&&p[1]>m&&p[0]<c.width-m&&p[1]<c.height-m),even=Math.max(T,B)/Math.min(T,B)<1.07&&Math.max(Lf,R)/Math.min(Lf,R)<1.07;
-  return {q:o,st:!inside?'cut':area<0.36?'far':(Math.abs(ratio-want)/want>0.07||!even)?'skew':'good'};}
-function sheetOv(q,st,c){const cv=$('#sheetOv');if(!cv)return;const W=cv.clientWidth,H=cv.clientHeight,dpr=devicePixelRatio||1;if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
-  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);if(!q||!c)return;const v=$('#vid'),vw=v.clientWidth||W,vh=v.clientHeight||H,P2=p=>[p[0]/c.width*vw,p[1]/c.height*vh];
-  const col=st==='good'?(LV.ok?'#2E9E44':'#F5C518'):'#F05325';g.lineWidth=4;g.strokeStyle=col;g.fillStyle=col+'22';g.lineJoin='round';g.beginPath();q.map(P2).forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fill();g.stroke();
-  g.fillStyle=col;for(const p of q.map(P2)){g.beginPath();g.arc(p[0],p[1],6,0,Math.PI*2);g.fill();}}
-function lvlMsg(){const st=AC.st,lvl=LV.t<90;let t;
-  if(st==='none')t='Show the whole sheet';else if(st==='cut')t='Show all 4 corners of the sheet';else if(st==='far')t='Move closer: fill the frame with the sheet';
-  else if(st==='skew')t=lvl&&!LV.ok?'Move the bubble to the centre':'Hold the phone flat over the sheet';else if(lvl&&!LV.ok)t='Move the bubble to the centre';
-  else t=AUTO?'Hold still…':'Ready: take the photo';$('#lvlTxt').textContent=t;}
-function acTick(){if(CURS!=='sCam'||shooting)return;const c=acFrame();if(!c){AC.st='none';sheetOv(null);return;}const r=sheetCheck(c);AC.st=r.st;sheetOv(r.q,r.st,c);lvlMsg();
-  const good=r.st==='good'&&(LV.ok||LV.t>=90);AC.good=good?AC.good+1:0;
-  if(AUTO&&AC.good>=4){AC.good=0;const s=$('#shut');s.classList.add('heard');setTimeout(()=>s.classList.remove('heard'),600);s.click();}}
+/* ---------- level hint ---------- */
+function lvlMsg(){$('#lvlTxt').textContent=LV.t>=90?'':LV.ok?'Level ✓':'Move the bubble to the centre';}
 
 /* ---------- voice: say "snap" (or photo, shoot, cheese...) to take the photo with one hand ---------- */
 let VOICE=false,REC=null,recOn=false,lastSnap=0;try{VOICE=localStorage.getItem('fa_voice')==='on';}catch(e){}
@@ -549,12 +523,12 @@ function voiceStart(){if(!SRC||!VOICE||recOn||CURS!=='sCam')return;try{REC=new S
   REC.onerror=ev=>{if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){VOICE=false;try{localStorage.setItem('fa_voice','off');}catch(x){}voiceLabel();toast('The microphone is blocked. Allow it in the browser to use voice.');}};
   REC.onend=()=>{recOn=false;if(VOICE&&CURS==='sCam')setTimeout(voiceStart,300);};REC.start();recOn=true;}catch(e){recOn=false;}}
 function voiceStop(){try{if(REC)REC.abort();}catch(e){}recOn=false;REC=null;}
-function voiceAuto(){voiceLabel();autoLabel();if(VOICE)setTimeout(voiceStart,400);}
+function voiceAuto(){voiceLabel();if(VOICE)setTimeout(voiceStart,400);}
 function voiceSnap(){const s=$('#shut');s.classList.add('heard');setTimeout(()=>s.classList.remove('heard'),600);s.click();}
 $('#voiceChip').onclick=()=>{if(!SRC){toast('Voice is not supported in this browser.');return;}VOICE=!VOICE;try{localStorage.setItem('fa_voice',VOICE?'on':'off');}catch(e){}voiceLabel();if(VOICE){voiceStart();toast('Say “snap” to take the photo.',2600);}else voiceStop();};
-voiceLabel();autoLabel();
+voiceLabel();
 function bindLevel(){if(levelOn)return;levelOn=true;window.addEventListener('deviceorientation',onOri);}
-function onOri(e){if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),ok=t<=2,k=Math.min(1,t/15),ang=Math.atan2(e.beta,e.gamma),R=LV.D/2-14;tiltNow=t;LV.t=t;LV.ok=ok;LV.dx=Math.cos(ang)*R*k;LV.dy=Math.sin(ang)*R*k;lvlMsg();}
+function onOri(e){if(e.beta==null)return;const t=Math.hypot(e.beta,e.gamma),ok=LV.ok?t<=3:t<=2,k=Math.min(1,t/15),ang=Math.atan2(e.beta,e.gamma),R=LV.D/2-14;tiltNow=t;if(ok&&!LV.ok&&Date.now()-(LV.bz||0)>900){LV.bz=Date.now();try{if(navigator.vibrate)navigator.vibrate(35);}catch(x){}}LV.t=t;LV.ok=ok;LV.dx=ok?0:Math.cos(ang)*R*k;LV.dy=ok?0:Math.sin(ang)*R*k;lvlMsg();}
 function grabFrame(){const v=$('#vid'),vw=v.videoWidth,vh=v.videoHeight,W=v.clientWidth||innerWidth,H=v.clientHeight||innerHeight,s=Math.max(W/vw,H/vh);
   let cw=W/s/digZoom,ch=H/s/digZoom;cw=Math.min(cw,vw);ch=Math.min(ch,vh);const sx=(vw-cw)/2,sy=(vh-ch)/2,c=document.createElement('canvas');c.width=Math.round(cw);c.height=Math.round(ch);c.getContext('2d').drawImage(v,sx,sy,cw,ch,0,0,c.width,c.height);return c;}
 $('#shut').onclick=async()=>{const v=$('#vid');if(!stream||!v.videoWidth){toast('The camera is not ready.');return;}if(shooting)return;shooting=true;
