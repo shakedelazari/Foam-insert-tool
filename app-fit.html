@@ -12411,13 +12411,17 @@ window.__attachPhoto=function(id,d){return Promise.resolve((()=>{try{
       ph.thumbPh=cv.toDataURL('image/jpeg',0.8);clearTimeout(window.__phRT);window.__phRT=setTimeout(()=>{if(typeof renderAll==='function')renderAll();},400);}catch(e){console.error(e);}};img.src=d.j;
   return true;}catch(e){console.error(e);return false;}})());};
 /* notches from the new phone app (app.html): [x, y, r] in the same mm as the outline. Each one is a round finger notch, centre on the outline. */
-function phonePos(p,xy){const g=S.parts.filter(z=>z.gid===p.gid),ok=!!(xy&&typeof xy.c==='string'&&Array.isArray(xy.p));g.forEach((q,i)=>{const v=ok?xy.p[i]:null;q.phXY=Array.isArray(v)&&v.length===2&&v.every(n=>isFinite(+n))?[+v[0],+v[1]]:null;});if(ok&&g.some(q=>q.phXY))S.phPos={c:xy.c};}
+function phonePos(p,xy){const g=S.parts.filter(z=>z.gid===p.gid),ok=!!(xy&&typeof xy.c==='string'&&Array.isArray(xy.p));g.forEach((q,i)=>{const v=ok?xy.p[i]:null;q.phXY=Array.isArray(v)&&(v.length===2||v.length===3)&&v.slice(0,2).every(n=>isFinite(+n))?(v.length===3?[+v[0],+v[1],1]:[+v[0],+v[1]]):null;});if(ok&&g.some(q=>q.phXY))S.phPos={c:xy.c};}
 window.phonePosTry=function(id){const P=S.phPos;if(!P||P.c!==id)return;S.phPos=null;
-  const bs=S.parts.filter(p=>p.where==='base');if(!bs.length||bs.some(p=>!p.phXY))return;
-  const nBad=()=>(S.flags||[]).filter(x=>x.lv==='bad').length,snap=bs.map(p=>[p,p.x,p.y]);recalc();const b0=nBad(),fm=S.fm;
-  for(const p of bs){const h=getOriented(p).hm;p.x=Math.round(fm.w/2+p.phXY[0]-h.w/2);p.y=Math.round(fm.h/2+p.phXY[1]-h.h/2);}
-  recalc();if(nBad()>b0){snap.forEach(([p,x,y])=>{p.x=x;p.y=y;});recalc();setTimeout(()=>toast('The layout from the phone does not fit here, so the parts were arranged again.'),60);return;}
-  setTimeout(()=>toast('Parts placed as on the phone.'),60);};
+  const nBad=()=>(S.flags||[]).filter(x=>x.lv==='bad').length;let done=0,fail=0;
+  const put=ps=>{const fm=S.fm;for(const p of ps){const h=getOriented(p).hm;p.x=Math.round(fm.w/2+p.phXY[0]-h.w/2);p.y=Math.round(fm.h/2+p.phXY[1]-h.h/2);}recalc();};
+  const bs=S.parts.filter(p=>(p.side||'base')!=='lid'&&p.where==='base');
+  if(S.side!=='lid'&&bs.length&&bs.every(p=>p.phXY&&!p.phXY[2])){const snap=bs.map(p=>[p,p.x,p.y]);recalc();const b0=nBad();put(bs);if(nBad()>b0){snap.forEach(([p,x,y])=>{p.x=x;p.y=y;});recalc();fail++;}else done++;}
+  const lp=S.parts.filter(p=>p.side==='lid');
+  if(lp.length&&lp.every(p=>p.phXY&&p.phXY[2])){const ks=S.side;try{S.side='lid';applySideFoam();syncWhere();autoLidLayout();recalc();const b1=nBad(),snap=lp.map(p=>[p,p.x,p.y,p.lidPlaced]);put(lp);lp.forEach(p=>{p.lidPlaced=true;});
+      if(nBad()>b1){snap.forEach(([p,x,y,l])=>{p.x=x;p.y=y;p.lidPlaced=l;});fail++;}else done++;}catch(e){console.error(e);fail++;}finally{S.side=ks;applySideFoam();syncWhere();recalc();}}
+  if(fail)setTimeout(()=>toast('The layout from the phone does not fit here'+(done?' for all parts':'')+', so '+(done?'some':'the')+' parts were arranged again.'),60);
+  else if(done)setTimeout(()=>toast('Parts placed as on the phone.'),60);};
 function phoneTurns(p,zr){const g=S.parts.filter(z=>z.gid===p.gid);g.forEach((q,i)=>{const v=Array.isArray(zr)?zr[i]:null;if(v!=null&&isFinite(+v)){q.ang.z=((Math.round(+v)%360)+360)%360;q.rotLock=true;}else if(Array.isArray(zr)){q.rotLock=false;}});}
 function phoneNotches(p,nt,x0,y0,bw,bh){if(!Array.isArray(nt))return;const fl=[];for(const c of nt.slice(0,4)){if(!Array.isArray(c)||c.length<2||!isFinite(+c[0])||!isFinite(+c[1]))continue;const r=Math.max(3,Math.min(60,+c[2]||25));
   const hl=+c[3]>r+0.5?Math.min(120,+c[3]):0;fl.push({shape:hl?'rect':'circle',ox:+(+c[0]-x0-bw/2).toFixed(2),oy:+(1*(+c[1]-y0-bh/2)).toFixed(2),a:hl||r,b:r,rad:hl?r:undefined,rot:hl?(+c[4]||0):0,dep:0,ang0:p.ang.z||0,T:p.T,kind:'finger'});}
@@ -12684,6 +12688,21 @@ body.fitmode #zoomBar,body.fitmode #layout .stage-note{display:none!important}
 .tmBar .tb:disabled{opacity:.35}
 .tmLinks{display:flex;justify-content:center;gap:26px}.tmLinks button{background:none;border:0;font:600 13px Poppins,sans-serif;text-decoration:underline;color:inherit;padding:4px}
 .tmLinks button:disabled{opacity:.35}
+.tmSide{display:flex;border:2px solid #292524;border-radius:12px;overflow:hidden;height:40px;flex:none}
+.tmSide button{flex:1;border:0;background:#fff;color:#292524;font:600 15px Poppins,sans-serif}
+.tmSide button+button{border-left:2px solid #292524}
+.tmSide button.on{background:#F05325;color:#fff}.tmSide button:disabled{opacity:.4}
+.tmAng{flex:1.1;height:50px;border:2px solid #F05325;border-radius:12px;background:#fff;color:#292524;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;box-sizing:border-box}
+.tmAng small{font:600 10px Poppins,sans-serif;color:#8a8279;margin-bottom:1px}
+.tmAng div{display:flex;align-items:baseline}
+.tmAng input{width:58px;border:0;background:transparent;color:inherit;font:700 21px Poppins,sans-serif;text-align:right;padding:0;-moz-appearance:textfield;appearance:textfield}
+.tmAng input::-webkit-inner-spin-button,.tmAng input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.tmAng input:focus{outline:none;text-decoration:underline;text-decoration-color:#F05325;text-decoration-thickness:2px}
+.tmAng b{font:700 21px Poppins,sans-serif}
+.tmAng.off{border-color:#c9c1b3;opacity:.45}
+html[data-theme=dark] .tmSide{border-color:#EDE8DD}html[data-theme=dark] .tmSide button{background:#2b2826;color:#EDE8DD}
+html[data-theme=dark] .tmSide button+button{border-left-color:#EDE8DD}html[data-theme=dark] .tmSide button.on{background:#F05325;color:#fff}
+html[data-theme=dark] .tmAng{background:#2b2826;color:#EDE8DD}html[data-theme=dark] .tmAng small{color:#aaa196}
 html[data-theme=dark] #tmOver{background:#1d1b1a;color:#EDE8DD}
 html[data-theme=dark] .tmTop button,html[data-theme=dark] .tmBar .tb:not(.o),html[data-theme=dark] .nfsec,html[data-theme=dark] .tmTag{background:#2b2826;color:#EDE8DD;border-color:#EDE8DD}
 html[data-theme=dark] .tmTop .dk{background:#EDE8DD;color:#1d1b1a}
@@ -12695,7 +12714,7 @@ const nfRoot=document.createElement('div');nfRoot.innerHTML=`<div id="nfTop"><di
 <button id="nfLid">Close lid</button><div id="nfZoom"><button id="nfZin" aria-label="Zoom in">+</button><button id="nfZout" aria-label="Zoom out">−</button></div><div id="nfOver"><canvas id="nfOverCv"></canvas><div id="nfChk"></div><div id="nfOverHint">Drag to turn · pinch to zoom</div></div><div id="nfNone">No STA-300 case fits these parts.<br>Send them to Shell-Case for a custom foam.</div>
 <div id="nfBot"><div class="nfchips" id="nfChips"></div><div id="nfWhy"></div>
 <div class="nfal" id="nfAl"><b>Align</b><div class="nfseg"><button data-al="auto">Auto</button><button data-al="straight">Straight</button><button data-al="tetris">Tetris</button></div></div>
-<button class="nfsec" id="nfTurn"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>Turn &amp; move parts</button><button class="nfpri" id="nfSend">Send to computer</button><div class="nflinks"><button class="nflink" id="nfEdit">Edit parts</button><button class="nflink" id="nfVid">Download video</button></div></div>`;document.body.appendChild(nfRoot);{const tmd=document.createElement('div');tmd.innerHTML=`<div id="tmOver" role="dialog" aria-label="Turn and move parts"><div class="tmTop"><button id="tmBack">‹ Back</button><h2>Turn &amp; move</h2><button id="tmDone" class="dk">Done</button></div><div class="tmHint" id="tmHint"></div><div class="tmView"><canvas id="tmCv"></canvas><div class="tmTag" id="tmCase"></div></div><div class="tmStat" id="tmStat"></div><div class="tmBar"><button class="tb" id="tmL" aria-label="Turn left 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button><button class="tb" id="tmR" aria-label="Turn right 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button><button class="tb o" id="tmAuto">Auto organize</button></div><div class="tmLinks"><button id="tmUndo">Undo</button><button id="tmReset">Reset turns</button></div></div>`;document.body.appendChild(tmd.firstChild);}
+<button class="nfsec" id="nfTurn"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>Turn &amp; move parts</button><button class="nfpri" id="nfSend">Send to computer</button><div class="nflinks"><button class="nflink" id="nfEdit">Edit parts</button><button class="nflink" id="nfVid">Download video</button></div></div>`;document.body.appendChild(nfRoot);{const tmd=document.createElement('div');tmd.innerHTML=`<div id="tmOver" role="dialog" aria-label="Turn and move parts"><div class="tmTop"><button id="tmBack">‹ Back</button><h2>Turn &amp; move</h2><button id="tmDone" class="dk">Done</button></div><div class="tmSide" id="tmSide"><button data-s="base" class="on">Base</button><button data-s="lid">Lid</button></div><div class="tmHint" id="tmHint"></div><div class="tmView"><canvas id="tmCv"></canvas><div class="tmTag" id="tmCase"></div></div><div class="tmStat" id="tmStat"></div><div class="tmBar"><button class="tb" id="tmL" aria-label="Turn left 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button><label class="tmAng off" id="tmAngBox"><small>Angle · tap to type</small><div><input id="tmAng" type="number" inputmode="numeric" min="-359" max="359" step="1" aria-label="Exact angle in degrees" disabled><b>°</b></div></label><button class="tb" id="tmR" aria-label="Turn right 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button></div><div class="tmBar"><button class="tb o" id="tmAuto">Auto organize</button></div><div class="tmLinks"><button id="tmUndo">Undo</button><button id="tmReset">Reset turns</button></div></div>`;document.body.appendChild(tmd.firstChild);}
 const sizeOrder=()=>CASES.slice().sort((a,b)=>a.L*a.W-b.L*b.W);
 const nfMm=v=>NF.unit==='in'?(Math.ceil(v/25.4*10)/10)+' in':Math.ceil(v)+' mm';
 const nfEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -12719,11 +12738,15 @@ function alignIdx(id,al){const e=S.ladder&&S.ladder.find(x=>x.c.id===id);if(!e||
 function applyAlign(){if(!NF.shown)return;const k=alignIdx(NF.shown,NF.align);if(k==null)return;applyCase(NF.shown,k);fit3d();}
 
 /* ---------- Turn & move parts (top view only: parts turn flat, the outline is cut into the foam the same way) ---------- */
-const TMV={on:false,sel:null,drag:null,undo:[],snap0:null,geo:null,img:new WeakMap(),fmC:null,fmK:null,msg:null};
+const TMV={side:'base',on:false,sel:null,drag:null,undo:[],snap0:null,geo:null,img:new WeakMap(),fmC:null,fmK:null,msg:null};
 const tmParts=()=>S.parts.filter(p=>p.where==='base'&&p.cur&&p.cur.cav);
-function tmSnap(){return {parts:S.parts.map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,lock:!!p.rotLock,st:p.stick,pl:p.allow?p.allow.plus:null,side:p.side,where:p.where})),cs:S.foam.caseId,res:FIT.res,rec:FIT.rec,lad:S.ladder,meta:S.meta,shown:NF.shown,sel:NF.sel};}
-function tmRestore(sn){if(!sn)return;FIT.res=sn.res;FIT.rec=sn.rec;S.ladder=sn.lad;S.meta=sn.meta;NF.shown=sn.shown;NF.sel=sn.sel;if(sn.cs&&sn.cs!==S.foam.caseId)setCase(sn.cs);
-  for(const o of sn.parts){const p=o.p;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.rotLock=o.lock;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.side=o.side;p.where=o.where;}recalc();}
+function tmSnap(){return {parts:S.parts.map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,lock:!!p.rotLock,st:p.stick,pl:p.allow?p.allow.plus:null,side:p.side,where:p.where,lp:!!p.lidPlaced})),view:S.side,cs:S.foam.caseId,res:FIT.res,rec:FIT.rec,lad:S.ladder,meta:S.meta,shown:NF.shown,sel:NF.sel};}
+function tmRestore(sn){if(!sn)return;FIT.res=sn.res;FIT.rec=sn.rec;S.ladder=sn.lad;S.meta=sn.meta;NF.shown=sn.shown;NF.sel=sn.sel;tmGoSide('base',true);if(sn.cs&&sn.cs!==S.foam.caseId)setCase(sn.cs);
+  for(const o of sn.parts){const p=o.p;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.rotLock=o.lock;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.side=o.side;p.lidPlaced=o.lp;}tmGoSide(sn.view||'base',true);}
+/* show the base or the lid foam (the engine lays out one side at a time) */
+function tmGoSide(side,quiet){S.side=side==='lid'?'lid':'base';applySideFoam();syncWhere();if(S.side==='lid'&&!quiet)autoLidLayout();recalc();TMV.side=S.side;}
+function tmAngTo(p,z){const [cx,cy]=center(p);p.ang.z=((Math.round(z)%360)+360)%360;p.rotLock=true;const h=getOriented(p).hm;p.x=Math.round(cx-h.w/2);p.y=Math.round(cy-h.h/2);}
+function tmSetAng(v){const p=TMV.sel;v=+v;if(!p||!isFinite(v))return;v=((Math.round(v)%360)+360)%360;if(v===Math.round(p.ang.z)&&p.rotLock){tmUpd();return;}TMV.undo.push(tmSnap());TMV.msg=null;tmAngTo(p,v);recalc();tmDraw();tmUpd();}
 function tmBad(){const L=S.L,bad=new Set();if(!L||!L.masks)return bad;const own=new Uint8Array(L.fm.w*L.fm.h);
   L.masks.forEach(m=>{for(let i=0;i<m.length;i++)if(m[i]&&own[i]<2)own[i]++;});
   L.per.forEach((q2,a)=>{if(L.out[a]>0){bad.add(q2.p);return;}const m=L.masks[a];for(let i=0;i<m.length;i++)if(m[i]&&own[i]>1){bad.add(q2.p);break;}});return bad;}
@@ -12742,24 +12765,32 @@ function tmDraw(){const cv=q('#tmCv');if(!cv||!TMV.on)return;const box=cv.parent
     g.drawImage(bad.has(p)?im.bad:im.fill,p.x,p.y);g.restore();
     if(sel){const b=cav.bbox||[0,0,cav.w-1,cav.h-1];lab={t:p.name,x:ox+(p.x+(b[0]+b[2]+1)/2)*k,y:oy+fm.h*k-(p.y+b[1])*k+16};}}
   if(lab){g.font='600 12px Poppins,sans-serif';const w=g.measureText(lab.t).width+18,x=Math.max(4,Math.min(W-w-4,lab.x-w/2)),y=Math.min(H-26,lab.y);g.fillStyle='#F05325';g.beginPath();if(g.roundRect)g.roundRect(x,y,w,22,11);else g.rect(x,y,w,22);g.fill();g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.fillText(lab.t,x+w/2,y+11);}}
-function tmUpd(){const has=!!TMV.sel;q('#tmL').disabled=q('#tmR').disabled=!has;q('#tmUndo').disabled=!TMV.undo.length;q('#tmReset').disabled=!S.parts.some(p=>p.rotLock);
-  const lid=S.parts.filter(p=>p.where!=='base'||p.side==='lid').length;
-  q('#tmHint').textContent=(has?'Turn it with the buttons, or drag it to move it.':'Tap a part to pick it. Drag a part to move it.')+(lid?' Lid parts are not shown here.':'');
-  const cs=S.foam.caseId||NF.shown;q('#tmCase').textContent=(cs?nm(cs)+' · ':'')+'top view';
+function tmUpd(){const has=!!TMV.sel,lidSide=S.side==='lid',mine=p=>((p.side||'base')==='lid')===lidSide;q('#tmL').disabled=q('#tmR').disabled=!has;q('#tmUndo').disabled=!TMV.undo.length;q('#tmReset').disabled=!S.parts.some(p=>p.rotLock&&mine(p));
+  const nLid=S.parts.filter(p=>p.side==='lid').length;q('#tmSide').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.s===S.side);if(b.dataset.s==='lid'){b.disabled=!nLid&&!lidSide;b.textContent=nLid?'Lid ('+nLid+')':'Lid (empty)';}});
+  const ai=q('#tmAng');q('#tmAngBox').classList.toggle('off',!has);ai.disabled=!has;if(document.activeElement!==ai)ai.value=has?String(Math.round(TMV.sel.ang.z)):'';
+  q('#tmHint').textContent=has?'Turn 90° with the buttons, or tap the angle to type any angle. Drag to move.':'Tap a part to pick it. Drag a part to move it.';
+  const cs=S.foam.caseId||NF.shown;q('#tmCase').textContent=(cs?nm(cs)+' · ':'')+(lidSide?'lid':'base')+' · top view';
   const st=q('#tmStat'),bad=S.flags&&S.flags.find(x=>x.lv==='bad');
   if(TMV.msg){st.className='tmStat '+TMV.msg.c;st.textContent=TMV.msg.t;}
   else if(bad){st.className='tmStat bad';st.textContent='✗ '+bad.t.replace(/\s*\(.*?\)\s*/g,' ').trim()+' Tap Auto organize.';}
-  else{st.className='tmStat ok';st.textContent='✓ Fits in '+(cs?nm(cs):'this case')+'.';}}
-function tmOpen(){if(!NF.shown||FIT.busy||!S.fm){toast('Pick a case that fits first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;TMV.snap0=tmSnap();recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
+  else if(!tmParts().length){st.className='tmStat';st.textContent=lidSide?'No parts in the lid.':'No parts in the base.';}
+  else{st.className='tmStat ok';st.textContent='✓ '+(lidSide?'The lid fits':'Fits')+' in '+(cs?nm(cs):'this case')+'.';}}
+function tmOpen(){if(!NF.shown||FIT.busy||!S.fm){toast('Pick a case that fits first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;if(S.side!=='base')tmGoSide('base',true);TMV.snap0=tmSnap();recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
 function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')||'{}'),by={};for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;(by[id]=by[id]||[]).push(p.rotLock?Math.round(p.ang.z):null);}
   for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}
-  try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);(by[id]=by[id]||[]).push(p.where==='base'?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]:null);}
+  try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);const lid=p.side==='lid';(by[id]=by[id]||[]).push(lid?(p.lidPlaced?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2),1]:null):[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]);}
   for(const id in by)all[id]={c:cs,p:by[id]};localStorage.setItem('fa_pos',JSON.stringify(all));}catch(e){}}
-function tmClose(keep){TMV.on=false;TMV.drag=null;q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{tmSaveTurns();if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
+function tmClose(keep){TMV.on=false;TMV.drag=null;try{q('#tmAng').blur();}catch(e){}q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{const lb=S.side==='lid'&&S.flags&&S.flags.some(x=>x.lv==='bad');tmGoSide('base',true);tmSaveTurns();if(lb)toast('Some lid parts overlap or are outside the lid foam. Open Turn & move, pick Lid and tap Auto organize.',4200);if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
   after();render();setTimeout(()=>{try{frontTilt();}catch(e){}},250);}
-function tmTurn(d){const p=TMV.sel;if(!p)return;TMV.undo.push(tmSnap());TMV.msg=null;const [cx,cy]=center(p);p.ang.z=((p.ang.z+d)%360+360)%360;p.rotLock=true;const h=getOriented(p).hm;p.x=Math.round(cx-h.w/2);p.y=Math.round(cy-h.h/2);recalc();tmDraw();tmUpd();}
-async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());if(reset)S.parts.forEach(p=>{p.rotLock=false;});const old=NF.shown;TMV.msg=null;
-  await fitRun();const now=FIT.rec?FIT.rec.id:null;NF.shown=now;NF.sel=now||NF.sel;recalc();
+function tmTurn(d){const p=TMV.sel;if(!p)return;TMV.undo.push(tmSnap());TMV.msg=null;tmAngTo(p,p.ang.z+d);recalc();tmDraw();tmUpd();}
+async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=null;
+  if(S.side==='lid'){const lp=S.parts.filter(p=>p.side==='lid');lp.forEach(p=>{if(reset)p.rotLock=false;p.lidPlaced=false;});autoLidLayout();recalc();
+    TMV.msg=S.flags&&S.flags.some(x=>x.lv==='bad')?{c:'bad',t:'✗ The lid parts do not fit the lid like this. Tap Undo or Reset turns.'}:{c:'ok',t:'✓ Lid organized. Spacing adjusted from the centre.'};
+    TMV.sel=TMV.sel&&S.parts.includes(TMV.sel)?TMV.sel:null;tmDraw();tmUpd();return;}
+  if(reset)S.parts.forEach(p=>{if(p.side!=='lid')p.rotLock=false;});const old=NF.shown,keepLid=S.parts.filter(p=>p.side==='lid'&&p.lidPlaced).map(p=>({p,x:p.x,y:p.y,z:p.ang.z,T:p.T,st:p.stick,pl:p.allow?p.allow.plus:null}));
+  await fitRun();const now=FIT.rec?FIT.rec.id:null;NF.shown=now;NF.sel=now||NF.sel;
+  if(now&&now===old)for(const o of keepLid){const p=o.p;if(p.side!=='lid')continue;p.x=o.x;p.y=o.y;p.ang.z=o.z;p.T=o.T;p.stick=o.st;if(p.allow&&o.pl!=null)p.allow.plus=o.pl;p.lidPlaced=true;}
+  recalc();
   if(!now)TMV.msg={c:'bad',t:'✗ No STA-300 case fits like this. Tap Undo or Reset turns.'};
   else if(now!==old){const big=CASES.find(c=>c.id===now),ob=CASES.find(c=>c.id===old),bigger=ob&&big.L*big.W>ob.L*ob.W;TMV.msg={c:bigger?'bad':'ok',t:(bigger?'Organized. It now needs the bigger '+nm(now)+'.':'✓ Organized. It now fits the smaller '+nm(now)+'.')};}
   else TMV.msg={c:'ok',t:'✓ Organized in '+nm(now)+'. Spacing adjusted from the centre.'};
@@ -12773,6 +12804,8 @@ async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());if(reset
   const up=()=>{const d=TMV.drag;if(!d)return;TMV.drag=null;if(d.moved){TMV.undo.push(d.snap);recalc();}tmDraw();tmUpd();};
   cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   q('#tmL').onclick=()=>tmTurn(90);q('#tmR').onclick=()=>tmTurn(-90);
+  q('#tmSide').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled||b.dataset.s===S.side||FIT.busy)return;TMV.undo.push(tmSnap());TMV.sel=null;TMV.msg=null;tmGoSide(b.dataset.s);tmDraw();tmUpd();};
+  const ai=q('#tmAng');ai.addEventListener('focus',()=>{try{ai.select();}catch(e){}});ai.addEventListener('change',()=>tmSetAng(ai.value));ai.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ai.blur();}});ai.addEventListener('blur',()=>{if(ai.value!=='')tmSetAng(ai.value);else tmUpd();});
   q('#tmAuto').onclick=()=>tmAuto(false);q('#tmReset').onclick=()=>tmAuto(true);
   q('#tmUndo').onclick=()=>{const sn=TMV.undo.pop();if(!sn)return;tmRestore(sn);TMV.msg=null;TMV.sel=TMV.sel&&S.parts.includes(TMV.sel)?TMV.sel:null;tmDraw();tmUpd();};
   q('#tmBack').onclick=()=>tmClose(false);q('#tmDone').onclick=()=>tmClose(true);
