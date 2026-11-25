@@ -168,6 +168,18 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 .shCards{display:flex;gap:10px}.shCards .sheetc{flex:1;padding:10px 13px}.shCards .sheetc.on{padding:9px 12px}
 .camChip.on{background:rgba(46,125,50,.85);border-color:#fff}
 #shut.heard{box-shadow:0 0 0 7px rgba(46,125,50,.85)}
+#sSize{overflow-y:auto}
+.szHd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#szProg{font:700 12px Poppins,sans-serif;padding:4px 10px;border-radius:999px;background:#FFF6D6;border:2px solid #E0A800;color:#7a5a00;white-space:nowrap;flex:none}
+#szProg.ok{background:#2E7D32;border-color:#2E7D32;color:#fff}
+.cf{width:96px;height:46px;flex:none;border-radius:12px;border:2px dashed #E0A800;background:var(--card);color:#7a5a00;font:700 14px Poppins,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;padding:0}
+.cf i{font-style:normal;width:18px;height:18px;border-radius:50%;border:2px solid #E0A800;display:grid;place-items:center;font-size:11px;box-sizing:border-box}
+.cf.ok{border:2px solid #2E7D32;background:#2E7D32;color:#fff}
+#sSize input.rv{border-color:#E0A800;background:#FFF6D6}#sSize input.ok{border-color:#2E7D32}
+html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{background:#3a3218;color:#EDE8DD}html[data-theme=dark] #szProg:not(.ok){background:#3a3218;color:#F5C518}
+.szLift{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px 12px;flex:none}.szLift .t{flex:1;min-width:0}.szLift b{display:block;font-size:14px}.szLift span{font-size:12px;color:var(--muted)}.szLift .sw{margin:0}
+.lfAdd{position:absolute;right:10px;top:10px;width:46px;height:46px;border-radius:50%;border:0;background:var(--fl);color:#fff;font:700 28px/1 Poppins,sans-serif;z-index:3;box-shadow:0 3px 8px rgba(0,0,0,.25);padding:0}
+.lfAddL{position:absolute;right:62px;top:24px;font:600 12px Poppins,sans-serif;color:var(--ink);z-index:3;pointer-events:none;background:rgba(255,255,255,.85);padding:2px 8px;border-radius:8px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -250,17 +262,18 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <!-- 6 Name & size -->
 <section id="sSize" class="scr">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <h2>Name &amp; size</h2>
+  <div class="szHd"><h2>Name &amp; size</h2><span id="szProg">0 of 3 checked</span></div>
   <label class="f">Name<input id="inName" type="text" autocomplete="off" placeholder="Part name"></label>
   <div id="nameHint"></div>
   <div class="row" style="background:#fff;border:2px solid var(--kh);border-radius:12px;padding:6px;gap:10px;flex:none">
     <div style="flex:1;min-width:0"><canvas id="szCv" aria-label="The part with its length and width"></canvas><div style="font-size:11px;color:#6b645d;text-align:center" id="sizeNote">Estimate. Confirm each.</div></div>
   </div>
   <div class="card">
-    <div class="vrow"><label class="f"><span class="ul">Length (L)</span><input id="inLen" type="number" inputmode="decimal" min="0" step="any"></label><button class="sw" role="switch" aria-checked="false" aria-label="Confirm length" data-cf="L"></button></div>
-    <div class="vrow"><label class="f"><span class="ul">Width (W)</span><input id="inWid" type="number" inputmode="decimal" min="0" step="any"></label><button class="sw" role="switch" aria-checked="false" aria-label="Confirm width" data-cf="W"></button></div>
-    <div class="vrow"><label class="f"><span class="ul">Depth</span><button type="button" class="iinf" id="depInfo" aria-label="What is depth?">i</button><input id="inDep" type="number" inputmode="decimal" min="0" step="any" placeholder="Measure"></label><button class="sw" role="switch" aria-checked="false" aria-label="Confirm depth" data-cf="D"></button></div>
+    <div class="vrow"><label class="f"><span class="ul">Length (L)</span><input id="inLen" type="number" inputmode="decimal" min="0" step="any"></label><button class="cf" type="button" aria-pressed="false" aria-label="Confirm length" data-cf="L"><i>?</i>Check</button></div>
+    <div class="vrow"><label class="f"><span class="ul">Width (W)</span><input id="inWid" type="number" inputmode="decimal" min="0" step="any"></label><button class="cf" type="button" aria-pressed="false" aria-label="Confirm width" data-cf="W"><i>?</i>Check</button></div>
+    <div class="vrow"><label class="f"><span class="ul">Depth</span><button type="button" class="iinf" id="depInfo" aria-label="What is depth?">i</button><input id="inDep" type="number" inputmode="decimal" min="0" step="any" placeholder="Measure"></label><button class="cf" type="button" aria-pressed="false" aria-label="Confirm depth" data-cf="D"><i>?</i>Check</button></div>
   </div>
+  <div class="szLift"><div class="t"><b>Easy to lift</b><span id="szLiftTxt">Off</span></div><button class="sw" role="switch" aria-checked="false" id="szLift" aria-label="Easy to lift"></button></div>
   <div class="grow"></div>
   <button class="sec" id="sizeOutline" style="display:none;height:44px">‹ Edit outline</button>
   <button class="pri" id="sizeGo" disabled>Add part</button>
@@ -280,7 +293,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <section id="sLift" class="scr" style="overflow-y:auto">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
   <h2>Easy to lift</h2>
-  <div class="cvBox" id="lfBox" style="flex:1 0 250px;max-height:360px"><canvas id="lfCv"></canvas><div class="lfTip" id="lfTip"></div></div>
+  <div class="cvBox" id="lfBox" style="flex:1 0 250px;max-height:360px"><canvas id="lfCv"></canvas><span class="lfAddL">Add a notch</span><button class="lfAdd" id="lfAdd" type="button" aria-label="Add a notch">+</button><div class="lfTip" id="lfTip"></div></div>
   <div style="font-size:14px;font-weight:600" id="lfCount">Notches: 0 of 4</div>
   <div class="lfShape"><div class="seg2" id="lfShape"><button data-sh="round">Round</button><button data-sh="slot">Wide slot</button></div><div class="lfLen" id="lfLen"><button data-d="-10" aria-label="Shorter">−</button><span id="lfLenTxt"></span><button data-d="10" aria-label="Longer">+</button></div></div>
   <div class="lfLg"><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#F05325" stroke-width="2.6"/><path d="M-6 0h12M-6 0l3-3M-6 0l3 3M6 0l-3-3M6 0l-3 3" stroke="#F05325" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drag to move it along the edge</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#fff" stroke="#292524" stroke-width="1.8" stroke-dasharray="3.5 2.5"/><path d="M-5 0h10M0 -5v10" stroke="#292524" stroke-width="2.2" stroke-linecap="round"/></svg>Tap to add a notch</div><div><svg width="30" height="30" viewBox="-15 -15 30 30"><circle r="12" fill="#F05325"/><path d="M-4.5 -4.5l9 9M4.5 -4.5l-9 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Tap a notch again to remove it</div></div>
@@ -371,7 +384,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.16 · 25 Nov 2026';
+const APP_VERSION='A1.17 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -720,7 +733,7 @@ function baseFromRing(ring){ // the outline in its own units, long side known
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;s.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);});
   let pts=s.map(p=>[p[0]-x0,y1-p[1]]);let ar=0;for(let i=0;i<pts.length;i++){const u=pts[i],v=pts[(i+1)%pts.length];ar+=u[0]*v[1]-v[0]*u[1];}if(ar<0)pts.reverse();
   const ex=(x1-x0)||1,ey=(y1-y0)||1;return {pts,ex,ey,longX:ex>=ey,bx0:x0,by1:y1};}
-function toSize(){if(!CUR||!CUR.cut)return;SZ.base=baseFromRing(CUR.cut.ring);SZ.wManual=false;SZ.cf={L:false,W:false,D:false};SZ.nameTyped=false;$('#nameHint').textContent='';
+function toSize(){if(!CUR||!CUR.cut)return;SZ.base=baseFromRing(CUR.cut.ring);SZ.wManual=false;SZ.cf={L:false,W:false,D:false};SZ.lift=false;SZ.nameTyped=false;$('#nameHint').textContent='';
   const ed=CUR.editId?P.parts.find(q=>q.id===CUR.editId):null;$('#inName').value=ed?ed.name:'';$('#inDep').value=ed?fromMm(ed.D):'';
   const B=SZ.base,longE=B.longX?B.ex:B.ey;$('#inLen').value=CUR.cut.pxmm>0?fromMm((longE+0.5)/CUR.cut.pxmm):(ed?fromMm(ed.L):'');$('#inWid').value='';
   $('#sizeNote').innerHTML=CUR.cut.pxmm>0?'Estimate. Confirm each.':'No sheet seen. Type each size.';sizeShow();show('sSize');requestAnimationFrame(()=>sizeUpd());if(!ed)guessName(CUR.cut);}
@@ -731,14 +744,14 @@ async function rebuildCut(q){if(q._cut)return q._cut;if(!q.ph||!q.ph.j){try{cons
   const a=mg.getImageData(0,0,w,h).data,m=new Uint8Array(w*h);let n=0;for(let i=0;i<w*h;i++){if(a[i*4+3]>127){m[i]=1;n++;}}if(n<10)return null;
   const cut={w,h,m,ring:contour(m,w,h),how:'saved',img:maskImg(photo,m,w,h),area:n/(w*h),pxmm:sx,photo};q._cut=cut;return cut;}
 async function editPart(id){const q=P.parts.find(x=>x.id===id);if(!q)return;const cut=await rebuildCut(q).catch(()=>null);CUR={cut:cut||null,editId:id};
-  SZ.base=q._cut?baseFromRing(q._cut.ring):q.base;SZ.wManual=true;SZ.cf={L:true,W:true,D:true};
+  SZ.base=q._cut?baseFromRing(q._cut.ring):q.base;SZ.wManual=true;SZ.cf={L:true,W:true,D:true};SZ.lift=!!q.lift;
   SZ.nameTyped=true;$('#nameHint').textContent='';$('#inName').value=q.name;$('#inLen').value=fromMm(q.L);$('#inWid').value=fromMm(q.W);$('#inDep').value=fromMm(q.D);$('#sizeNote').innerHTML='Edit the sizes. Confirm each.';sizeShow();show('sSize');if(CUR.cut)HIST.push('sOutline');requestAnimationFrame(()=>sizeUpd());}
 function sizeShow(){$$('#sSize .ul').forEach((u,i)=>{u.textContent=['Length (L)','Width (W)','Depth'][i]+' '+P.unit;});sizeUpd();}
 function dims(){const B=SZ.base,L=toMm(+$('#inLen').value),longE=B.longX?B.ex:B.ey,shortE=B.longX?B.ey:B.ex,autoW=L*shortE/longE,W=SZ.wManual?toMm(+$('#inWid').value):autoW;return {L,W,autoW,D:toMm(+$('#inDep').value)};}
 function sizeUpd(){if(!SZ.base)return;let d=dims();if(!SZ.wManual)$('#inWid').value=d.L>0?fromMm(d.autoW):'';d=dims();
-  $$('#sSize [data-cf]').forEach(b=>b.setAttribute('aria-checked',String(!!SZ.cf[b.dataset.cf])));
+  $$('#sSize [data-cf]').forEach(b=>{const on=!!SZ.cf[b.dataset.cf];b.classList.toggle('ok',on);b.setAttribute('aria-pressed',String(on));b.innerHTML=on?'✓ OK':'<i>?</i>Check';});[['L','#inLen'],['W','#inWid'],['D','#inDep']].forEach(([k2,id])=>{const e=$(id);e.classList.toggle('ok',!!SZ.cf[k2]);e.classList.toggle('rv',!SZ.cf[k2]);});{const n=['L','W','D'].filter(k2=>SZ.cf[k2]).length,pg=$('#szProg');pg.textContent=n===3?'✓ All checked':n+' of 3 checked';pg.classList.toggle('ok',n===3);}{const ed=CUR&&CUR.editId?P.parts.find(q=>q.id===CUR.editId):null;$('#szLift').setAttribute('aria-checked',String(!!SZ.lift));$('#szLiftTxt').innerHTML=!SZ.lift?'Off: no finger notches':ed&&ed.lift?ed.notches.length+' notch'+(ed.notches.length===1?'':'es')+' · <u id="szLiftEd">edit</u>':'On: you place the notches after saving';}
   const ok=$('#inName').value.trim().length>0&&d.L>0&&d.W>0&&d.D>0&&SZ.cf.L&&SZ.cf.W&&SZ.cf.D;$('#sizeGo').disabled=!ok;
-  $('#sizeGo').textContent=CUR&&CUR.editId?'Save part':'Add part';$('#sizeDel').style.display=CUR&&CUR.editId?'block':'none';$('#sizeOutline').style.display=CUR&&CUR.editId&&CUR.cut?'block':'none';drawSizePic(d);updNav();}
+  $('#sizeGo').textContent=ok?(CUR&&CUR.editId?'Save part':'Add part'):!$('#inName').value.trim()?'Type a name to save':!(d.L>0&&d.W>0&&d.D>0)?'Type all 3 sizes':'Check all 3 sizes to save';$('#sizeDel').style.display=CUR&&CUR.editId?'block':'none';$('#sizeOutline').style.display=CUR&&CUR.editId&&CUR.cut?'block':'none';drawSizePic(d);updNav();}
 /* the part with dashed lines where the length and width start and end */
 function sizeImg(){const c=CUR&&CUR.cut,B=SZ.base;if(!c||!B||B.bx0==null)return null;if(c._szcv)return c._szcv;const t=document.createElement('canvas');t.width=c.w;t.height=c.h;t.getContext('2d').putImageData(c.img,0,0);
   const o=document.createElement('canvas');o.width=Math.max(1,Math.ceil(B.ex));o.height=Math.max(1,Math.ceil(B.ey));o.getContext('2d').drawImage(t,B.bx0,B.by1-B.ey,B.ex,B.ey,0,0,o.width,o.height);c._szcv=o;return o;}
@@ -750,9 +763,9 @@ function drawSizePic(d){const cv=$('#szCv'),B=SZ.base;if(!cv||!B||!cv.clientWidt
   g.moveTo(x0,y0+ih);g.lineTo(x0,padT-16);g.moveTo(x0+iw,y0+ih);g.lineTo(x0+iw,padT-16);   // start and end of the top size
   g.moveTo(x0+iw,y0);g.lineTo(x0-24,y0);g.moveTo(x0+iw,y0+ih);g.lineTo(x0-24,y0+ih);g.stroke();g.setLineDash([]);
   const arrow=(ax,ay,bx,by)=>{g.beginPath();g.moveTo(ax,ay);g.lineTo(bx,by);g.lineWidth=2;g.stroke();const an=Math.atan2(by-ay,bx-ax);[[ax,ay,an],[bx,by,an+Math.PI]].forEach(([x,y,a])=>{g.beginPath();g.moveTo(x,y);g.lineTo(x+8*Math.cos(a+0.4),y+8*Math.sin(a+0.4));g.lineTo(x+8*Math.cos(a-0.4),y+8*Math.sin(a-0.4));g.closePath();g.fill();});};
-  const ty=padT-10;arrow(x0,ty,x0+iw,ty);const tx=x0-16;arrow(tx,y0,tx,y0+ih);
-  g.font='600 12px Poppins,sans-serif';g.textAlign='center';g.textBaseline='bottom';const t1=hz[0]+' '+fmt(hz[1]),w1=g.measureText(t1).width+8;g.fillStyle='#fff';g.fillRect(x0+iw/2-w1/2,ty-15,w1,14);g.fillStyle='#F05325';g.fillText(t1,x0+iw/2,ty-1);
-  g.save();g.translate(tx-4,y0+ih/2);g.rotate(-Math.PI/2);const t2=vt[0]+' '+fmt(vt[1]);g.fillStyle='#F05325';g.fillText(t2,0,0);g.restore();}
+  const cO=k2=>SZ.cf[k2]?'#2E7D32':'#B98900',c1=cO(hz[0]),c2=cO(vt[0]);const ty=padT-10;g.strokeStyle=g.fillStyle=c1;arrow(x0,ty,x0+iw,ty);const tx=x0-16;g.strokeStyle=g.fillStyle=c2;arrow(tx,y0,tx,y0+ih);
+  g.font='600 12px Poppins,sans-serif';g.textAlign='center';g.textBaseline='bottom';const t1=(SZ.cf[hz[0]]?'✓ ':'')+hz[0]+' '+fmt(hz[1]),w1=g.measureText(t1).width+8;g.fillStyle='#fff';g.fillRect(x0+iw/2-w1/2,ty-15,w1,14);g.fillStyle=c1;g.fillText(t1,x0+iw/2,ty-1);
+  g.save();g.translate(tx-4,y0+ih/2);g.rotate(-Math.PI/2);const t2=(SZ.cf[vt[0]]?'✓ ':'')+vt[0]+' '+fmt(vt[1]);g.fillStyle=c2;g.fillText(t2,0,0);g.restore();}
 /* the name: guess what the object is (a small image-recognition model, loaded only when needed) */
 let NAMER=null;
 function loadNamer(){if(NAMER)return NAMER;const ld=u=>new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=u;sc.onload=ok;sc.onerror=()=>no(new Error('load'));document.head.appendChild(sc);});
@@ -771,6 +784,9 @@ $('#depInfo').onclick=e=>{e.preventDefault();e.stopPropagation();$('#mDepth').cl
 $('#sizeOutline').onclick=()=>{if(CUR&&CUR.cut)show('sOutline');};
 $$('#sSize [data-cf]').forEach(b=>b.onclick=()=>{const k=b.dataset.cf,d=dims(),v=k==='L'?d.L:k==='W'?d.W:d.D;if(!SZ.cf[k]&&!(v>0)){toast('Type the value first.');return;}SZ.cf[k]=!SZ.cf[k];sizeUpd();});
 FWD.sSize=()=>$('#sizeGo').disabled?null:()=>savePart();
+['inLen','inWid','inDep'].forEach(id=>$('#'+id).addEventListener('input',()=>{const k2={inLen:'L',inWid:'W',inDep:'D'}[id];if(SZ.cf[k2]){SZ.cf[k2]=false;sizeUpd();}}));
+$('#szLift').onclick=()=>{SZ.lift=!SZ.lift;sizeUpd();};
+$('#szLiftTxt').onclick=e=>{if(e.target.id==='szLiftEd'&&CUR&&CUR.editId)openLift(CUR.editId,false);};
 $('#sizeGo').onclick=()=>savePart();
 $('#sizeDel').onclick=()=>{const id=CUR&&CUR.editId;if(!id||!confirm('Delete this part from the library?'))return;P.parts=P.parts.filter(q=>q.id!==id);PHDB.del('ph:'+id).catch(()=>{});saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);};
 function partThumb(cut){const t=document.createElement('canvas'),k=Math.min(120/cut.w,120/cut.h);t.width=Math.max(8,Math.round(cut.w*k));t.height=Math.max(8,Math.round(cut.h*k));const g=t.getContext('2d'),s=document.createElement('canvas');s.width=cut.w;s.height=cut.h;s.getContext('2d').putImageData(cut.img,0,0);g.fillStyle='#fff';g.fillRect(0,0,t.width,t.height);g.drawImage(s,0,0,t.width,t.height);return t.toDataURL('image/jpeg',0.8);}
@@ -785,7 +801,8 @@ function savePart(){const d=dims(),B=SZ.base,name=$('#inName').value.trim();if(!
       q.ph={j:c.toDataURL('image/jpeg',0.72),x:r1((0-B.bx0)*sx),y:r1((B.by1-Pc.height)*sy),w:r1(Pc.width*sx),h:r1(Pc.height*sy)};q.hasPh=1;}}
   else if(!q.thumb)q.thumb=ringThumb(ring);
   if(resized&&q.notches.length)q.notches=q.notches.map(n=>({...n})); // positions follow the outline (stored along its length)
-  if(!old)P.parts.push(q);saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);if(!old)$('#mAdded').classList.add('on');}
+  if(!SZ.lift){q.lift=false;q.notches=[];}const wantLift=!!SZ.lift&&!q.lift;
+  if(!old)P.parts.push(q);saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);if(wantLift)openLift(q.id,true);else if(!old)$('#mAdded').classList.add('on');}
 $('#addMore').onclick=()=>{$('#mAdded').classList.remove('on');CUR=null;show('sCam');};
 $('#addDone').onclick=()=>{$('#mAdded').classList.remove('on');};
 
@@ -826,9 +843,10 @@ function slotTs(r){ // where a line through the middle meets the outline: left, 
   for(let i=0;i<r.length;i++){const a=r[i],b=r[(i+1)%r.length];if((a[1]-cy)*(b[1]-cy)<=0&&a[1]!==b[1])hx.push(a[0]+(cy-a[1])/(b[1]-a[1])*(b[0]-a[0]));if((a[0]-cx)*(b[0]-cx)<=0&&a[0]!==b[0])vy.push(a[1]+(cx-a[0])/(b[0]-a[0])*(b[1]-a[1]));}
   const L=hx.length?Math.min(...hx):x0,R=hx.length?Math.max(...hx):x1,B=vy.length?Math.min(...vy):y0,T=vy.length?Math.max(...vy):y1;
   return [ringT(r,L,cy),ringT(r,R,cy),ringT(r,cx,B),ringT(r,cx,T)];}
+function lfOrder(q){const xs=q.ring.map(p=>p[0]),ys=q.ring.map(p=>p[1]);return (Math.max(...xs)-Math.min(...xs))>=(Math.max(...ys)-Math.min(...ys))?[3,2,0,1]:[0,1,3,2];}
 function openLift(id,fresh){const q=P.parts.find(x=>x.id===id);if(!q)return;LF.id=id;LF.fresh=fresh;const ts=slotTs(q.ring);
   LF.slots=ts.map((t,k)=>{const n=q.notches.find(z=>z.slot===k);return {t:n?n.t:t,open:!!n,home:t,w:n&&n.w>SLOT_MIN?n.w:SLOT_MIN};});
-  if(fresh&&!q.notches.length)LF.slots[3].open=true; // start with one notch at the top
+  if(fresh&&!q.notches.length){const o=lfOrder(q);LF.slots[o[0]].open=true;LF.slots[o[1]].open=true;} // start with 2 notches on the long sides
   LF.sel=LF.slots[3].open?3:lfFirstOpen();LF.drag=-1;LF.ghost=null;LF.demo=null;
   let seen=false;try{seen=localStorage.getItem('fa_lift_hint')==='1';}catch(e){}LF.hint=!seen;
   show('sLift');}
@@ -837,7 +855,8 @@ function lfHint(){const t0=performance.now();const step=now=>{if(!LF.hint||CURS!
   const ph=(now-t0)/1000;LF.demo=0.035*Math.sin(ph*2.4)*Math.min(1,ph*1.5);drawLift();requestAnimationFrame(step);};requestAnimationFrame(step);}
 FWD.sLift=()=>()=>liftDone();
 function liftDone(){const q=P.parts.find(x=>x.id===LF.id);if(!q)return back();LF.hint=false;q.notches=LF.slots.map((s,k)=>s.open?(s.w>SLOT_MIN+0.5?{slot:k,t:+s.t.toFixed(4),w:Math.round(s.w)}:{slot:k,t:+s.t.toFixed(4)}):null).filter(Boolean);q.lift=q.notches.length>0;saveAll();back();}
-$('#lfDone').onclick=liftDone;$('#lfCancel').onclick=()=>{LF.hint=false;back();};
+$('#lfDone').onclick=liftDone;
+$('#lfAdd').onclick=()=>{const q=P.parts.find(x=>x.id===LF.id);if(!q)return;const k=lfOrder(q).find(i=>!LF.slots[i].open);if(k==null){toast('Up to 4 notches.');return;}const s=LF.slots[k];s.open=true;s.t=s.home;s.w=SLOT_MIN;LF.sel=k;LF.hint=false;drawLift();};$('#lfCancel').onclick=()=>{LF.hint=false;back();};
 $('#lfShape').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;if(b.dataset.sh==='round')s.w=SLOT_MIN;else if(s.w<=SLOT_MIN+0.5)s.w=Math.min(SLOT_MAX,SLOT_MIN+30);drawLift();};
 $('#lfLen').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;s.w=Math.max(SLOT_MIN+10,Math.min(SLOT_MAX,s.w+(+b.dataset.d)));drawLift();};
 function drawLift(){const q=P.parts.find(x=>x.id===LF.id),box=$('#lfBox'),cv=$('#lfCv');if(!q)return;const r=q.ring,dpr=devicePixelRatio||1,W=box.clientWidth,H=box.clientHeight;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
