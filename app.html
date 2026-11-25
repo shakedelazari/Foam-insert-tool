@@ -361,14 +361,14 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.5 · 25 Nov 2026';
+const APP_VERSION='A1.6 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
 const MODEL_URL='./models/u2netp.onnx';
 const ORT_BASE='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/';
 const DESKTOP_URL=new URL('./design.html',location.href).href;
-const NOTCH_R=25; // mm, half circle outside the edge
+const NOTCH_R=20; // mm, half circle outside the edge
 const SHEETS={a4:{n:'A4',w:210,h:297,lab:'210 × 297 mm'},letter:{n:'Letter',w:215.9,h:279.4,lab:'8.5 × 11 in'}};
 const MAXC=1000;
 function toast(m,ms=2600){const t=$('#toast');t.innerHTML=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms);}
