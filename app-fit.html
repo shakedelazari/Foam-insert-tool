@@ -9188,8 +9188,8 @@ function applyOption(i){const o=S.opts&&S.opts[i];if(!o)return;
   const hasLock=S.parts.some(p=>p.locked&&p.where!=='off'),snap=S.parts.map(p=>({p,x:p.x,y:p.y,T:p.T,z:p.ang.z,st:p.stick,pl:p.allow.plus})),badBefore=S.flags.filter(x=>x.lv==='bad').length;
   applyPlaced(o);S.sel=null;
   if(hasLock){recalc();if(S.flags.filter(x=>x.lv==='bad').length>badBefore){for(const s of snap){s.p.x=s.x;s.p.y=s.y;s.p.T=s.T;s.p.ang.z=s.z;s.p.stick=s.st;s.p.allow.plus=s.pl;}recalc();toast('This layout option does not fit around the locked part(s). They stay where they are.');after();return;}}
-  centerLayout();S.optIdx=i;S.optSig=layoutSig();after();}
-function applyCase(id,idx){const e=S.ladder&&S.ladder.find(x=>x.c.id===id),ok=!!(idx&&e&&e.options&&e.options[idx]);setCase(id);S.fit3=true;if(e&&e.fit)applyPlaced(ok?e.options[idx]:e.placed);S.sel=null;centerLayout();S.opts=e&&e.fit&&e.options&&e.options.length>1?e.options:null;S.optIdx=ok?idx:0;if(window.phonePosTry)window.phonePosTry(id);S.optSig=layoutSig();after();}
+  centerLayout();if(window.spreadParts)window.spreadParts();S.optIdx=i;S.optSig=layoutSig();after();}
+function applyCase(id,idx){const e=S.ladder&&S.ladder.find(x=>x.c.id===id),ok=!!(idx&&e&&e.options&&e.options[idx]);setCase(id);S.fit3=true;if(e&&e.fit)applyPlaced(ok?e.options[idx]:e.placed);S.sel=null;centerLayout();if(window.spreadParts)window.spreadParts();S.opts=e&&e.fit&&e.options&&e.options.length>1?e.options:null;S.optIdx=ok?idx:0;if(window.phonePosTry)window.phonePosTry(id);S.optSig=layoutSig();after();}
 function applyCustom(){const c=S.custom;if(!c)return;setCase('custom');S.fit3=true;const f=S.foam;f.L=c.L;f.W=c.W;f.R=S.set.cornerR;f.autoH=true;applyPlaced(c.placed);centerLayout();S.opts=null;after();}
 /* ---------- add parts ---------- */
 const CAD={files:[]};
@@ -9506,7 +9506,7 @@ function build3D(){
       off+=d.L+50;});
     const tl=over?maxL:off-50;T3.t.set(tl/2,maxW/2,30);if(S.fit3){T3.dist=Math.max(tl,maxW)*1.9;T3.d0=T3.dist;S.fit3=false;}S.dirty3=false;resize3D();return;}
   const Hf=S.Hf;g.add(foamObj(S.L,f,0,0,1,null));
-  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,null,1),z=p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H;m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
+  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,(p.noFit||p.tooTall)?'#B3261E':null,1),z=p.noFit?0:(p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H);m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
   const lh=f.mode==='sta'?f.lid:S.set.lidH,pivot=new THREE.Group();pivot.position.set(0,f.W,Hf);pivot.rotation.x=-S.lidAng*Math.PI/180;
   const lg=new THREE.ExtrudeGeometry(rrShape(f.L,f.W,f.R),{depth:lh,bevelEnabled:false});lg.translate(0,-f.W,0);
   pivot.add(new THREE.Mesh(lg,new THREE.MeshBasicMaterial({color:0xC6B68D,transparent:true,opacity:0.14,depthWrite:false})));pivot.add(new THREE.LineSegments(new THREE.EdgesGeometry(lg,30),new THREE.LineBasicMaterial({color:0x8a8070})));{const li=lidInner();if(li){if(pivot.children[0])pivot.children[0].visible=false;li.g.rotation.x=Math.PI;li.g.position.set(0,0,li.lh);pivot.add(li.g);}}g.add(pivot);T3.pivot=pivot;
@@ -10368,7 +10368,7 @@ function build3D(){
   if(!init3D())return;const g=T3.group;while(g.children.length){const o=g.children.pop();if(o.geometry&&!o.userData.keep)o.geometry.dispose();}T3.partMeshes=[];
   const f=S.foam,Hf=S.Hf;
   if(S.vec){try{g.add(foamVecObj(1));}catch(e){console.error(e);g.add(foamObj(S.L,f,0,0,1,null));}}else g.add(foamObj(S.L,f,0,0,1,null));
-  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,null,1),z=p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H;m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
+  for(const p of visParts()){const c=p.cur.c,m=partMesh(p,c,null,(p.noFit||p.tooTall)?'#B3261E':null,1),z=p.noFit?0:(p.where==='lid'?Hf:Hf+p.cur.s-p.cur.H);m.position.set(p.x+PAD,p.y+PAD,z);m.userData.part=p;m.userData.zFinal=z;g.add(m);T3.partMeshes.push(m);}
   const lh=lidHOf(f),pivot=new THREE.Group();pivot.position.set(0,f.W,Hf);pivot.rotation.x=-S.lidAng*Math.PI/180;
   const lg=new THREE.ExtrudeGeometry(rrShape(f.L,f.W,Math.min(f.R,40)),{depth:lh,bevelEnabled:false});lg.translate(0,-f.W,0);
   pivot.add(new THREE.Mesh(lg,new THREE.MeshBasicMaterial({color:0xC6B68D,transparent:true,opacity:0.12,depthWrite:false})));pivot.add(new THREE.LineSegments(new THREE.EdgesGeometry(lg,30),new THREE.LineBasicMaterial({color:0x8a8070})));{const li=lidInner();if(li){if(pivot.children[0])pivot.children[0].visible=false;li.g.rotation.x=Math.PI;li.g.position.set(0,0,li.lh);pivot.add(li.g);}}g.add(pivot);T3.pivot=pivot;
@@ -12526,7 +12526,46 @@ const root=document.createElement('div');root.innerHTML=`
 <div id="fitBusy"><div class="tickwrap"><svg class="tb" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg><svg class="ov tr" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 -7 L 7 -91.73 A 92 92 0 0 1 91.73 -7 Z"/></svg><svg class="ov br" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M 7 7 L 91.73 7 A 92 92 0 0 1 7 91.73 Z"/></svg><svg class="ov bl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 7 L -7 91.73 A 92 92 0 0 1 -91.73 7 Z"/></svg><svg class="ov tl" viewBox="-100 -100 200 200" aria-hidden="true"><path d="M -7 -7 L -91.73 -7 A 92 92 0 0 1 -7 -91.73 Z"/></svg></div><span id="fitBusyT">Checking the fit…</span></div>`;document.body.appendChild(root);
 const busy=(on,t)=>{q('#fitBusy').style.display=on?'flex':'none';if(t)q('#fitBusyT').textContent=t;};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-function centerIdx(id){const e=S.ladder&&S.ladder.find(x=>x.c.id===id),k=e&&e.options?e.options.findIndex(o=>o.kind==='center'):-1;return k>0?k:0;} // start from the centre and grow outward
+window.spreadPlan=function(regs,fm,al,gap){const n=regs.length;if(!n)return null;const W=fm.w,H=fm.h,rr=(gap+1.5)/2,E=Math.ceil(rr)+1;
+  const P=regs.map(r=>{const c=[];let x0=1e9,y0=1e9,x1=-1,y1=-1;for(let j=0;j<r.h;j++)for(let i=0;i<r.w;i++)if(r.region[j*r.w+i]){c.push(i,j);if(i<x0)x0=i;if(i>x1)x1=i;if(j<y0)y0=j;if(j>y1)y1=j;}
+    const w2=r.w+2*E,h2=r.h+2*E,t=new Uint8Array(w2*h2);for(let k=0;k<c.length;k+=2)t[(c[k+1]+E)*w2+c[k]+E]=1;const dl=dilate(t,w2,h2,rr),d=[];for(let j=0;j<h2;j++)for(let i=0;i<w2;i++)if(dl[j*w2+i])d.push(i-E,j-E);
+    return {c,d,b:r.cb||[x0,y0,x1,y1],x:r.x,y:r.y};});
+  if(P.some(p=>!p.c.length))return null;const grid=new Uint8Array(W*H);
+  const valid=pos=>{grid.fill(0);for(let k=0;k<n;k++){const p=P[k],px=pos[k][0],py=pos[k][1],c=p.c,d=p.d;
+      for(let q=0;q<c.length;q+=2){const X=px+c[q],Y=py+c[q+1];if(X<0||Y<0||X>=W||Y>=H||!al[Y*W+X])return false;}
+      for(let q=0;q<d.length;q+=2){const X=px+d[q],Y=py+d[q+1];if(X>=0&&Y>=0&&X<W&&Y<H&&grid[Y*W+X])return false;}
+      for(let q=0;q<d.length;q+=2){const X=px+d[q],Y=py+d[q+1];if(X>=0&&Y>=0&&X<W&&Y<H)grid[Y*W+X]=1;}}return true;};
+  let gx0=1e9,gy0=1e9,gx1=-1e9,gy1=-1e9;for(const p of P){gx0=Math.min(gx0,p.x+p.b[0]);gy0=Math.min(gy0,p.y+p.b[1]);gx1=Math.max(gx1,p.x+p.b[2]+1);gy1=Math.max(gy1,p.y+p.b[3]+1);}
+  const gcx=(gx0+gx1)/2,gcy=(gy0+gy1)/2,hb=p=>[(p.b[0]+p.b[2]+1)/2,(p.b[1]+p.b[3]+1)/2],cen=P.map(p=>[p.x+hb(p)[0],p.y+hb(p)[1]]);
+  const posOf=(sx,sy,dx,dy)=>P.map((p,k)=>[Math.round(W/2+(cen[k][0]-gcx)*sx+dx-hb(p)[0]),Math.round(H/2+(cen[k][1]-gcy)*sy+dy-hb(p)[1])]);
+  const met=(pos,ax)=>{let inner=1e9,outer=1e9;const bx=P.map((p,k)=>[pos[k][0]+p.b[0],pos[k][1]+p.b[1],pos[k][0]+p.b[2]+1,pos[k][1]+p.b[3]+1]);
+    for(let a=0;a<n;a++){outer=Math.min(outer,ax?Math.min(bx[a][1],H-bx[a][3]):Math.min(bx[a][0],W-bx[a][2]));
+      for(let b=a+1;b<n;b++){const ov=ax?(bx[a][0]<bx[b][2]&&bx[b][0]<bx[a][2]):(bx[a][1]<bx[b][3]&&bx[b][1]<bx[a][3]);if(!ov)continue;
+        const g=ax?Math.max(bx[b][1]-bx[a][3],bx[a][1]-bx[b][3]):Math.max(bx[b][0]-bx[a][2],bx[a][0]-bx[b][2]);if(g>=0)inner=Math.min(inner,g);}}return {inner,outer};};
+  const orig=P.map(p=>[p.x,p.y]);
+  // 1) centre: the exact centre, or the nearest shift that fits
+  let dx=null,dy=null;
+  for(let d=0;d<=60&&dx===null;d+=2){const ring=[];if(!d)ring.push([0,0]);else for(let t=-d;t<=d;t+=2)ring.push([t,-d],[t,d],[-d,t],[d,t]);ring.sort((u,v)=>Math.hypot(u[0],u[1])-Math.hypot(v[0],v[1]));
+    for(const [a,b] of ring)if(valid(posOf(1,1,a,b))){dx=a;dy=b;break;}}
+  if(dx===null)return valid(orig)?{pos:orig,score:-1}:null;
+  // 2) spread along x, then along y, until the gaps between parts match the margin to the foam edge
+  let sx=1,sy=1;
+  for(const ax of [0,1]){const S0=s=>ax?posOf(sx,s,dx,dy):posOf(s,sy,dx,dy),m1=met(S0(1),ax);if(m1.inner>=1e8||m1.inner>=m1.outer)continue;
+    let lo=1,hi=4;for(let it=0;it<22;it++){const mid=(lo+hi)/2,m=met(S0(mid),ax);if(m.inner>=m.outer)hi=mid;else lo=mid;}
+    let s=hi;if(!valid(S0(s))){let a=1,b=s;for(let it=0;it<12;it++){const mid=(a+b)/2;if(valid(S0(mid)))a=mid;else b=mid;}s=a;}
+    if(ax)sy=s;else sx=s;}
+  const pos=posOf(sx,sy,dx,dy);if(!valid(pos))return {pos:posOf(1,1,dx,dy),score:0};
+  const mx=met(pos,0),my=met(pos,1);let score=Math.min(mx.outer,my.outer,mx.inner,my.inner);score-=Math.hypot(dx,dy)*0.25;
+  return {pos,score};};
+window.spreadParts=function(){try{const bs=S.parts.filter(p=>p.where==='base'&&!p.noFit&&p.cur&&p.cur.cav);if(!bs.length||bs.some(p=>p.locked))return;
+  recalc();const fm=S.fm,al=allowedMask(fm,S.set.edge),before=(S.flags||[]).filter(x=>x.lv==='bad').length;
+  const regs=bs.map(p=>{const pr=padRegion(p,p.cur.cav,p.ang.z),cb=p.cur.cav.bbox,o=pr.off;return {region:pr.region,w:pr.w,h:pr.h,x:p.x-o,y:p.y-o,off:o,cb:cb&&cb[2]>=0?[cb[0]+o,cb[1]+o,cb[2]+o,cb[3]+o]:null};});
+  const r=window.spreadPlan(regs,fm,al,S.set.wall);if(!r)return;const old=bs.map(p=>[p.x,p.y]);
+  bs.forEach((p,k)=>{p.x=r.pos[k][0]+regs[k].off;p.y=r.pos[k][1]+regs[k].off;});recalc();
+  if((S.flags||[]).filter(x=>x.lv==='bad').length>before){bs.forEach((p,k)=>{p.x=old[k][0];p.y=old[k][1];});recalc();}}catch(e){console.error('spread',e);}};
+function centerIdx(id){const e=S.ladder&&S.ladder.find(x=>x.c.id===id);if(!e||!e.options||!e.options.length)return 0;if(e._auto!=null&&e._autoN===e.options.length)return e._auto;let best=0,bs=-1e9;
+  try{const fm=getFMf(foamDefOf(e.c)),al=allowedMask(fm,S.set.edge);(e.optDraw||[]).forEach((dr,k)=>{const r=window.spreadPlan(dr.map(d=>({region:d.region,w:d.w,h:d.h,x:d.x,y:d.y})),fm,al,S.set.wall);if(!r)return;const sc=r.score+(e.options[k].kind==='center'?1:0);if(sc>bs){bs=sc;best=k;}});}catch(x){console.error(x);}
+  e._auto=best;e._autoN=e.options.length;return best;} // the option with the most even room once centred and spread
 function fit3d(){setTimeout(()=>{const b=[...document.querySelectorAll('#layout button')].find(x=>x.textContent.trim()==='Fit');if(b)b.click();},700);}
 const nm=id=>String(id).replace(/^STA-300-/,'');
 const dimOf=p=>{try{return getOriented(p,getR(p)).o.ext.map(v=>Math.round(v)).join(' × ')+' mm';}catch(e){return '';}};
@@ -12703,6 +12742,7 @@ body.fitmode #zoomBar,body.fitmode #layout .stage-note{display:none!important}
 html[data-theme=dark] .tmSide{border-color:#EDE8DD}html[data-theme=dark] .tmSide button{background:#2b2826;color:#EDE8DD}
 html[data-theme=dark] .tmSide button+button{border-left-color:#EDE8DD}html[data-theme=dark] .tmSide button.on{background:#F05325;color:#fff}
 html[data-theme=dark] .tmAng{background:#2b2826;color:#EDE8DD}html[data-theme=dark] .tmAng small{color:#aaa196}
+body.fitmode.nfreal #checksList{display:none!important}
 html[data-theme=dark] #tmOver{background:#1d1b1a;color:#EDE8DD}
 html[data-theme=dark] .tmTop button,html[data-theme=dark] .tmBar .tb:not(.o),html[data-theme=dark] .nfsec,html[data-theme=dark] .tmTag{background:#2b2826;color:#EDE8DD;border-color:#EDE8DD}
 html[data-theme=dark] .tmTop .dk{background:#EDE8DD;color:#1d1b1a}
@@ -12810,6 +12850,33 @@ async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=
   q('#tmUndo').onclick=()=>{const sn=TMV.undo.pop();if(!sn)return;tmRestore(sn);TMV.msg=null;TMV.sel=TMV.sel&&S.parts.includes(TMV.sel)?TMV.sel:null;tmDraw();tmUpd();};
   q('#tmBack').onclick=()=>tmClose(false);q('#tmDone').onclick=()=>tmClose(true);
   addEventListener('resize',()=>{if(TMV.on)tmDraw();});})();
+
+/* ---------- a case that does not fit: same 3D view as a good case; the parts that fit are laid in it (centred, spread), the rest wait in red next to the case ---------- */
+function nfRedClear(){if(!NF.redFor)return;const sn=NF.goodSnap;NF.redFor=null;NF.redInfo=null;S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;});const ks=NF.sel;if(sn)tmRestore(sn);NF.sel=ks;NF.goodSnap=null;S.dirty3=true;after();}
+function nfRedShow(cs){if(NF.redFor===cs.id)return;
+  if(!NF.redFor)NF.goodSnap=tmSnap();else{S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;});const ks=NF.sel;tmRestore(NF.goodSnap);NF.sel=ks;}
+  NF.redFor=cs.id;setCase(cs.id);S.fit3=true;S.side='base';applySideFoam();syncWhere();S.parts.forEach(p=>{if(p.side==='lid')p.lidPlaced=false;});recalc();
+  const fm=S.fm,set=S.set,al=allowedMask(fm,set.edge),avail=cs.base-set.floor,bs=S.parts.filter(p=>p.where==='base'),fixed=[],out=[],tall=[];
+  const order=bs.map(p=>{let a=0;try{const e=getOriented(p,getR(p)).o.ext;a=e[0]*e[1];}catch(x){}return {p,a};}).sort((u,v)=>v.a-u.a).map(o=>o.p);
+  for(const p of order){const rots=[],ms=[];
+    for(const T of allowedTs(p))for(let z=0;z<4;z++){const zd=p.rotLock?p.ang.z:(p.ang.z+90*z)%360;try{const R=mmul(rotMat('z',zd),mmul(rotMat('y',p.ang.y),mmul(rotMat('x',p.ang.x),mmul(TM[T],p.R0)))),c=getOriented(p,R),H=c.o.ext[2],st=stickFor(p,T),cv=getCavity(p,c,H,st),pr=padRegion(p,cv,zd);rots.push({region:pr.region,w:pr.w,h:pr.h,H,st});ms.push({T,zd,off:pr.off});}catch(x){}}
+    if(!rots.length){p.noFit=true;out.push(p);continue;}
+    let ok=rots.map((r,k)=>k).filter(k=>rots[k].H<=avail+(rots[k].st||0)+1e-6);const deep=!ok.length;if(deep)ok=rots.map((r,k)=>k);
+    let res=null;try{res=packParts([{id:p.id,rots:ok.map(k=>({region:rots[k].region,w:rots[k].w,h:rots[k].h}))}],fm.w,fm.h,al,set.wall,fixed);}catch(x){console.error(x);}
+    if(res&&res.ok&&res.placed&&res.placed.length){const q2=res.placed[0],k=ok[q2.k],m=ms[k];p.T=m.T;p.stick=stickFor(p,m.T);if(p.allow)p.allow.plus=Math.max(0,p.stick);p.ang.z=m.zd;p.x=q2.x+m.off;p.y=q2.y+m.off;
+      fixed.push({region:rots[k].region,w:rots[k].w,h:rots[k].h,x:q2.x,y:q2.y});if(deep){p.tooTall=true;tall.push(p);}}
+    else{p.noFit=true;out.push(p);}}
+  recalc();let ox=fm.w+45,oy=0,colW=0;
+  for(const p of out){const h=getOriented(p).hm;if(oy>0&&oy+h.h>fm.h){ox+=colW+20;oy=0;colW=0;}p.x=ox;p.y=fm.h-oy-h.h;oy+=h.h+20;colW=Math.max(colW,h.w);}
+  recalc();if(window.spreadParts)window.spreadParts();S.dirty3=true;after();
+  const names=a=>[...new Set(a.map(p=>p.name))].map(n=>[n,a.filter(p=>p.name===n).length]);
+  NF.redInfo={out:names(out),tall:[...new Set(tall.map(p=>p.name))],fingers:out.concat(tall).some(p=>(p.fingers||[]).some(f=>f.shape)),n:out.length};
+  setTimeout(nfRedFrame,80);setTimeout(nfRedFrame,700);}
+function nfRedFrame(){try{frontTilt();const ps=S.parts.filter(p=>p.noFit);if(!ps.length||typeof T3==='undefined'||!T3.ready)return;const f=S.foam;let mx=f.L;for(const p of ps){const h=getOriented(p).hm;mx=Math.max(mx,p.x+h.w+30);}T3.t.x=mx/2;T3.dist*=Math.max(1,mx/f.L)*0.86;camUpdate();}catch(e){}}
+function nfRedLines(cs){const I=NF.redInfo,L=[],lst=a=>a.map(([n,c])=>'<b>'+nfEsc(n)+'</b>'+(c>1?' ×'+c:'')).join(', ');
+  if(I.out.length)L.push('<b>'+nm(cs.id)+':</b> '+lst(I.out)+(I.n===1?' does':' do')+' not fit (red, next to the case).');
+  if(I.tall.length)L.push((I.out.length?'':'<b>'+nm(cs.id)+':</b> ')+I.tall.map(n=>'<b>'+nfEsc(n)+'</b>').join(', ')+(I.tall.length>1?' are':' is')+' too deep (red in the case).');
+  L.push(I.fingers?'Tip: fewer or smaller finger notches save room.':'Tip: turn the parts, or put one in the lid.');return L.slice(0,3);}
 function nfLayout(){const t=q('#nfTop'),b=q('#nfBot');if(!t||!b)return;document.documentElement.style.setProperty('--nft',(t.offsetHeight+6)+'px');document.documentElement.style.setProperty('--nfb',(b.offsetHeight+8)+'px');}
 /* the case seen from the front, tilted, so the base and the open lid are both in view */
 function frontTilt(){if(typeof T3==='undefined'||!T3.ready)return;T3.az=-Math.PI/2;T3.el=0.55;try{const f=S.foam,hf=2*Math.atan(Math.tan(T3.cam.fov*Math.PI/360)*T3.cam.aspect),vf=T3.cam.fov*Math.PI/180;T3.t.set(f.L/2,f.W/2,(S.Hf||30)/2);T3.dist=Math.max(f.L*1.5/(2*Math.tan(hf/2)),f.W*2.2/(2*Math.tan(vf/2)));}catch(e){}camUpdate();}
@@ -12902,20 +12969,22 @@ function render(){
   q('#nfH').textContent=rec?'Best fit: '+nm(rec.id):'No case fits';
   q('#nfChips').innerHTML=ord.map(c=>{const s=stat(c.id),lab={no:'NO',yes:'YES',best:'BEST'}[s];return `<button class="nfchip ${s}${NF.sel===c.id?' sel':''}" data-id="${c.id}" aria-label="${nm(c.id)} ${lab}">${nm(c.id)}<span>${lab}</span></button>`;}).join('');
   const sel=CASES.find(c=>c.id===NF.sel),ss=stat(NF.sel),w=q('#nfWhy');let lines;
-  if(ss==='no')lines=reasonFor(sel).map((x,i)=>i?x:'<b>'+nm(sel.id)+':</b> '+x);
+  const lidOnly=ss==='no'&&/lid/i.test((FIT.res&&FIT.res.why[sel.id])||''),realRed=ss==='no'&&!lidOnly&&!!NF.shown;if(NF.redFor&&!realRed)nfRedClear();if(realRed)nfRedShow(sel);
+  if(ss==='no')lines=(realRed&&NF.redInfo&&(NF.redInfo.out.length||NF.redInfo.tall.length))?nfRedLines(sel):reasonFor(sel).map((x,i)=>i?x:'<b>'+nm(sel.id)+':</b> '+x);
   else if(ss==='best'){const smaller=ord.filter(c=>c.L*c.W<sel.L*sel.W&&stat(c.id)==='no'),nx=smaller[smaller.length-1];
     lines=nx?reasonFor(nx).slice(0,1).map(x=>'<b>'+nm(nx.id)+' is too small:</b> '+x):['<b>'+sel.name+'</b> is the smallest STA-300 case.'];}
   else lines=['<b>'+nm(sel.id)+'</b> fits too'+(rec?': a bigger case than '+nm(rec.id):'')+'.'];
   w.className=ss;w.innerHTML=lines.join('<br>');
-  document.body.classList.toggle('nfred',ss==='no');if(ss==='no')requestAnimationFrame(()=>drawOver(sel));
-  const shown=NF.shown;q('#nfAl').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.al===NF.align);b.disabled=!shown||alignIdx(shown,b.dataset.al)==null;});
-  q('#nfLid').textContent=(S.lidAng||0)>50?'Close lid':'Open lid';q('#nfTurn').disabled=!shown;
+  document.body.classList.toggle('nfred',ss==='no'&&!realRed);document.body.classList.toggle('nfreal',!!realRed);if(ss==='no'&&!realRed)requestAnimationFrame(()=>drawOver(sel));
+  const shown=NF.shown;q('#nfAl').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.al===NF.align);b.disabled=!shown||!!NF.redFor||alignIdx(shown,b.dataset.al)==null;});
+  q('#nfLid').textContent=(S.lidAng||0)>50?'Close lid':'Open lid';q('#nfTurn').disabled=!shown||!!NF.redFor;
   requestAnimationFrame(nfLayout);}
 window.__startFit=function(){document.body.classList.add('fitmode');const sp=document.getElementById('fitSplash');if(sp)sp.remove();const nb=q('#btnNext');if(nb&&nb.parentElement)nb.parentElement.classList.add('fithide');
   S.parts.forEach(p=>{if(!p.fitSide)p.fitSide='auto';});
   q('#nfBack').onclick=q('#nfEdit').onclick=()=>{location.href=APP+'#layout';};
   q('#nfFwd').onclick=q('#nfSend').onclick=()=>{location.href=APP+'#send';};
   q('#nfChips').onclick=async e=>{const b=e.target.closest('.nfchip');if(!b||FIT.busy)return;const id=b.dataset.id;NF.sel=id;
+    if(stat(id)!=='no'&&NF.redFor){nfRedClear();if(id===NF.shown)setTimeout(frontTilt,300);}
     if(stat(id)!=='no'&&id!==NF.shown){NF.shown=id;await pickCase(id);if(NF.align!=='auto')applyAlign();setTimeout(frontTilt,900);}render();};
   q('#nfTurn').onclick=()=>tmOpen();
   q('#nfAl').onclick=e=>{const b=e.target.closest('button[data-al]');if(!b||b.disabled)return;NF.align=b.dataset.al;applyAlign();render();};
