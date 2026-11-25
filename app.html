@@ -159,6 +159,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 .lfLen button{width:38px;height:40px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:700 18px Poppins,sans-serif}
 .lfLen span{min-width:62px;text-align:center;font:600 14px Poppins,sans-serif}
 .lfLg{display:flex;flex-direction:column;gap:2px;font-size:13px}.lfLg div{display:flex;align-items:center;gap:8px}.lfLg svg{flex:none}
+.lb .ed{height:34px;padding:0 10px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:600 13px Poppins,sans-serif;flex:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -361,7 +362,7 @@ html[data-theme=dark] .lfTip{background:#EDE8DD;color:#1d1b1a}
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.6 · 25 Nov 2026';
+const APP_VERSION='A1.7 · 25 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -423,11 +424,12 @@ function afterSheet(){let seen=false;try{seen=localStorage.getItem('fa_lvl_seen'
 $('#homeOpen').onclick=()=>show('sProj');
 const szTxt=q=>{const f=v=>P.unit==='in'?(v/25.4).toFixed(1):Math.round(v);return f(q.L)+' × '+f(q.W)+' × '+f(q.D)+' '+P.unit;};
 ENTER.sProj=()=>{const l=$('#projList'),list=P.parts.slice().reverse(),n=LAY().length;
-  l.innerHTML=list.length?list.map(q=>`<div class="lb${q.use?' on':''}" data-lb="${q.id}"><button class="ck" data-a="use" role="checkbox" aria-checked="${!!q.use}" aria-label="Use ${esc(q.name)}">${q.use?'✓':''}</button><img class="th" src="${q.thumb||''}" alt=""><div style="flex:1;min-width:0" data-a="use"><b>${esc(q.name)}</b><span>${szTxt(q)}</span></div><button class="dl" data-a="del" aria-label="Delete ${esc(q.name)}">🗑</button></div>`).join(''):'<p class="hint" style="text-align:center;padding:30px 0">The library is empty. Scan an object first.</p>';
+  l.innerHTML=list.length?list.map(q=>`<div class="lb${q.use?' on':''}" data-lb="${q.id}"><button class="ck" data-a="use" role="checkbox" aria-checked="${!!q.use}" aria-label="Use ${esc(q.name)}">${q.use?'✓':''}</button><img class="th" src="${q.thumb||''}" alt=""><div style="flex:1;min-width:0" data-a="use"><b>${esc(q.name)}</b><span>${szTxt(q)}</span></div><button class="ed" data-a="edit" aria-label="Edit ${esc(q.name)}">Edit</button><button class="dl" data-a="del" aria-label="Delete ${esc(q.name)}">🗑</button></div>`).join(''):'<p class="hint" style="text-align:center;padding:30px 0">The library is empty. Scan an object first.</p>';
   $('#libGo').textContent=n?'Go to layout ('+n+')':'Go to layout';$('#libGo').disabled=!n;$('#libHint').style.display=list.length?'block':'none';updNav();};
 FWD.sProj=()=>LAY().length?()=>show('sLayout'):null;
 $('#projList').onclick=e=>{const b=e.target.closest('[data-a]'),r=e.target.closest('[data-lb]');if(!b||!r)return;const q=P.parts.find(x=>x.id===r.dataset.lb);if(!q)return;
   if(b.dataset.a==='use'){q.use=!q.use;saveAll();ENTER.sProj();return;}
+  if(b.dataset.a==='edit'){editPart(q.id);return;}
   if(b.dataset.a==='del'){if(!confirm('Delete "'+q.name+'" from the library? This cannot be undone.'))return;PHDB.del('ph:'+q.id).catch(()=>{});P.parts=P.parts.filter(x=>x!==q);saveAll();ENTER.sProj();}};
 $('#libGo').onclick=()=>{if(LAY().length){CUR=null;show('sLayout');}};
 $('#libScan').onclick=()=>{CUR=null;show('sSheet');};
@@ -738,7 +740,7 @@ ENTER.sLayout=()=>{$('#layGo').textContent=SHOW_FIT?'Find my STA-300 case':'Send
 FWD.sLayout=()=>LAY().length?()=>layNext():null;
 function renderLayout(){const l=$('#layList');if(!LAY().length){l.innerHTML='<p class="hint" style="text-align:center;padding:30px 0">No parts yet. Scan a part, or add parts from the library.</p>';return;}
   l.innerHTML=LAY().map(q=>`<div class="card pc${q.inCheck===false?' out':''}" data-id="${q.id}">
-  <div class="row" style="gap:12px"><img class="th" src="${q.thumb||''}" alt=""><div class="nm">${esc(q.name)}</div><button class="sm" data-a="edit">Edit</button><button class="sm" data-a="out" aria-label="Take out of the layout">✕</button></div>
+  <div class="row" style="gap:12px"><img class="th" src="${q.thumb||''}" alt=""><div class="nm">${esc(q.name)}</div><button class="sm" data-a="out" aria-label="Take out of the layout">✕</button></div>
   <div class="ln"><span>Copies</span><div class="row" style="gap:10px"><button class="qb" data-a="minus" aria-label="Remove one">-</button><span>${q.qty||1}</span><button class="qb add" data-a="plus" aria-label="Add one">+</button></div></div>
   <div class="bl"><button data-a="base" class="${q.side!=='lid'?'on':''}" role="checkbox" aria-checked="${q.side!=='lid'}">Base</button><button data-a="lid" class="${q.side==='lid'||q.side==='both'?'on':''}" role="checkbox" aria-checked="${q.side==='lid'||q.side==='both'}">Lid</button></div>${q.side==='both'?'<div class="blh">Base and Lid: the tool picks the best place.</div>':''}
   <div class="ln"><button class="lift" data-a="liftedit">Easy to lift${q.lift?' <u>· '+q.notches.length+' notch'+(q.notches.length===1?'':'es')+' · edit</u>':''}</button><button class="sw" role="switch" aria-checked="${!!q.lift}" aria-label="Easy to lift" data-a="lift"></button></div>
