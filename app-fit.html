@@ -12430,12 +12430,12 @@ function phoneNotches(p,nt,x0,y0,bw,bh){if(!Array.isArray(nt))return;const fl=[]
 window.__importOutline=function(name,ring,H,qty,side,opts){try{
   if(!ring||ring.length<3||!(H>0))return null;let ar=0;for(let i=0;i<ring.length;i++){const u=ring[i],v=ring[(i+1)%ring.length];ar+=u[0]*v[1]-v[0]*u[1];}if(ar<0)ring=ring.slice().reverse();
   const xs=ring.map(a=>a[0]),ys=ring.map(a=>a[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),bw=x1-x0,bh=y1-y0;
-  if(bw>285||bh>285){toast('A part from the phone is bigger than 285 mm.');return null;}
-  const poly=ring.map(a=>[a[0]-x0,a[1]-y0]),pos=extrude(poly,H),stt=meshStats(pos),w=900,h=900,offX=(300-bw)/2,offY=(300-bh)/2,toPx=a=>[(a[0]+offX)*PPM,h-(a[1]+offY)*PPM,0,0,null];
+  if(bw>1200||bh>1200){toast('A part from the phone is bigger than 1.2 m and was not added.');return null;}const FLD=Math.max(300,Math.ceil(Math.max(bw,bh)+20));
+  const poly=ring.map(a=>[a[0]-x0,a[1]-y0]),pos=extrude(poly,H),stt=meshStats(pos),w=FLD*PPM,h=FLD*PPM,offX=(FLD-bw)/2,offY=(FLD-bh)/2,toPx=a=>[(a[0]+offX)*PPM,h-(a[1]+offY)*PPM,0,0,null];
   const cxp=(offX+bw/2)*PPM,cyp=h-(offY+bh/2)*PPM,hw=bw*PPM/2,hh=bh*PPM/2;
   const tc=document.createElement('canvas');tc.width=tc.height=72;const tg=tc.getContext('2d'),k=64/Math.max(bw,bh);tg.fillStyle='#f6f3ec';tg.fillRect(0,0,72,72);tg.fillStyle='#3c6e2f';tg.beginPath();poly.forEach((a,i)=>{const x=36+(a[0]-bw/2)*k,y=36-(a[1]-bh/2)*k;i?tg.lineTo(x,y):tg.moveTo(x,y);});tg.closePath();tg.fill();
   const photo={source:'sketch',estimate:true,sheet:'Phone',diffMm:0,diffCdMm:null,heightMm:H,outline:poly.map(q=>[+q[0].toFixed(2),+q[1].toFixed(2)]),thumb:tc.toDataURL('image/png'),
-    edit:{sketch:true,warp:null,ww:w,wh:h,sheetW:300,sheetH:300,poly:poly.map(toPx),dim:{A:[[cxp-hw,cyp],[cxp+hw,cyp]],B:[[cxp,cyp-hh],[cxp,cyp+hh]]},dimHide:{},cal:{ab:bw.toFixed(4),cd:bh.toFixed(4),h:String(H),name},line:null}};
+    edit:{sketch:true,warp:null,ww:w,wh:h,sheetW:FLD,sheetH:FLD,poly:poly.map(toPx),dim:{A:[[cxp-hw,cyp],[cxp+hw,cyp]],B:[[cxp,cyp-hh],[cxp,cyp+hh]]},dimHide:{},cal:{ab:bw.toFixed(4),cd:bh.toFixed(4),h:String(H),name},line:null}};
   if(opts&&opts.id){photo.phoneId=opts.id;photo.pbox=[x0,y0,bw,bh];
     const ex=S.parts.find(q=>q.photo&&q.photo.phoneId===opts.id);
     if(ex){ /* same part sent again from the phone: update it (outline, depth, name, photo). Quantity and Base/Lid stay as set on the computer. */
