@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Best fit — Shell-Case</title>
 <script>(function(){var d=false;try{d=localStorage.getItem('fa_theme')==='dark';}catch(e){}document.documentElement.setAttribute('data-theme',d?'dark':'light');})();</script>
-<script>(function(){var h=location.hash;if(!/^#phone=/.test(h)){location.replace('app.html');return;}var m=/&u=(in|mm)/.exec(h);window.__faUnit=m?m[1]:'mm';})();</script>
+<script>(function(){var h=location.hash;window.__faHash=h;if(!/^#phone=/.test(h)){location.replace('app.html');return;}var m=/&u=(in|mm)/.exec(h);window.__faUnit=m?m[1]:'mm';})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -12711,7 +12711,7 @@ html[data-theme=dark] #nfMenu .mp{background:#2b2826;color:#EDE8DD;border-color:
 body.fitmode #zoomBar,body.fitmode #layout .stage-note{display:none!important}
 
 .nfsec{width:100%;height:42px;border:2px solid #292524;border-radius:12px;background:#fff;color:#292524;font:600 15px Poppins,sans-serif;margin:6px 0 0;display:flex;align-items:center;justify-content:center;gap:8px}
-.nfsec:disabled{opacity:.4}
+.nfsec:disabled{opacity:.4} .nfrow2{display:flex;gap:8px}.nfrow2>.nfsec{flex:1;min-width:0;padding:0 6px;white-space:nowrap} #svM{position:fixed;inset:0;z-index:90;background:rgba(41,37,36,.55);display:none;align-items:flex-end;justify-content:center}#svM.on{display:flex} #svM .c{background:#fff;color:#292524;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 18px calc(env(safe-area-inset-bottom) + 18px);display:flex;flex-direction:column;gap:10px;font-family:Poppins,Arial,sans-serif} #svM h2{margin:0;font:700 26px Antonio,Arial,sans-serif;text-transform:uppercase}#svM p{margin:0;font-size:13px;color:#6b645d} #svM input{height:48px;border:2px solid #292524;border-radius:12px;padding:0 12px;font:500 16px Poppins,Arial,sans-serif;color:#292524;background:#fff} #svM .b{height:48px;border-radius:12px;border:2px solid #292524;background:#fff;color:#292524;font:600 15px Poppins,Arial,sans-serif}#svM .b.p{background:#292524;color:#F1EEE5}#svM .l{border:0;background:none;text-decoration:underline;height:32px}
 #tmOver{position:fixed;inset:0;z-index:55;background:#F1EEE5;display:none;flex-direction:column;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 12px);font-family:Poppins,sans-serif;color:#292524;box-sizing:border-box}
 #tmOver.on{display:flex}
 .tmTop{display:flex;align-items:center;gap:8px}.tmTop h2{flex:1;text-align:center;margin:0;font:700 24px Antonio,sans-serif;text-transform:uppercase;letter-spacing:.5px}
@@ -12762,7 +12762,7 @@ const nfRoot=document.createElement('div');nfRoot.innerHTML=`<div id="nfTop"><di
 <button id="nfLid">Close lid</button><div id="nfZoom"><button id="nfZin" aria-label="Zoom in">+</button><button id="nfZout" aria-label="Zoom out">−</button></div><div id="nfOver"><canvas id="nfOverCv"></canvas><div id="nfChk"></div><div id="nfOverHint">Drag to turn · pinch to zoom</div></div><div id="nfNone">No STA-300 case fits these parts.<br>Send them to Shell-Case for a custom foam.</div>
 <div id="nfBot"><div class="nfchips" id="nfChips"></div><div id="nfWhy"></div>
 <div class="nfal" id="nfAl"><b>Align</b><div class="nfseg"><button data-al="auto">Auto</button></div></div>
-<button class="nfsec" id="nfTurn"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>Turn &amp; move parts</button><button class="nfpri" id="nfSend">Send to computer</button><div class="nflinks"><button class="nflink" id="nfEdit">Edit parts</button><button class="nflink" id="nfVid">Download video</button></div></div>`;document.body.appendChild(nfRoot);{const tmd=document.createElement('div');tmd.innerHTML=`<div id="tmOver" role="dialog" aria-label="Turn and move parts"><div class="tmTop"><button id="tmBack">‹ Back</button><h2>Turn &amp; move</h2><button id="tmDone" class="dk">Done</button></div><div class="tmSide" id="tmSide"><button data-s="base" class="on">Base</button><button data-s="lid">Lid</button></div><div class="tmHint" id="tmHint"></div><div class="tmView"><canvas id="tmCv"></canvas><div class="tmTag" id="tmCase"></div></div><div class="tmStat" id="tmStat"></div><div class="tmBar"><button class="tb" id="tmL" aria-label="Turn left 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button><label class="tmAng off" id="tmAngBox"><small>Angle · tap to type</small><div><input id="tmAng" type="number" inputmode="numeric" min="-359" max="359" step="1" aria-label="Exact angle in degrees" disabled><b>°</b></div></label><button class="tb" id="tmR" aria-label="Turn right 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button></div><div class="tmBar"><button class="tb o" id="tmAuto">Auto organize</button></div><div class="tmLinks"><button id="tmUndo">Undo</button><button id="tmReset">Reset turns</button></div></div>`;document.body.appendChild(tmd.firstChild);}
+<div class="nfrow2"><button class="nfsec" id="nfTurn"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>Turn &amp; move</button><button class="nfsec" id="nfSave"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 3h10l3 3v11H4z"/><path d="M7 3v5h6V3M7 17v-5h7v5"/></svg>Save layout</button></div><button class="nfpri" id="nfSend">Send to computer</button><div class="nflinks"><button class="nflink" id="nfEdit">Edit parts</button><button class="nflink" id="nfVid">Download video</button></div></div>`;document.body.appendChild(nfRoot);{const tmd=document.createElement('div');tmd.innerHTML=`<div id="tmOver" role="dialog" aria-label="Turn and move parts"><div class="tmTop"><button id="tmBack">‹ Back</button><h2>Turn &amp; move</h2><button id="tmDone" class="dk">Done</button></div><div class="tmSide" id="tmSide"><button data-s="base" class="on">Base</button><button data-s="lid">Lid</button></div><div class="tmHint" id="tmHint"></div><div class="tmView"><canvas id="tmCv"></canvas><div class="tmTag" id="tmCase"></div></div><div class="tmStat" id="tmStat"></div><div class="tmBar"><button class="tb" id="tmL" aria-label="Turn left 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button><label class="tmAng off" id="tmAngBox"><small>Angle · tap to type</small><div><input id="tmAng" type="number" inputmode="numeric" min="-359" max="359" step="1" aria-label="Exact angle in degrees" disabled><b>°</b></div></label><button class="tb" id="tmR" aria-label="Turn right 90 degrees"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M7 3.5A6.5 6.5 0 1 0 13.5 10"/><path d="M3 1v5h5"/></svg>90°</button></div><div class="tmBar"><button class="tb o" id="tmAuto">Auto organize</button></div><div class="tmLinks"><button id="tmUndo">Undo</button><button id="tmReset">Reset turns</button></div></div>`;document.body.appendChild(tmd.firstChild);}
 const sizeOrder=()=>CASES.slice().sort((a,b)=>a.L*a.W-b.L*b.W);
 const nfMm=v=>NF.unit==='in'?(Math.ceil(v/25.4*10)/10)+' in':Math.ceil(v)+' mm';
 const nfEsc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -12824,7 +12824,7 @@ function tmUpd(){const has=!!TMV.sel,lidSide=S.side==='lid',mine=p=>((p.side||'b
   else if(!tmParts().length){st.className='tmStat';st.textContent=lidSide?'No parts in the lid.':'No parts in the base.';}
   else{st.className='tmStat ok';st.textContent='✓ '+(lidSide?'The lid fits':'Fits')+' in '+(cs?nm(cs):'this case')+'.';}}
 function tmOpen(){if(!(NF.shown||NF.redFor)||FIT.busy||!S.fm){toast('Pick a case first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;if(S.side!=='base')tmGoSide('base',true);TMV.snap0=tmSnap();if(NF.redFor&&nfBringIn())TMV.msg={c:'bad',t:'The red parts did not fit. Drag and turn them to try, or tap Auto organize.'};recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
-function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')||'{}'),by={};for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;(by[id]=by[id]||[]).push(p.rotLock?Math.round(p.ang.z):null);}
+window.__tmSave=()=>tmSaveTurns();function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')||'{}'),by={};for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;(by[id]=by[id]||[]).push(p.rotLock?Math.round(p.ang.z):null);}
   for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}
   try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);const lid=p.side==='lid';(by[id]=by[id]||[]).push(lid?(p.lidPlaced?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2),1]:null):[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]);}
   for(const id in by)all[id]={c:cs,p:by[id]};localStorage.setItem('fa_pos',JSON.stringify(all));}catch(e){}}
@@ -13239,4 +13239,41 @@ window.__prodLib={save:saveGroup,add:addEntry,list:getIndex,show:showLib};
 })();
 </script>
 
+<div id="svM" role="dialog" aria-modal="true" aria-label="Save layout"><div class="c"><h2>Save layout</h2><p id="svInfo"></p>
+<input id="svName" maxlength="40" aria-label="Name" autocomplete="off"><button class="b p" id="svGo" type="button">Save</button><button class="b" id="svNew" type="button" style="display:none">Save as new</button><button class="b l" id="svNo" type="button">Cancel</button></div></div>
+<script>
+/* ---------- Save layout: the case + parts in place, kept on this phone (fa_saved) ---------- */
+(function(){const $i=id=>document.getElementById(id),LS='fa_saved';
+ const rd=()=>{try{const a=JSON.parse(localStorage.getItem(LS)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}};
+ const wr=a=>{try{localStorage.setItem(LS,JSON.stringify(a));return true;}catch(e){return false;}};
+ const H0=window.__faHash||location.hash,prm=new URLSearchParams(H0.split('&').slice(1).join('&'));let svId=prm.get('sv');const wantCase=prm.get('case');
+ async function items(){const m=/^#phone=([jz])\.([A-Za-z0-9_-]+)/.exec(H0);if(!m)return [];let b=m[2].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';
+  const bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);let txt;
+  if(m[1]==='z'){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(u);w.close();txt=new TextDecoder().decode(await new Response(ds.readable).arrayBuffer());}else txt=new TextDecoder().decode(u);
+  const j=JSON.parse(txt);return Array.isArray(j.items)?j.items:[];}
+ const caseName=()=>{const c=document.querySelector('.nfchip.sel');return c&&c.firstChild?String(c.firstChild.textContent||'').trim():(S.foam.caseId||'');};
+ async function snap(){try{window.__tmSave&&window.__tmSave();}catch(e){}const its=await items();let pos={},tu={};try{pos=JSON.parse(localStorage.getItem('fa_pos')||'{}');tu=JSON.parse(localStorage.getItem('fa_turns')||'{}');}catch(e){}
+  const cs=S.foam.caseId;return its.map(it=>{const o=Object.assign({},it);if(it.i){const p=pos[it.i];if(p&&p.c===cs)o.xy={c:cs,p:p.p};else delete o.xy;const t=tu[it.i];if(Array.isArray(t))o.zr=t;else delete o.zr;}return o;});}
+ function open(){if(!S.foam||!S.foam.caseId||(window.__FIT&&window.__FIT.busy)){toast('Pick a case first.');return;}
+  const old=svId?rd().find(r=>r.id===svId):null,n=S.parts.length;
+  $i('svInfo').textContent=caseName()+' · '+n+' part'+(n===1?'':'s')+' · find it in the app menu: Saved layouts';
+  $i('svName').value=old?old.name:'Layout '+(rd().length+1);$i('svGo').textContent=old?'Save changes':'Save';$i('svNew').style.display=old?'':'none';
+  $i('svM').classList.add('on');setTimeout(()=>{try{$i('svName').focus();$i('svName').select();}catch(e){}},80);}
+ async function save(asNew){const name=($i('svName').value||'').trim()||'Layout '+(rd().length+1);const its=await snap();if(!its.length){toast('Nothing to save.');return;}
+  const old=!asNew&&svId?rd().find(r=>r.id===svId):null;
+  const rec={id:old?old.id:'L'+Date.now().toString(36),name,t:Date.now(),cs:S.foam.caseId,cn:caseName(),u:window.__faUnit||'mm',items:its};
+  const a=rd().filter(r=>r.id!==rec.id);a.unshift(rec);if(!wr(a)){toast('The phone storage is full. Delete an old saved layout in the app.');return;}
+  svId=rec.id;$i('svM').classList.remove('on');toast('Saved: '+name+'. Open it from the app menu: Saved layouts.');}
+ document.addEventListener('click',e=>{if(e.target.closest('#nfSave'))open();});
+ $i('svGo').onclick=()=>save(false);$i('svNew').onclick=()=>save(true);$i('svNo').onclick=()=>$i('svM').classList.remove('on');
+ $i('svM').addEventListener('click',e=>{if(e.target.id==='svM')$i('svM').classList.remove('on');});
+ $i('svName').addEventListener('keydown',e=>{if(e.key==='Enter')save(false);});
+ /* a saved layout opens on its own case */
+ if(wantCase){const t0=Date.now();let tried=false;const iv=setInterval(()=>{if(Date.now()-t0>120000){clearInterval(iv);return;}
+   const F=window.__FIT,N=window.__NF;if(!document.body.classList.contains('fitmode')||(F&&F.busy)||!N||!document.querySelector('#nfChips .nfchip'))return;
+   const b=document.querySelector('#nfChips .nfchip[data-id="'+wantCase.replace(/"/g,'')+'"]');
+   if(!b){const m=document.querySelector('#nfChips .nfchip.more');if(m&&!tried){tried=true;m.click();return;}clearInterval(iv);return;}
+   clearInterval(iv);if(!b.classList.contains('sel'))b.click();},400);}
+})();
+</script>
 </body></html>

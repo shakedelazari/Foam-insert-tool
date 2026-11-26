@@ -180,6 +180,22 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 .szLift{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px 12px;flex:none}.szLift .t{flex:1;min-width:0}.szLift b{display:block;font-size:14px}.szLift span{font-size:12px;color:var(--muted)}.szLift .sw{margin:0}
 .lfAdd{position:absolute;right:10px;top:10px;width:46px;height:46px;border-radius:50%;border:0;background:var(--fl);color:#fff;font:700 28px/1 Poppins,sans-serif;z-index:3;box-shadow:0 3px 8px rgba(0,0,0,.25);padding:0}
 .lfAddL{position:absolute;right:62px;top:24px;font:600 12px Poppins,sans-serif;color:var(--ink);z-index:3;pointer-events:none;background:rgba(255,255,255,.85);padding:2px 8px;border-radius:8px}
+#guide{position:fixed;inset:0;z-index:300;background:#F1EEE5;color:#292524;display:none;flex-direction:column;gap:10px;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 14px)}
+#guide.on{display:flex}
+#guide .gTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#guide .gTop b{font:700 22px Antonio,sans-serif;text-transform:uppercase}
+#guide .gX{height:38px;padding:0 14px;border:2px solid #292524;border-radius:10px;background:#fff;color:#292524;font:600 14px Poppins,sans-serif}
+#guide .gSt{flex:1 1 auto;min-height:0;display:flex;justify-content:center;touch-action:pan-y}
+#guide .gSt svg{width:100%;height:100%;display:block}
+#guide .gBig{display:flex;align-items:center;gap:12px;min-height:58px}
+#guide .gNum{width:48px;height:48px;border-radius:50%;background:#F05325;color:#fff;font:700 26px Antonio,sans-serif;display:grid;place-items:center;flex:none}
+#guide h3{margin:0;font:700 30px/1 Antonio,sans-serif;text-transform:uppercase;color:#292524}
+#guide .gBig p{margin:3px 0 0;font-size:14px;color:#6b645d}
+#guide .gDots{display:flex;gap:8px;justify-content:center}#guide .gDots i{width:10px;height:10px;border-radius:50%;background:#d6ccb3}#guide .gDots i.on{background:#F05325;width:26px;border-radius:5px}
+#guide .gRow{display:flex;gap:8px}#guide .gB{flex:1;height:52px;border-radius:12px;border:2px solid #292524;background:#fff;color:#292524;font:600 16px Poppins,sans-serif}#guide .gB.p{background:#292524;color:#F1EEE5}
+.card.svc{display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px}.svb{width:54px;height:54px;border-radius:10px;background:#C6B68D;color:#292524;font:700 19px Antonio,sans-serif;display:grid;place-items:center;flex:none;text-align:center;line-height:1}
+.svt{flex:1;min-width:0}.svt b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.svt span{font-size:12px;color:var(--muted)}
+.svc .nb{flex:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -193,6 +209,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <div class="grow homeVis"><img src="case-family.webp" alt="Shell-Case cases"></div>
   <button class="pri" id="homeScan" style="background:var(--fl);border-color:var(--fl);color:#fff">Scan object</button>
   <button class="sec" id="homeOpen">Open library</button>
+    <button class="sec" id="homeSaved" style="display:none">Saved layouts</button>
   <div class="hint" style="text-align:center" id="verTxt"></div>
 </section>
 
@@ -204,6 +221,15 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <div class="lay" id="projList"></div>
   <button class="sec" id="libScan">+ Scan new object</button>
   <button class="pri" id="libGo">Go to layout</button>
+</section>
+
+<!-- Saved layouts: cases with the parts in place, saved in Best fit -->
+<section id="sSaved" class="scr">
+  <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd" disabled>Forward ›</button></div>
+  <h2>Saved layouts</h2>
+  <div class="hint" id="svHint">Your cases with the parts in place. Tap Open to keep working on one.</div>
+  <div class="lay" id="svList"></div>
+  <button class="sec" id="svLib">Open library</button>
 </section>
 
 <!-- 2 Allow level -->
@@ -360,6 +386,10 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <button class="mi" data-mi="home">Home</button>
   <button class="mi" data-mi="lib">Library</button>
   <button class="mi" data-mi="lay">Layout</button>
+    <button class="mi" data-mi="saved">Saved layouts</button>
+    <hr>
+    <button class="mi" data-mi="g0">How to scan</button>
+    <button class="mi" data-mi="g1">How to place in the case</button>
   <hr>
   <button class="mi" data-mi="dark">Dark mode<span class="sw" role="switch" aria-checked="false" id="darkSw" style="pointer-events:none"></span></button>
 </div></div>
@@ -380,11 +410,212 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 </div></div>
 <div id="busy"><i></i><span id="busyT">Working…</span><button type="button" id="busyBack" class="sec" style="display:none;height:46px;padding:0 22px">‹ Back</button></div>
 <div id="toast"></div>
+<div id="guide" role="dialog" aria-modal="true" aria-label="How it works"><div class="gTop"><b id="gName"></b><button class="gX" id="gSkip" type="button">Skip ✕</button></div><div class="gSt" id="gSt"></div><div class="gBig"><div class="gNum" id="gNum"></div><div><h3 id="gT"></h3><p id="gS"></p></div></div><div class="gDots" id="gDots"></div><div class="gRow"><button class="gB" id="gBack" type="button">‹ Back</button><button class="gB p" id="gNext" type="button">Next ›</button></div></div>
+<script>
+/* ---------- step-by-step guides (pictures move, minimum text) ---------- */
+window.GUIDE=(function(){
+
+const C=(a,b,p)=>Math.min(1,Math.max(0,(p-a)/(b-a))),E=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2,L=(a,b,k)=>a+(b-a)*k;
+const W=343,H=426,T=(x,y,s,o)=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="${o&&o.f||'Poppins'}" font-weight="700" font-size="${s}" fill="${o&&o.c||'#292524'}">`;
+const SHAPE="M-48 -38 H28 Q50 -38 50 -26 H70 Q78 -26 78 -18 V-2 Q78 6 70 6 H50 Q50 18 28 18 H4 V62 H10 V88 H-36 V62 H-30 V18 H-48 Q-70 18 -70 -10 Q-70 -38 -48 -38 Z";
+function part(x,y,s,op){return `<g transform="translate(${x},${y}) scale(${s})" opacity="${op==null?1:op}"><path d="${SHAPE}" fill="#4a4542"/><rect x="-36" y="62" width="46" height="26" rx="4" fill="#F05325"/><circle cx="-44" cy="-10" r="9" fill="#6b645d"/></g>`}
+function finger(x,y,down){return `<g transform="translate(${x},${y})"><circle r="${down?21:16}" fill="rgba(240,83,37,${down?.35:.18})"/><circle r="9" fill="#fff" stroke="#292524" stroke-width="3"/></g>`}
+function tick(){return '';}function tick_old(x,y,k,r){r=r||24;return k<=0?'':`<g transform="translate(${x},${y}) scale(${E(k)})"><circle r="${r}" fill="#2E7D32"/><path d="M${-r*.42} 0 l${r*.3} ${r*.32} l${r*.56} ${-r*.6}" stroke="#fff" stroke-width="${r*.2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`}
+function arrowV(x,y1,y2,c){return `<path d="M${x} ${y1} V${y2} M${x-7} ${y1+9} l7 -9 l7 9 M${x-7} ${y2-9} l7 9 l7 -9" stroke="${c}" stroke-width="3" fill="none"/>`}
+const table=`<rect width="${W}" height="${H}" fill="#C6B68D"/><g opacity=".18" stroke="#7a6a45" stroke-width="2">${[60,140,220,300,380].map(y=>`<path d="M0 ${y} Q170 ${y+12} ${W} ${y}"/>`).join('')}</g>`;
+// case top view with foam + pockets; items = [{x,y,w,h,c,rot}]
+function caseTop(cx,cy,items,frame){let s=`<g transform="translate(${cx},${cy})"><rect x="-150" y="-110" width="300" height="200" rx="18" fill="#292524"/><rect x="-134" y="-94" width="268" height="168" rx="8" fill="#6b645f"/>`;
+ for(const it of items){s+=`<g transform="translate(${it.x},${it.y}) rotate(${it.rot||0})"><rect x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" rx="8" fill="${it.c||'#2b2725'}" ${it.st?`stroke="${it.st}" stroke-width="3" stroke-dasharray="${it.dash||''}"`:''}/></g>`}
+ if(frame)s+=`<rect x="-134" y="-94" width="268" height="168" rx="8" fill="none" stroke="${frame}" stroke-width="5"/>`;return s+'</g>'}
+function chips(sel,hl,y){const ch=[['B11','NO','#B3261E'],['B15','NO','#B3261E'],['B20','BEST','#2E7D32']];return ch.map((c,i)=>{const x=16+i*106;
+ return `<rect x="${x}" y="${y}" width="96" height="52" rx="10" fill="${c[2]}" ${i===sel?`stroke="#292524" stroke-width="${4+hl*2}"`:''}/>${T(x+48,y+22,15,{c:'#fff'})}${c[0]}</text>${T(x+48,y+42,13,{c:'#fff'})}${c[1]}</text>`}).join('')}
+
+const LIB=[{n:'Battery',w:56,h:38},{n:'Charger',w:72,h:46},{n:'Bits',w:78,h:28},{n:'Drill',k:'d'}];
+function icon(it,x,y,s,col,rot,st){col=col||'#4a4542';const S=st?`stroke="${st}" stroke-width="${3/s}"`:'';return it.k==='d'?`<g transform="translate(${x},${y}) rotate(${rot||0}) scale(${s}) translate(-4,-25)"><path d="${SHAPE}" fill="${col}" ${S}/></g>`
+ :`<g transform="translate(${x},${y}) rotate(${rot||0}) scale(${s})"><rect x="${-it.w/2}" y="${-it.h/2}" width="${it.w}" height="${it.h}" rx="6" fill="${col}" ${S}/></g>`}
+const slot=i=>[16+(i%2)*161,44+Math.floor(i/2)*132];
+function card(i,it,o){o=o||{};const [x,y]=slot(i);return `<g opacity="${o.op==null?1:o.op}"><rect x="${x}" y="${y}" width="150" height="120" rx="12" fill="#fff" stroke="${o.sel?'#F05325':'#e2dccf'}" stroke-width="${o.sel?3:1.5}"/>
+ ${icon(it,x+75,y+50,it.k==='d'?.4:1)}<text x="${x+75}" y="${y+106}" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="14" fill="#292524">${it.n}</text>
+ ${o.sel?`<circle cx="${x+130}" cy="${y+20}" r="12" fill="#F05325"/><path d="M${x+124} ${y+20} l4 4 l8 -8" stroke="#fff" stroke-width="3" fill="none"/>`:''}
+ ${o.nw?`<rect x="${x+8}" y="${y+8}" width="48" height="22" rx="11" fill="#2E7D32"/><text x="${x+32}" y="${y+24}" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11" fill="#fff">NEW</text>`:''}</g>`}
+const libHead=`<text x="16" y="30" font-family="Antonio" font-weight="700" font-size="22" fill="#292524">LIBRARY</text>`;
+const TG=[[245,100,1.1],[245,180,1.1],null,[115,145,.62]];
+function caseLay(cx,cy,sc,o){o=o||{};const mv=o.mv||0,rt=o.rt||0;return `<g transform="translate(${cx},${cy}) scale(${sc}) translate(-171,-150)">${caseTop(171,150,[],o.frame)}
+ ${icon(LIB[3],115,145,.62,'#2b2725')}${icon(LIB[0],245,100,1.1,'#2b2725')}${icon(LIB[1],L(245,205,mv),L(180,172,mv),1.1,'#2b2725',rt*90,o.hl?'#F05325':null)}</g>`}
+
+// isometric-style open case like the app: rounded base in front, full foam lid standing behind, parts sit in cavities. o.k = parts dropped in (0..1)
+function iso(ox,oy,o){o=o||{};const sc=o.sc||1,k=o.k==null?1:o.k,dz=(1-k)*110,A=o.alt,Wd=230,D=140,Hb=44,Hl=150;
+ const M=z=>`matrix(1,0,.55,-.42,0,${-z})`,V=y=>`matrix(1,0,0,-1,${y*.55},${-y*.42})`;
+ let s=`<g transform="translate(${ox},${oy}) scale(${sc})">`;
+ // lid: shell thickness, rim, full foam, one cavity
+ for(let t=12;t>=2;t-=2)s+=`<g transform="${V(D+t)}"><rect x="0" y="${Hb}" width="${Wd}" height="${Hl}" rx="18" fill="#3f3a37" stroke="#3f3a37" stroke-width="2.5"/></g>`;
+ s+=`<g transform="${V(D)}"><rect x="0" y="${Hb}" width="${Wd}" height="${Hl}" rx="18" fill="#5f5955"/><rect x="8" y="${Hb+8}" width="${Wd-16}" height="${Hl-16}" rx="12" fill="#8f8a84"/>
+  <g opacity="${C(0,.3,k)}">${A?`<rect x="26" y="${Hb+40}" width="98" height="68" rx="8" fill="#2b2725"/>`:`<rect x="112" y="${Hb+40}" width="86" height="60" rx="8" fill="#2b2725"/>`}</g>
+  <g opacity="${k}" transform="translate(0,${dz*.6})">${A?`<rect x="31" y="${Hb+45}" width="88" height="58" rx="6" fill="#d6a85a"/>`:`<rect x="117" y="${Hb+45}" width="76" height="50" rx="6" fill="#4fae6a"/>`}</g></g>`;
+ // base: stacked rounded walls, rim, foam
+ for(let z=0;z<Hb;z+=2)s+=`<g transform="${M(z)}"><rect x="0" y="0" width="${Wd}" height="${D}" rx="20" fill="${z<Hb-4?'#4d4743':'#5f5955'}" stroke="#4d4743" stroke-width="2.5"/></g>`;
+ s+=`<g transform="${M(Hb)}"><rect x="0" y="0" width="${Wd}" height="${D}" rx="20" fill="#5f5955"/><rect x="7" y="7" width="${Wd-14}" height="${D-14}" rx="14" fill="#8f8a84"/>`;
+ // cavities (dark pockets), always cut
+ const cv=A?`<rect x="18" y="26" width="124" height="86" rx="8" fill="#2b2725"/><rect x="152" y="26" width="62" height="86" rx="8" fill="#2b2725"/>`
+  :`<g transform="translate(78,72) scale(.68,-.68) translate(-4,-25)"><path d="${SHAPE}" fill="#2b2725"/></g><rect x="156" y="74" width="58" height="46" rx="8" fill="#2b2725"/><rect x="156" y="18" width="58" height="46" rx="8" fill="#2b2725"/>`;
+ s+=`<g opacity="${C(0,.3,k)}">${cv}</g></g>`;
+ // parts drop into the cavities
+ s+=`<g transform="${M(Hb+dz)}" opacity="${k}">${A?`<rect x="22" y="30" width="116" height="78" rx="6" fill="#d65b5b"/><rect x="156" y="30" width="54" height="78" rx="6" fill="#5b8fd6"/>`
+  :`<g transform="translate(78,72) scale(.6,-.6) translate(-4,-25)"><path d="${SHAPE}" fill="#5b8fd6"/></g><rect x="160" y="78" width="50" height="38" rx="6" fill="#9b6fd6"/><rect x="160" y="22" width="50" height="38" rx="6" fill="#9b6fd6"/>`}</g>`;
+ return s+'</g>'}
+function qr(x,y,sz){const n=21,c=sz/n;let s=`<g transform="translate(${x},${y})"><rect x="${-c}" y="${-c}" width="${sz+2*c}" height="${sz+2*c}" fill="#fff"/>`;
+ const fin=(i,j)=>{const a=i<7&&j<7||i>=n-7&&j<7||i<7&&j>=n-7;if(!a)return null;const u=i>=n-7?i-(n-7):i,v=j>=n-7?j-(n-7):j;return u===0||u===6||v===0||v===6||(u>=2&&u<=4&&v>=2&&v<=4)};
+ for(let i=0;i<n;i++)for(let j=0;j<n;j++){const f=fin(i,j);const on=f===null?((i*7+j*13+i*j)%5<2):f;if(on)s+=`<rect x="${i*c}" y="${j*c}" width="${c+.3}" height="${c+.3}" fill="#292524"/>`;}
+ return s+'</g>'}
+function fitBtns(st){const sv=st==='saved';return `<rect x="12" y="322" width="154" height="44" rx="12" fill="#fff" stroke="#292524" stroke-width="2"/>${T(89,350,14)}↻ Turn &amp; move</text>
+ <rect x="177" y="322" width="154" height="44" rx="12" fill="${sv?'#2E7D32':'#fff'}" stroke="${sv?'#2E7D32':'#292524'}" stroke-width="2"/>${T(254,350,14,{c:sv?'#fff':'#292524'})}${sv?'Saved ✓':'Save layout'}</text>
+ <rect x="12" y="374" width="319" height="44" rx="12" fill="#292524"/>${T(171,402,15,{c:'#F1EEE5'})}Send to computer</text>`}
+const G=[
+{name:'Scan a part',end:'Start scanning ▶',steps:[
+ {t:'Paper',s:'Part on white paper · line it up',d:p=>{const k1=E(C(0,.28,p)),k2=E(C(.32,.55,p)),k3=E(C(.6,.78,p)),py=L(-300,78,k1),dy=L(-260,0,k2),sc=.85,a=L(112,90,k3),ok=k3>=1;
+  return table+`<rect x="89" y="${py+5}" width="172" height="248" rx="3" fill="rgba(0,0,0,.18)"/><rect x="85" y="${py}" width="172" height="248" rx="3" fill="#fff"/>
+  ${k2>0?`<g transform="translate(171,${202+dy}) rotate(${a}) translate(${-4*sc},${-25*sc})">${part(0,0,sc)}</g>`:''}
+  ${k2>=1&&!ok?`<path d="M240 130 a46 46 0 0 1 0 60" stroke="#F05325" stroke-width="3.5" fill="none"/><path d="M233 186 l7 5 l5 -8" stroke="#F05325" stroke-width="3.5" fill="none"/>`:''}
+  ${ok?`<rect x="${171-63*sc}" y="${202-74*sc}" width="${126*sc}" height="${148*sc}" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-dasharray="7 5"/>
+   <path d="M${171-63*sc} ${py+4} V${202-74*sc-4} M${171+63*sc} ${py+4} V${202-74*sc-4} M${171-63*sc} ${py+244} V${202+74*sc+4} M${171+63*sc} ${py+244} V${202+74*sc+4}" stroke="#2E7D32" stroke-width="2.5"/>`:''}
+  ${tick(300,48,C(.82,.94,p))}`}},
+ {t:'Picture',s:'Tilt till flat · lift to 45 cm',d:p=>{const r=E(C(.05,.4,p)),flat=r>=1,up=E(C(.45,.75,p)),fl=C(.8,.84,p)*(1-C(.84,.95,p));
+  const ang=L(-24,0,r),py=L(120,40,up),col=flat?'#2E7D32':'#F05325',cm=Math.round(L(10,45,up)),bx=-ang/24*18;
+  const zs=L(1.45,1,up);
+  return `<rect width="${W}" height="${H}" fill="#F1EEE5"/>
+  <rect x="0" y="170" width="${W}" height="22" fill="#C6B68D"/><rect x="96" y="166" width="150" height="4" fill="#fff"/><rect x="128" y="150" width="86" height="16" rx="5" fill="#4a4542"/>
+  <g transform="translate(171,${py}) rotate(${ang})"><rect x="-56" y="-6" width="112" height="12" rx="5" fill="#292524"/><rect x="-22" y="6" width="12" height="4" fill="#292524"/></g>
+  ${up>0?`${arrowV(276,py+8,146,'#F05325')}<text x="288" y="${(py+146)/2+8}" font-family="Antonio" font-weight="700" font-size="22">${cm} cm</text>`:''}
+  ${!flat?`<text x="60" y="${py+8}" font-family="Antonio" font-weight="700" font-size="22" fill="#F05325">↻</text>`:''}
+  <rect x="86" y="202" width="170" height="220" rx="22" fill="#292524"/>
+  <svg x="96" y="214" width="150" height="196" viewBox="-75 -98 150 196"><rect x="-75" y="-98" width="150" height="196" fill="#efece6"/>
+   <g transform="skewX(${ang*.5}) scale(${zs},${zs*L(.8,1,r)})"><rect x="-48" y="-64" width="96" height="128" fill="#fff"/><g transform="rotate(90) translate(-2,-13)">${part(0,0,.52)}</g></g>
+   <circle cx="0" cy="0" r="26" fill="rgba(0,0,0,.2)" stroke="${col}" stroke-width="4"/><circle cx="${bx}" cy="${bx*.4}" r="8" fill="${col}" stroke="#fff" stroke-width="2.5"/>
+   <rect x="-44" y="-90" width="88" height="22" rx="11" fill="${flat&&up>=1?'#2E7D32':'rgba(0,0,0,.55)'}"/><text x="0" y="-74" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11" fill="#fff">${flat?'FLAT':'TILT'} · ${cm} cm</text>
+   <circle cx="0" cy="78" r="13" fill="#fff" stroke="${flat&&up>=1?'#2E7D32':'#888'}" stroke-width="3"/>
+   <rect x="-75" y="-98" width="150" height="196" fill="#fff" opacity="${fl}"/></svg>
+  ${p>.74&&p<.84?finger(171,392,p>.79):''}${tick(296,250,C(.88,.97,p))}`}},
+ {t:'Outline = foam cut',s:'The photo gives the shape',d:p=>{const tr=C(.05,.45,p),fade=C(.5,.62,p),foam=E(C(.65,.85,p));
+  let s=`<rect width="${W}" height="${H}" fill="#fff"/>`;
+  if(foam<1)s+=`<g opacity="${1-foam}">${part(171,190,1.25,1-fade)}<g transform="translate(171,190) scale(1.25)"><path d="${SHAPE}" pathLength="1" fill="none" stroke="#F05325" stroke-width="3.2" stroke-dasharray="1" stroke-dashoffset="${1-tr}" stroke-linejoin="round"/></g></g>`;
+  if(foam>0)s+=`<g opacity="${foam}"><rect x="22" y="70" width="299" height="250" rx="10" fill="#6b645f"/><g transform="translate(171,186) scale(1.18)"><path d="${SHAPE}" fill="#2b2725" stroke="#F05325" stroke-width="2.4"/><path d="${SHAPE}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="6" transform="translate(2,3)" clip-path="none"/></g>${T(171,360,26,{f:'Antonio'})}FOAM</text></g>`;
+  return s+tick(292,50,C(.88,.97,p))}},
+ {t:'Check sizes',s:'L · W from photo · D with a ruler',d:p=>{const rows=[['L','260'],['W','180'],['D','80']],on=[.2,.36,.74].map(a=>p>a),tg=[.1,.26,.64].findIndex(a=>p>a&&p<a+.1),side=p>.44;
+  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/><rect x="16" y="14" width="311" height="164" rx="12" fill="#fff"/>`;
+  if(!side)s+=`<g transform="translate(171,96) scale(.82)"><path d="${SHAPE}" fill="none" stroke="#F05325" stroke-width="3.6"/></g>
+   <path d="M114 28 H236" stroke="${on[0]?'#2E7D32':'#B98900'}" stroke-width="3"/>${T(175,24,12,{c:on[0]?'#2E7D32':'#B98900'})}L</text>
+   <path d="M98 66 V166" stroke="${on[1]?'#2E7D32':'#B98900'}" stroke-width="3"/>${T(86,120,12,{c:on[1]?'#2E7D32':'#B98900'})}W</text>`;
+  else{const rl=E(C(.46,.6,p));s+=`<path d="M30 158 H312" stroke="#C6B68D" stroke-width="6"/><rect x="70" y="${158-76}" width="170" height="76" rx="8" fill="#4a4542"/>${T(155,126,13,{c:'#fff'})}SIDE VIEW</text>
+   <g transform="translate(${L(330,252,rl)},0)"><rect x="0" y="30" width="24" height="128" fill="#F5C518" stroke="#292524" stroke-width="2"/>${[...Array(12).keys()].map(i=>`<path d="M0 ${158-i*10} h${i%5?7:13}" stroke="#292524" stroke-width="1.5"/>`).join('')}</g>
+   ${rl>=1?`<path d="M70 82 H262" stroke="${on[2]?'#2E7D32':'#B98900'}" stroke-width="2" stroke-dasharray="5 4"/>${arrowV(56,84,156,on[2]?'#2E7D32':'#B98900')}${T(38,126,16,{c:on[2]?'#2E7D32':'#B98900',f:'Antonio'})}D</text>`:''}`}
+  rows.forEach(([k,v],i)=>{const y=194+i*58,ok=on[i];s+=`${T(30,y+31,26,{f:'Antonio'})}${k}</text>
+   <rect x="52" y="${y}" width="150" height="46" rx="10" fill="${ok?'#fff':'#FFF6D6'}" stroke="${ok?'#2E7D32':'#E0A800'}" stroke-width="2"/><text x="66" y="${y+30}" font-family="Poppins" font-weight="600" font-size="18">${v} mm</text>
+   <rect x="214" y="${y}" width="108" height="46" rx="12" fill="${ok?'#2E7D32':'#fff'}" stroke="${ok?'#2E7D32':'#E0A800'}" stroke-width="2" ${ok?'':'stroke-dasharray="6 4"'}/>${T(268,y+29,16,{c:ok?'#fff':'#7a5a00'})}${ok?'✓ OK':'? Check'}</text>`});
+  s+=`<rect x="16" y="370" width="311" height="46" rx="12" fill="${on[2]?'#292524':'#cfc8bb'}"/>${T(171,399,16,{c:'#F1EEE5'})}${on[2]?'Add part':'Check all 3'}</text>`;
+  if(tg>=0)s+=finger(268,217+tg*58,true);else if(p>.8&&p<.94)s+=finger(171,393,p>.86);
+  return s+tick(298,38,C(.92,.99,p),20)}},
+ {t:'Add to library',s:'Saved in your library',d:p=>{const k=E(C(.15,.5,p)),nw=k>=1;
+  const rows=[{n:'Battery',it:LIB[0],c:'#9b6fd6',d:'120 × 80 × 60 mm'},{n:'Charger',it:LIB[1],c:'#4fae6a',d:'150 × 100 × 55 mm'},{n:'Bits',it:LIB[2],c:'#d6a85a',d:'160 × 40 × 25 mm'},{n:'Drill',it:LIB[3],c:'#5b8fd6',d:'260 × 180 × 80 mm',nw:1}];
+  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/><text x="14" y="34" font-family="Antonio" font-weight="700" font-size="28" fill="#292524">LIBRARY</text>
+   <text x="14" y="56" font-family="Poppins" font-size="12" fill="#6b645d">Tick the parts you want in the case.</text>`;
+  rows.forEach((r,i)=>{const y0=68+i*64,y=r.nw?L(y0+50,y0,k):y0,on=!!r.nw;
+   s+=`<g opacity="${r.nw?k:1}"><rect x="12" y="${y}" width="319" height="56" rx="12" fill="#fff" stroke="${on?'#F05325':'#fff'}" stroke-width="2"/>
+   <rect x="22" y="${y+17}" width="22" height="22" rx="5" fill="${on?'#F05325':'#fff'}" stroke="${on?'#F05325':'#292524'}" stroke-width="2"/>${on?`<path d="M27 ${y+28} l4 4 l8 -8" stroke="#fff" stroke-width="2.6" fill="none"/>`:''}
+   <rect x="52" y="${y+8}" width="40" height="40" rx="6" fill="#C6B68D"/>${icon(r.it,72,y+28,r.it.k==='d'?.2:.45,r.c)}
+   <text x="102" y="${y+26}" font-family="Poppins" font-weight="700" font-size="14" fill="#292524">${r.n}</text><text x="102" y="${y+44}" font-family="Poppins" font-size="11" fill="#6b645d">${r.d}</text>
+   <rect x="240" y="${y+15}" width="44" height="26" rx="8" fill="#fff" stroke="#292524" stroke-width="2"/><text x="262" y="${y+33}" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="11">Edit</text>
+   <rect x="292" y="${y+15}" width="26" height="26" rx="8" fill="#fff" stroke="#292524" stroke-width="2"/><path d="M301 ${y+23} h8 M302 ${y+25} v9 h6 v-9" stroke="#292524" stroke-width="1.6" fill="none"/>
+   ${r.nw&&nw?`<rect x="196" y="${y-9}" width="44" height="20" rx="10" fill="#2E7D32"/><text x="218" y="${y+5}" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11" fill="#fff">NEW</text>`:''}</g>`});
+  s+=`<rect x="12" y="330" width="319" height="38" rx="12" fill="#fff" stroke="#292524" stroke-width="2"/>${T(171,354,13)}+ Scan new object</text>
+   <rect x="12" y="376" width="319" height="44" rx="12" fill="#292524"/>${T(171,403,14,{c:'#F1EEE5'})}Go to layout${nw?' (1)':''}</text>`;
+  return s}}]},
+
+{name:'Place it in the case',end:'Done ✓',steps:[
+ {t:'Base or lid',s:'How many · base or lid',d:p=>{const two=p>.2,lid=p>.42,fd=p>.62;
+  const cards=[{n:'Battery',it:LIB[0],c:'#9b6fd6',lid:false,cp:two?2:1},{n:'Charger',it:LIB[1],c:'#4fae6a',lid},{n:'Drill',it:LIB[3],c:'#5b8fd6',lid:false}];
+  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/><text x="16" y="30" font-family="Antonio" font-weight="700" font-size="24" fill="#292524">LAYOUT</text>`;
+  cards.forEach((c,i)=>{const y=42+i*100;s+=`<rect x="12" y="${y}" width="319" height="90" rx="12" fill="#fff"/>
+   <rect x="22" y="${y+8}" width="40" height="36" rx="6" fill="#C6B68D"/>${icon(c.it,42,y+26,c.it.k==='d'?.2:.5,c.c)}
+   <text x="72" y="${y+33}" font-family="Antonio" font-weight="700" font-size="20" fill="#292524">${c.n}</text>
+   <rect x="234" y="${y+12}" width="24" height="24" rx="6" fill="#fff" stroke="#292524" stroke-width="2"/><text x="246" y="${y+29}" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="14">−</text>
+   <text x="272" y="${y+29}" text-anchor="middle" font-family="Poppins" font-weight="${c.cp>1?700:400}" font-size="${c.cp>1?16:13}" fill="${c.cp>1?'#F05325':'#292524'}">${c.cp||1}</text><rect x="286" y="${y+12}" width="24" height="24" rx="6" fill="#292524"/><text x="298" y="${y+29}" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="14" fill="#fff">+</text>
+   <rect x="22" y="${y+50}" width="142" height="30" rx="8" fill="${c.lid?'#fff':'#F05325'}" stroke="${c.lid?'#292524':'#F05325'}" stroke-width="2"/><text x="93" y="${y+70}" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13" fill="${c.lid?'#292524':'#fff'}">Base</text>
+   <rect x="172" y="${y+50}" width="146" height="30" rx="8" fill="${c.lid?'#F05325':'#fff'}" stroke="${c.lid?'#F05325':'#292524'}" stroke-width="2"/><text x="245" y="${y+70}" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13" fill="${c.lid?'#fff':'#292524'}">Lid</text>`});
+  s+=`<rect x="12" y="356" width="319" height="50" rx="12" fill="#292524"/>${T(171,387,16,{c:'#F1EEE5'})}Find my STA-300 case</text>`;
+  if(p>.06&&p<.24)s+=finger(298,66,p>.14);else if(p>.3&&p<.48)s+=finger(245,212,p>.38);else if(fd&&p<.82)s+=finger(171,381,p>.7);
+  return s}},
+ {t:'Best case',s:'Base in front · lid behind',d:p=>{const k=E(C(.15,.55,p)),hl=C(.6,.72,p);
+  return `<rect width="${W}" height="${H}" fill="#ECE7DC"/>${hl>0?`<g opacity="${hl}">${T(171,28,22,{c:'#2E7D32',f:'Antonio'})}BEST FIT: B20</text></g>`:''}
+  <g opacity="${C(0,.15,p)}">${iso(8,298,{k,sc:.85})}</g>
+  <g font-family="Antonio" font-weight="700" font-size="18" fill="#6b645d"><text x="282" y="150">LID</text><text x="282" y="268">BASE</text></g>
+  <path d="M278 145 h-14 M278 263 h-14" stroke="#6b645d" stroke-width="2"/>
+  <g opacity="${hl}"><rect x="12" y="320" width="150" height="46" rx="10" fill="#2E7D32"/>${T(87,340,14,{c:'#fff'})}B20</text>${T(87,357,11,{c:'#fff'})}BEST</text>
+  <rect x="172" y="320" width="159" height="46" rx="10" fill="#fff" stroke="#292524" stroke-width="2"/>${T(251,349,14)}Other cases ▾</text></g>
+  ${tick(306,52,C(.8,.9,p),20)}`}},
+ {t:'Move & turn',s:'Tap the button · drag · red = overlap',d:p=>{
+  if(p<.2){return `<rect width="${W}" height="${H}" fill="#ECE7DC"/>${iso(30,262,{k:1,sc:.9})}
+   ${fitBtns("")}${finger(89,344,p>.08)}`;}
+  const q=C(.2,1,p);let bx,by,rot=0;
+  if(q<.15){bx=250;by=128}else if(q<.4){const k=E(C(.15,.4,q));bx=L(250,140,k);by=L(128,170,k)}else if(q<.5){bx=140;by=170}else if(q<.68){const k=E(C(.5,.68,q));bx=L(140,240,k);by=L(170,140,k)}else{bx=240;by=140}
+  if(q>.74)rot=E(C(.74,.84,q))*90;
+  const over=Math.abs(bx-115)<75&&Math.abs(by-165)<60;
+  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/><text x="171" y="30" text-anchor="middle" font-family="Antonio" font-weight="700" font-size="22">TURN &amp; MOVE</text>
+   <rect x="268" y="10" width="64" height="30" rx="8" fill="#292524"/>${T(300,30,13,{c:'#fff'})}Done</text>
+   <rect x="12" y="48" width="160" height="32" rx="8" fill="#F05325"/>${T(92,69,13,{c:'#fff'})}Base</text><rect x="172" y="48" width="159" height="32" rx="8" fill="#fff" stroke="#292524" stroke-width="2"/>${T(251,69,13)}Lid</text>
+   <g transform="translate(171,168)"><rect x="-150" y="-76" width="300" height="152" rx="22" fill="#5f5955"/><rect x="-140" y="-66" width="280" height="132" rx="16" fill="#8f8a84"/></g>
+   ${icon(LIB[3],115,165,.62,over?'#E53935':'#5b8fd6')}${icon({w:62,h:42},250,210,1,'#9b6fd6')}${icon({w:62,h:42},bx,by,1,over?'#E53935':'#9b6fd6',rot,q>.1&&q<.86?'#292524':null)}
+   <rect x="12" y="258" width="319" height="30" rx="8" fill="${over?'#FDE7E5':'#E6F3E7'}"/><text x="22" y="278" font-family="Poppins" font-weight="700" font-size="13" fill="${over?'#B3261E':'#2E7D32'}">${over?'✕ Parts overlap':'✓ Fits in B20'}</text>
+   <rect x="12" y="300" width="96" height="44" rx="10" fill="#fff" stroke="#292524" stroke-width="2"/>${T(60,328,15)}↻ 90°</text>
+   <rect x="116" y="300" width="111" height="44" rx="10" fill="#fff" stroke="#cfc8bb" stroke-width="2"/>${T(171,328,14,{c:'#6b645d'})}${Math.round(rot)}°</text>
+   <rect x="235" y="300" width="96" height="44" rx="10" fill="#fff" stroke="#292524" stroke-width="2"/>${T(283,328,15)}↺ 90°</text>`;
+  if(q>.1&&q<.7)s+=finger(bx,by,true);else if(q>.7&&q<.84)s+=finger(60,322,q>.74);else if(q>.88&&q<.98)s+=finger(300,25,true);
+  return s}},
+ {t:'Save layout',s:'Keep it · open it again later',d:p=>{const sv=p>.3,k=E(C(.38,.7,p));
+  let s=`<rect width="${W}" height="${H}" fill="#ECE7DC"/><g opacity="${1-k}">${iso(30,262,{k:1,sc:.9})}
+   ${fitBtns(sv?'saved':'')}</g>`;
+  if(p>.12&&p<.32)s+=finger(254,344,p>.22);
+  if(k>0)s+=`<g opacity="${k}"><rect width="${W}" height="${H}" fill="#F1EEE5"/><text x="16" y="30" font-family="Antonio" font-weight="700" font-size="22" fill="#292524">MY LAYOUTS</text>
+   ${[0,1].map(i=>{const y=50+i*104,nw=i===0;return `<rect x="12" y="${y}" width="319" height="92" rx="12" fill="#fff" stroke="${nw?'#2E7D32':'#e2dccf'}" stroke-width="${nw?3:1.5}"/>
+   ${iso(20,y+84,{k:1,alt:!nw,sc:.31})}
+   <text x="138" y="${y+40}" font-family="Poppins" font-weight="700" font-size="16" fill="#292524">${nw?'Drill kit':'Tool set'}</text><text x="138" y="${y+64}" font-family="Poppins" font-size="13" fill="#6b645d">${nw?'B20 · just now':'B15 · last week'}</text>`}).join('')}</g>`;
+  return s+tick(300,96,C(.8,.9,p),20)}},
+ {t:'Send',s:'QR code → keep editing on the computer',d:p=>{
+  if(p<.18)return `<rect width="${W}" height="${H}" fill="#ECE7DC"/>${iso(30,262,{k:1,sc:.9})}${fitBtns("")}${finger(171,396,p>.08)}`;
+  const q=C(.18,1,p),ph=E(C(0,.22,q)),scan=C(.25,.5,q),got=q>.52,ed=C(.58,.7,q);
+  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/>
+   <rect x="20" y="20" width="303" height="200" rx="10" fill="#292524"/><rect x="30" y="30" width="283" height="180" rx="4" fill="#fff"/><path d="M151 220 v18 h41 v-18 M121 244 h101" stroke="#292524" stroke-width="6" fill="none"/>`;
+  if(ed<1)s+=`<g opacity="${1-ed}">${qr(116,48,112)}${T(172,196,13,{c:'#6b645d'})}Scan with the phone</text></g>`;
+  if(ed>0)s+=`<g opacity="${ed}">${iso(44,190,{k:1,sc:.6})}
+   <path d="M${L(250,190,C(.72,.9,q))} ${L(170,135,C(.72,.9,q))} l0 22 l6 -6 l5 11 l4 -2 l-5 -11 l8 0 z" fill="#292524" stroke="#fff" stroke-width="1.5"/>
+   <rect x="200" y="38" width="106" height="24" rx="12" fill="#2E7D32"/><text x="253" y="55" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11" fill="#fff">Keep editing</text></g>`;
+  const py=L(440,262,ph)+ed*170;
+  s+=`<g transform="translate(222,${py})"><rect x="0" y="0" width="96" height="160" rx="16" fill="#292524"/><rect x="7" y="12" width="82" height="136" rx="6" fill="${got?'#2E7D32':'#1c1a19'}"/>
+   ${got?`<path d="M30 80 l12 12 l24 -26" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/><text x="48" y="124" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12" fill="#fff">Sent</text>`
+   :`${qr(20,40,56)}<path d="M14 ${46+scan*56} h68" stroke="#F05325" stroke-width="3"/><path d="M14 34 v-8 h8 M74 26 h8 v8 M82 104 v8 h-8 M22 112 h-8 v-8" stroke="#fff" stroke-width="2" fill="none"/>`}</g>`;
+  return s+tick(44,268,C(.88,.97,q),20)}}]}];
+
+
+const g$=id=>document.getElementById(id);let cur=null,raf=0;const SEG=6500,HOLD=1500;
+function setStep(i){const g=G[cur.gi],n=g.steps.length;cur.i=Math.max(0,Math.min(n-1,i));cur.t0=performance.now();const st=g.steps[cur.i];
+ g$('gNum').textContent=cur.i+1;g$('gT').textContent=st.t;g$('gS').textContent=st.s;
+ g$('gDots').innerHTML=g.steps.map((x,j)=>'<i'+(j===cur.i?' class="on"':'')+'></i>').join('');
+ g$('gNext').textContent=cur.i===n-1?(cur.end||'Got it'):'Next ›';g$('gBack').style.visibility=cur.i?'visible':'hidden';}
+function frame(){if(!cur)return;const p=((performance.now()-cur.t0)%(SEG+HOLD))/SEG;g$('gSt').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" aria-hidden="true">'+G[cur.gi].steps[cur.i].d(Math.min(1,p))+'</svg>';raf=requestAnimationFrame(frame);}
+function close(done){if(!cur)return;const c=cur;cur=null;cancelAnimationFrame(raf);g$('guide').classList.remove('on');try{localStorage.setItem('fa_tut_'+c.gi,'1');}catch(e){}if(done&&c.onEnd)c.onEnd();}
+function open(gi,o){o=o||{};cur={gi,i:0,t0:0,end:o.end,onEnd:o.onEnd};g$('gName').textContent=G[gi].name;setStep(0);g$('guide').classList.add('on');cancelAnimationFrame(raf);frame();}
+g$('gNext').onclick=()=>{if(!cur)return;if(cur.i>=G[cur.gi].steps.length-1)close(true);else setStep(cur.i+1);};
+g$('gBack').onclick=()=>{if(cur)setStep(cur.i-1);};g$('gSkip').onclick=()=>close(false);
+addEventListener('keydown',e=>{if(!cur)return;if(e.key==='Escape')close(false);else if(e.key==='ArrowRight')g$('gNext').click();else if(e.key==='ArrowLeft')g$('gBack').click();});
+{let x0=null;g$('gSt').addEventListener('pointerdown',e=>{x0=e.clientX;});g$('gSt').addEventListener('pointerup',e=>{if(x0==null||!cur)return;const dx=e.clientX-x0;x0=null;if(dx<-50)g$('gNext').click();else if(dx>50&&cur.i>0)setStep(cur.i-1);});}
+const seen=gi=>{try{return localStorage.getItem('fa_tut_'+gi)==='1';}catch(e){return true;}};
+return {open,seen,isOpen:()=>!!cur};
+})();
+</script>
 
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.19 · 26 Nov 2026';
+const APP_VERSION='A1.20 · 26 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -437,7 +668,35 @@ function setTheme(d){if(d)document.documentElement.setAttribute('data-theme','da
 document.addEventListener('click',e=>{if(e.target.closest('[data-menu]')){$('#darkSw').setAttribute('aria-checked',String(isDark()));$('#menu').classList.add('on');return;}
   const mi=e.target.closest('[data-mi]');if(e.target.id==='menu'){$('#menu').classList.remove('on');return;}if(!mi)return;const k=mi.dataset.mi;
   if(k==='dark'){setTheme(!isDark());return;}$('#menu').classList.remove('on');
-  if(k==='home'){HIST.length=0;CURS=null;show('sHome',false);}else if(k==='lib')show('sProj');else if(k==='lay'){if(LAY().length)show('sLayout');else{toast('The layout is empty. Tick parts in the library.');show('sProj');}}});
+  if(k==='g0'||k==='g1'){GUIDE.open(+k[1],{});return;}if(k==='saved'){show('sSaved');return;}if(k==='home'){HIST.length=0;CURS=null;show('sHome',false);}else if(k==='lib')show('sProj');else if(k==='lay'){if(LAY().length)show('sLayout');else{toast('The layout is empty. Tick parts in the library.');show('sProj');}}});
+
+/* ---------- Saved layouts (saved in Best fit, key fa_saved) ---------- */
+function svAll(){try{const a=JSON.parse(localStorage.getItem('fa_saved')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function svPut(a){try{localStorage.setItem('fa_saved',JSON.stringify(a));return true;}catch(e){toast('The phone storage is full.');return false;}}
+function svHome(){const n=svAll().length,b=$('#homeSaved');b.style.display=n?'':'none';b.textContent='Saved layouts ('+n+')';}
+ENTER.sHome=()=>svHome();
+ENTER.sSaved=()=>{const a=svAll(),l=$('#svList');$('#svHint').textContent=a.length?'Your cases with the parts in place. Tap Open to keep working on one.':'Nothing saved yet. In Best fit, tap Save layout.';
+  const dt=t=>{try{return new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'});}catch(e){return '';}};
+  l.innerHTML=a.map(r=>{const n=(r.items||[]).reduce((s,it)=>s+(+it.q||1),0);return `<div class="card svc"><div class="svb">${esc(r.cn||r.cs||'?')}</div><div class="svt"><b>${esc(r.name)}</b><span>${n} part${n===1?'':'s'} · ${dt(r.t)}</span></div><button class="nb" data-sv-open="${esc(r.id)}">Open</button><button class="nb" data-sv-del="${esc(r.id)}" aria-label="Delete ${esc(r.name)}">✕</button></div>`;}).join('');};
+$('#svList').onclick=async e=>{const o=e.target.closest('[data-sv-open]'),d=e.target.closest('[data-sv-del]');
+  if(d){const a=svAll(),r=a.find(x=>x.id===d.dataset.svDel);if(r&&confirm('Delete "'+r.name+'"?')){svPut(a.filter(x=>x!==r));ENTER.sSaved();}return;}
+  if(o)svOpen(o.dataset.svOpen);};
+$('#svLib').onclick=()=>show('sProj');
+$('#homeSaved').onclick=()=>show('sSaved');
+async function packRaw(base,items,extra){const txt=new TextEncoder().encode(JSON.stringify({v:1,items}));let tag='j.',body=txt;
+  if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(txt);w.close();body=new Uint8Array(await new Response(cs.readable).arrayBuffer());tag='z.';}
+  return base+'#phone='+tag+b64u(body)+(extra||'');}
+async function svOpen(id){const r=svAll().find(x=>x.id===id);if(!r||!(r.items||[]).length){toast('This saved layout is empty.');return;}
+  const by={};r.items.forEach(it=>{if(it.i)by[it.i]=it;});
+  try{const pos=JSON.parse(localStorage.getItem('fa_pos')||'{}'),tu=JSON.parse(localStorage.getItem('fa_turns')||'{}');
+    for(const k in by){const it=by[k];if(it.xy)pos[k]=it.xy;else delete pos[k];if(Array.isArray(it.zr))tu[k]=it.zr;else delete tu[k];}
+    localStorage.setItem('fa_pos',JSON.stringify(pos));localStorage.setItem('fa_turns',JSON.stringify(tu));}catch(e){}
+  P.parts.forEach(q=>{const it=by[q.id];q.use=!!it;if(it){q.qty=+it.q||1;q.side=it.s==='lid'?'lid':it.s==='auto'?'both':'base';}});saveAll();
+  busy(true,'Opening '+r.name+'…');$('#busyBack').style.display='';
+  location.href=await packRaw(new URL('./app-fit.html',location.href).href,r.items,'&fit=1&u='+(r.u||P.unit)+'&case='+encodeURIComponent(r.cs||'')+'&sv='+encodeURIComponent(r.id));}
+
+/* ---------- first-time guide 2: the first time the Layout screen has parts (after the Part added window) ---------- */
+function guidePlaceMaybe(){setTimeout(()=>{if(CURS!=='sLayout'||!LAY().length||GUIDE.seen(1)||GUIDE.isOpen()||$('#mAdded').classList.contains('on'))return;GUIDE.open(1,{});},450);}
 
 /* ---------- 1 Home and Open project ---------- */
 $('#verTxt').textContent='Foam Insert '+APP_VERSION.split(' ')[0];
@@ -804,10 +1063,10 @@ function savePart(){const d=dims(),B=SZ.base,name=$('#inName').value.trim();if(!
   if(!SZ.lift){q.lift=false;q.notches=[];}const wantLift=!!SZ.lift&&!q.lift;
   if(!old)P.parts.push(q);saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);if(wantLift)openLift(q.id,true);else if(!old)$('#mAdded').classList.add('on');}
 $('#addMore').onclick=()=>{$('#mAdded').classList.remove('on');CUR=null;show('sCam');};
-$('#addDone').onclick=()=>{$('#mAdded').classList.remove('on');};
+$('#addDone').onclick=()=>{$('#mAdded').classList.remove('on');guidePlaceMaybe();};
 
 /* ---------- 7 Layout: copies, Base or Lid, Easy to lift, In check ---------- */
-ENTER.sLayout=()=>{$('#layGo').textContent=SHOW_FIT?'Find my STA-300 case':'Send to computer';renderLayout();};
+ENTER.sLayout=()=>{guidePlaceMaybe();$('#layGo').textContent=SHOW_FIT?'Find my STA-300 case':'Send to computer';renderLayout();};
 FWD.sLayout=()=>LAY().length?()=>layNext():null;
 function renderLayout(){const l=$('#layList');if(!LAY().length){l.innerHTML='<p class="hint" style="text-align:center;padding:30px 0">No parts yet. Scan a part, or add parts from the library.</p>';return;}
   l.innerHTML=LAY().map(q=>`<div class="card pc${q.inCheck===false?' out':''}" data-id="${q.id}">
@@ -1026,7 +1285,7 @@ $('#scanQrClose').onclick=closeQrScanner;
   const h=location.hash.replace('#','');if(h)history.replaceState(null,'',location.pathname+location.search);
   if(h==='library'){HIST.push('sHome');CURS=null;show('sProj',false);}
   else if(LAY().length&&(h==='layout'||h==='send')){HIST.push('sHome');if(h==='send'){HIST.push('sLayout');}CURS=null;show(h==='send'?'sSend':'sLayout',false);}
-  else show('sHome',false);})();
+  else{show('sHome',false);if(!P.parts.length&&!GUIDE.seen(0))setTimeout(()=>{if(CURS==='sHome')GUIDE.open(0,{end:'Start scanning ▶',onEnd:()=>$('#homeScan').click()});},500);}})();
 </script>
 </body>
 </html>
