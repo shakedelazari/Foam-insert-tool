@@ -9483,12 +9483,12 @@ function init3D(){
     else{T3.az-=dx*0.006;T3.el=Math.max(-1.55,Math.min(1.55,T3.el+dy*0.006));}camUpdate();});
   el.addEventListener('pointerup',e=>{if(dr&&dr.moved<5&&dr.btn===0){const p=pick3D(e);S.sel=p?p.id:null;renderParts();renderRotBar();draw();}dr=null;});
   el.addEventListener('contextmenu',e=>{e.preventDefault();const p=pick3D(e);if(p)showCtx(p.id,e.clientX,e.clientY);});
-  el.addEventListener('wheel',e=>{e.preventDefault();T3.dist=Math.max(60,Math.min(4000,T3.dist*(1+Math.sign(e.deltaY)*0.1)));camUpdate();updZoom();},{passive:false});
+  el.addEventListener('wheel',e=>{e.preventDefault();T3.dist=Math.max(60,Math.min(Math.max(4000,T3.dmax||0),T3.dist*(1+Math.sign(e.deltaY)*0.1)));camUpdate();updZoom();},{passive:false});
   new ResizeObserver(()=>resize3D()).observe(host);T3.ready=true;resize3D();return true;}
 function pick3D(e){if(!T3.ready)return null;const r=T3.r.domElement.getBoundingClientRect();T3.ray.setFromCamera({x:((e.clientX-r.left)/r.width)*2-1,y:-((e.clientY-r.top)/r.height)*2+1},T3.cam);
   const ms=T3.group.children.filter(o=>o.userData.part),h=T3.ray.intersectObjects(ms,false);return h.length?h[0].object.userData.part:null;}
 function resize3D(){if(!T3.ready)return;const h=$('#v3'),w=h.clientWidth,hh=h.clientHeight;if(w<10||hh<10)return;T3.r.setSize(w,hh);T3.cam.aspect=w/hh;T3.cam.updateProjectionMatrix();camUpdate();}
-function camUpdate(){if(!T3.ready)return;const c=Math.cos(T3.el);T3.cam.position.set(T3.t.x+T3.dist*c*Math.cos(T3.az),T3.t.y+T3.dist*c*Math.sin(T3.az),T3.t.z+T3.dist*Math.sin(T3.el));T3.cam.lookAt(T3.t);T3.r.render(T3.scene,T3.cam);drawCube();}
+function camUpdate(){if(!T3.ready)return;{const fr=Math.max(8000,T3.dist*4),nr=Math.max(1,T3.dist/400);if(T3.cam.far!==fr||T3.cam.near!==nr){T3.cam.far=fr;T3.cam.near=nr;T3.cam.updateProjectionMatrix();}}const c=Math.cos(T3.el);T3.cam.position.set(T3.t.x+T3.dist*c*Math.cos(T3.az),T3.t.y+T3.dist*c*Math.sin(T3.az),T3.t.z+T3.dist*Math.sin(T3.el));T3.cam.lookAt(T3.t);T3.r.render(T3.scene,T3.cam);drawCube();}
 function rrShape(L,W,R){const s=new THREE.Shape();R=Math.min(R,L/2,W/2);s.moveTo(R,0);s.lineTo(L-R,0);s.absarc(L-R,R,R,-Math.PI/2,0,false);s.lineTo(L,W-R);s.absarc(L-R,W-R,R,0,Math.PI/2,false);s.lineTo(R,W);s.absarc(R,W-R,R,Math.PI/2,Math.PI,false);s.lineTo(0,R);s.absarc(R,R,R,Math.PI,1.5*Math.PI,false);return s;}
 function partMesh(p,c,R,tint,opacity){if(!c.geo){c.geo=new THREE.BufferGeometry();c.geo.setAttribute('position',new THREE.BufferAttribute(c.o.pos,3));c.geo.computeVertexNormals();}
   const m=new THREE.Mesh(c.geo,new THREE.MeshPhongMaterial({color:tint||p.color,side:THREE.DoubleSide,shininess:30,transparent:opacity<1,opacity:opacity||1}));m.userData.keep=true;return m;}
@@ -9586,7 +9586,7 @@ function init(){
   $('#rotBar').addEventListener('change',e=>{const p=S.parts.find(x=>x.id===S.sel),k=e.target.dataset.rk;if(!p||!k)return;applyRot(p,k.slice(1),+e.target.value||0);});
   $('#zoomBar').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(!b)return;const a=S.active,z=b.dataset.z;
     if(S.zoom[a]){const q=S.zoom[a];if(z==='fit'){q.k=1;q.x=0;q.y=0;}else{const k=Math.max(0.3,Math.min(14,q.k*(z==='in'?1.25:0.8)));q.x*=k/q.k;q.y*=k/q.k;q.k=k;}drawPanes();}
-    else if(T3.ready){if(z==='fit'){S.fit3=true;S.dirty3=true;draw();}else{T3.dist=Math.max(60,Math.min(4000,T3.dist*(z==='in'?0.8:1.25)));camUpdate();}}updZoom();});
+    else if(T3.ready){if(z==='fit'){S.fit3=true;S.dirty3=true;draw();}else{T3.dist=Math.max(60,Math.min(Math.max(4000,T3.dmax||0),T3.dist*(z==='in'?0.8:1.25)));camUpdate();}}updZoom();});
   $('#dimBar').addEventListener('change',e=>{const k=e.target.dataset.dm;if(!k)return;S.dim[k]=e.target.checked;drawPanes();});
   $('#dimBar b').addEventListener('click',()=>$('#dimBar').classList.toggle('closed'));
   $('#viewCube').addEventListener('click',cubeClick);$('#viewCube').addEventListener('dblclick',()=>{T3.az=-0.7;T3.el=0.85;camUpdate();});
@@ -11088,7 +11088,7 @@ async function loadSaved(name){try{const txt=await idbGet('proj:'+name);if(!txt)
   $('#rotBar').addEventListener('change',e=>{const p=S.parts.find(x=>x.id===S.sel),k=e.target.dataset.rk;if(!p||!k)return;applyRot(p,k.slice(1),+e.target.value||0);});
   $('#zoomBar').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(!b)return;const a=S.active,z=b.dataset.z;
     if(S.zoom[a]){const q=S.zoom[a];if(z==='fit'){q.k=1;q.x=0;q.y=0;}else{const k=Math.max(0.3,Math.min(14,q.k*(z==='in'?1.25:0.8)));q.x*=k/q.k;q.y*=k/q.k;q.k=k;}drawPanes();}
-    else if(T3.ready){if(z==='fit'){S.fit3=true;S.dirty3=true;draw();}else{T3.dist=Math.max(60,Math.min(4000,T3.dist*(z==='in'?0.8:1.25)));camUpdate();}}updZoom();});
+    else if(T3.ready){if(z==='fit'){S.fit3=true;S.dirty3=true;draw();}else{T3.dist=Math.max(60,Math.min(Math.max(4000,T3.dmax||0),T3.dist*(z==='in'?0.8:1.25)));camUpdate();}}updZoom();});
   $('#viewCube').addEventListener('click',cubeClick);$('#viewCube').addEventListener('dblclick',()=>{T3.az=-0.7;T3.el=0.85;camUpdate();});
   $('#themeBtn').addEventListener('click',()=>{const r=document.documentElement,cur=r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';draw();});
   new ResizeObserver(()=>{if(S.step===4)drawPanes();}).observe($('#stage'));
@@ -12430,7 +12430,7 @@ function phoneNotches(p,nt,x0,y0,bw,bh){if(!Array.isArray(nt))return;const fl=[]
 window.__importOutline=function(name,ring,H,qty,side,opts){try{
   if(!ring||ring.length<3||!(H>0))return null;let ar=0;for(let i=0;i<ring.length;i++){const u=ring[i],v=ring[(i+1)%ring.length];ar+=u[0]*v[1]-v[0]*u[1];}if(ar<0)ring=ring.slice().reverse();
   const xs=ring.map(a=>a[0]),ys=ring.map(a=>a[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),bw=x1-x0,bh=y1-y0;
-  if(bw>1200||bh>1200){toast('A part from the phone is bigger than 1.2 m and was not added.');return null;}const FLD=Math.max(300,Math.ceil(Math.max(bw,bh)+20));
+  if(!(bw>0&&bh>0)||bw>100000||bh>100000){toast('This part size looks wrong and was not added.');return null;}const FLD=Math.max(300,Math.ceil(Math.max(bw,bh)+20));
   const poly=ring.map(a=>[a[0]-x0,a[1]-y0]),pos=extrude(poly,H),stt=meshStats(pos),w=FLD*PPM,h=FLD*PPM,offX=(FLD-bw)/2,offY=(FLD-bh)/2,toPx=a=>[(a[0]+offX)*PPM,h-(a[1]+offY)*PPM,0,0,null];
   const cxp=(offX+bw/2)*PPM,cyp=h-(offY+bh/2)*PPM,hw=bw*PPM/2,hh=bh*PPM/2;
   const tc=document.createElement('canvas');tc.width=tc.height=72;const tg=tc.getContext('2d'),k=64/Math.max(bw,bh);tg.fillStyle='#f6f3ec';tg.fillRect(0,0,72,72);tg.fillStyle='#3c6e2f';tg.beginPath();poly.forEach((a,i)=>{const x=36+(a[0]-bw/2)*k,y=36-(a[1]-bh/2)*k;i?tg.lineTo(x,y):tg.moveTo(x,y);});tg.closePath();tg.fill();
@@ -12802,7 +12802,7 @@ function tmImg(p,cav){let o=TMV.img.get(cav);if(o&&o.col===(p.color||''))return 
     for(let j=0;j<cav.h;j++)for(let i=0;i<cav.w;i++){if(cav.D[j*cav.w+i]<=0)continue;const k=(j*cav.w+i)*4;id.data[k]=r;id.data[k+1]=gg;id.data[k+2]=b;id.data[k+3]=255;}g.putImageData(id,0,0);return c;};
   const col=/^#[0-9a-f]{6}$/i.test(p.color||'')?p.color:'#6aa9ff';o={col:p.color||'',fill:mk(col),sil:mk('#F05325'),bad:mk('#B3261E')};TMV.img.set(cav,o);return o;}
 function tmDraw(){const cv=q('#tmCv');if(!cv||!TMV.on)return;const box=cv.parentElement,dpr=devicePixelRatio||1,W=box.clientWidth,H=box.clientHeight;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
-  const fm=S.fm||(S.L&&S.L.fm);if(!fm)return;const pad=18,top=48,k=Math.min((W-2*pad)/fm.w,(H-top-pad)/fm.h),ox=(W-fm.w*k)/2,oy=top+((H-top-pad)-fm.h*k)/2;TMV.geo={k,ox,oy,fm};
+  const fm=S.fm||(S.L&&S.L.fm);if(!fm)return;const pad=18,top=48;let E=TMV.drag&&TMV.ext?TMV.ext:null;if(!E){E=[0,0,fm.w,fm.h];for(const p of tmParts()){const c=p.cur.cav,b=c.bbox||[0,0,c.w-1,c.h-1];E[0]=Math.min(E[0],p.x+b[0]-10);E[1]=Math.min(E[1],p.y+b[1]-10);E[2]=Math.max(E[2],p.x+b[2]+11);E[3]=Math.max(E[3],p.y+b[3]+11);}TMV.ext=E;}const ew=E[2]-E[0],eh=E[3]-E[1],k=Math.min((W-2*pad)/ew,(H-top-pad)/eh),ox=(W-ew*k)/2-E[0]*k,oy=top+((H-top-pad)-eh*k)/2-fm.h*k+E[3]*k;TMV.geo={k,ox,oy,fm};
   if(TMV.fmK!==fm){const c=document.createElement('canvas');c.width=fm.w;c.height=fm.h;const fg=c.getContext('2d'),id=fg.createImageData(fm.w,fm.h);for(let i=0;i<fm.m.length;i++)if(fm.m[i]){id.data[i*4]=141;id.data[i*4+1]=134;id.data[i*4+2]=128;id.data[i*4+3]=255;}fg.putImageData(id,0,0);TMV.fmC=c;TMV.fmK=fm;}
   const R=Math.max(6,((S.foam&&S.foam.R)||12)*k);g.fillStyle='#5f5955';g.beginPath();if(g.roundRect)g.roundRect(ox-7,oy-7,fm.w*k+14,fm.h*k+14,R+7);else g.rect(ox-7,oy-7,fm.w*k+14,fm.h*k+14);g.fill();
   const flip=()=>{g.translate(ox,oy+fm.h*k);g.scale(k,-k);};
@@ -12823,13 +12823,13 @@ function tmUpd(){const has=!!TMV.sel,lidSide=S.side==='lid',mine=p=>((p.side||'b
   else if(bad){st.className='tmStat bad';st.textContent='✗ '+bad.t.replace(/\s*\(.*?\)\s*/g,' ').trim()+' Tap Auto organize.';}
   else if(!tmParts().length){st.className='tmStat';st.textContent=lidSide?'No parts in the lid.':'No parts in the base.';}
   else{st.className='tmStat ok';st.textContent='✓ '+(lidSide?'The lid fits':'Fits')+' in '+(cs?nm(cs):'this case')+'.';}}
-function tmOpen(){if(!NF.shown||FIT.busy||!S.fm){toast('Pick a case that fits first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;if(S.side!=='base')tmGoSide('base',true);TMV.snap0=tmSnap();if(NF.redFor&&nfBringIn())TMV.msg={c:'bad',t:'The red parts did not fit. Drag and turn them to try, or tap Auto organize.'};recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
+function tmOpen(){if(!(NF.shown||NF.redFor)||FIT.busy||!S.fm){toast('Pick a case first.');return;}TMV.on=true;TMV.sel=null;TMV.undo=[];TMV.msg=null;if(S.side!=='base')tmGoSide('base',true);TMV.snap0=tmSnap();if(NF.redFor&&nfBringIn())TMV.msg={c:'bad',t:'The red parts did not fit. Drag and turn them to try, or tap Auto organize.'};recalc();q('#tmOver').classList.add('on');requestAnimationFrame(()=>{tmDraw();tmUpd();});}
 function tmSaveTurns(){try{const all=JSON.parse(localStorage.getItem('fa_turns')||'{}'),by={};for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;(by[id]=by[id]||[]).push(p.rotLock?Math.round(p.ang.z):null);}
   for(const id in by){if(by[id].some(v=>v!=null))all[id]=by[id];else delete all[id];}localStorage.setItem('fa_turns',JSON.stringify(all));}catch(e){}
   try{const cs=S.foam.caseId,fm=S.fm;if(!cs||!fm)return;const all=JSON.parse(localStorage.getItem('fa_pos')||'{}'),by={},h2=v=>Math.round(v*2)/2;for(const p of S.parts){const id=p.photo&&p.photo.phoneId;if(!id)continue;const c=center(p);const lid=p.side==='lid';(by[id]=by[id]||[]).push(lid?(p.lidPlaced?[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2),1]:null):[h2(c[0]-fm.w/2),h2(c[1]-fm.h/2)]);}
   for(const id in by)all[id]={c:cs,p:by[id]};localStorage.setItem('fa_pos',JSON.stringify(all));}catch(e){}}
 function tmClose(keep){TMV.on=false;TMV.drag=null;try{q('#tmAng').blur();}catch(e){}q('#tmOver').classList.remove('on');if(!keep)tmRestore(TMV.snap0);else{const lb=S.side==='lid'&&S.flags&&S.flags.some(x=>x.lv==='bad');tmGoSide('base',true);if(NF.redFor){nfRedMark();nfRedSave();}else tmSaveTurns();if(lb)toast('Some lid parts overlap or are outside the lid foam. Open Turn & move, pick Lid and tap Auto organize.',4200);if(S.flags&&S.flags.some(x=>x.lv==='bad'))toast('Some parts overlap or are outside the foam. Open Turn & move and tap Auto organize.',4200);}
-  after();render();setTimeout(()=>{try{frontTilt();}catch(e){}},250);}
+  after();render();setTimeout(()=>{try{if(NF.redFor)nfRedFrame();else frontTilt();}catch(e){}},250);}
 function tmTurn(d){const p=TMV.sel;if(!p)return;TMV.undo.push(tmSnap());TMV.msg=null;tmAngTo(p,p.ang.z+d);recalc();tmDraw();tmUpd();}
 async function tmAuto(reset){if(FIT.busy)return;TMV.undo.push(tmSnap());TMV.msg=null;
   if(NF.redFor&&S.side!=='lid'){const cs=CASES.find(c=>c.id===NF.redFor);if(reset)S.parts.forEach(p=>{if(p.side!=='lid')p.rotLock=false;});nfRedPack(cs);const n=S.parts.filter(p=>p.noFit).length;nfBringIn();recalc();
@@ -12866,7 +12866,7 @@ const nfFlagsOff=()=>S.parts.forEach(p=>{p.noFit=false;p.tooTall=false;p.badFit=
 function nfRedClear(){if(!NF.redFor)return;const sn=NF.goodSnap;NF.redFor=null;NF.redInfo=null;nfFlagsOff();const ks=NF.sel;if(sn)tmRestore(sn);NF.sel=ks;NF.goodSnap=null;S.dirty3=true;after();}
 function nfRedShow(cs){if(NF.redFor===cs.id)return;
   if(!NF.redFor)NF.goodSnap=tmSnap();else{nfFlagsOff();const ks=NF.sel;tmRestore(NF.goodSnap);NF.sel=ks;}
-  NF.redFor=cs.id;NF.redSaved=NF.redSaved||{};nfRedInit();
+  NF.redFor=cs.id;NF.redSaved=NF.redSaved||{};nfRedInit();if(S.step!==4){S.chosen=true;go(4);}q('#layout').style.display='';{const v=q('[data-view="3d"]');if(v&&S.view!=='3d')v.click();}
   if(NF.redSaved[cs.id]){const ks=NF.sel;tmRestore(NF.redSaved[cs.id]);NF.sel=ks;NF.redInfo=nfRedInfo();setTimeout(()=>toast('Your changes in '+nm(cs.id)+' are kept'),120);}
   else{setCase(cs.id);S.fit3=true;S.side='base';applySideFoam();syncWhere();S.parts.forEach(p=>{if(p.side==='lid')p.lidPlaced=false;});recalc();nfRedPack(cs);}
   S.dirty3=true;after();setTimeout(nfRedFrame,80);setTimeout(nfRedFrame,700);}
@@ -12908,7 +12908,7 @@ function nfRedMark(){S.parts.forEach(p=>{p.badFit=false;});try{for(const p of tm
 const nfNames=a=>[...new Set(a.map(p=>p.name))].map(n=>[n,a.filter(p=>p.name===n).length]);
 function nfRedInfo(){const out=S.parts.filter(p=>p.noFit),tall=S.parts.filter(p=>p.tooTall&&!p.noFit),bad=S.parts.filter(p=>p.badFit&&!p.noFit),rz=S.parts.filter(p=>p.raised>0&&!p.tooTall&&!p.noFit),first=a=>{const m=new Map();for(const p of a)if(!m.has(p.name))m.set(p.name,p);return [...m.values()];};
   return {out:nfNames(out),n:out.length,tall:[...new Set(tall.map(p=>p.name))],tallP:first(tall).map(p=>[p.name,p.id]),raised:first(rz).map(p=>[p.name,p.raised]),bad:nfNames(bad),nb:bad.length,fingers:out.concat(tall,bad).some(p=>(p.fingers||[]).some(f=>f.shape))};}
-function nfRedFrame(){try{frontTilt();const ps=S.parts.filter(p=>p.noFit);if(!ps.length||typeof T3==='undefined'||!T3.ready)return;const f=S.foam;let mx=f.L;for(const p of ps){const h=getOriented(p).hm;mx=Math.max(mx,p.x+h.w+30);}T3.t.x=mx/2;T3.dist*=Math.max(1,mx/f.L)*0.86;camUpdate();}catch(e){}}
+function nfRedFrame(){try{frontTilt();if(typeof T3==='undefined'||!T3.ready)return;const f=S.foam;let x0=0,x1=f.L,y0=0,y1=f.W;for(const p of S.parts.filter(q=>q.where==='base')){const h=getOriented(p).hm;x0=Math.min(x0,p.x-30);x1=Math.max(x1,p.x+h.w+30);y0=Math.min(y0,p.y-30);y1=Math.max(y1,p.y+h.h+30);}const k=Math.max(1,(x1-x0)/f.L,(y1-y0)/f.W);if(k>1.05){const hf=2*Math.atan(Math.tan(T3.cam.fov*Math.PI/360)*T3.cam.aspect);T3.t.x=(x0+x1)/2;T3.t.y=(y0+y1)/2;T3.dist=Math.max(T3.dist,(x1-x0)*0.56/Math.tan(hf/2),(y1-y0)*1.6);}T3.dmax=Math.max(4000,T3.dist*2.5);camUpdate();}catch(e){}}
 function nfRedLines(cs){const I=NF.redInfo||nfRedInfo(),L=[],c='<b>'+nm(cs.id)+':</b> ',lst=a=>a.map(([n,k])=>'<b>'+nfEsc(n)+'</b>'+(k>1?' ×'+k:'')).join(', ');
   if(I.n)L.push(c+lst(I.out)+(I.n===1?' does':' do')+' not fit in length or width (red, beside the case).');
   else if(I.nb)L.push(c+lst(I.bad)+(I.nb===1?' overlaps or sticks out':' overlap or stick out')+' (red).');
@@ -12924,26 +12924,26 @@ function nfLidFrame(a){try{frontTilt();if(a>=150&&typeof T3!=='undefined'&&T3.re
 function nfLayout(){const t=q('#nfTop'),b=q('#nfBot');if(!t||!b)return;document.documentElement.style.setProperty('--nft',(t.offsetHeight+6)+'px');document.documentElement.style.setProperty('--nfb',(b.offsetHeight+8)+'px');}
 /* the case seen from the front, tilted, so the base and the open lid are both in view */
 function frontTilt(){if(typeof T3==='undefined'||!T3.ready)return;T3.az=-Math.PI/2;T3.el=0.55;try{const f=S.foam,hf=2*Math.atan(Math.tan(T3.cam.fov*Math.PI/360)*T3.cam.aspect),vf=T3.cam.fov*Math.PI/180;T3.t.set(f.L/2,f.W/2,(S.Hf||30)/2);T3.dist=Math.max(f.L*1.5/(2*Math.tan(hf/2)),f.W*2.2/(2*Math.tan(vf/2)));}catch(e){}camUpdate();}
-function zoomBy(k){if(document.body.classList.contains('nfred')&&OV.r){OV.dist=Math.max(80,Math.min(5000,OV.dist*k));ovRender();return;}if(typeof T3==='undefined'||!T3.ready)return;T3.dist=Math.max(60,Math.min(4000,T3.dist*k));camUpdate();}
+function zoomBy(k){if(document.body.classList.contains('nfred')&&OV.r){OV.dist=Math.max(80,Math.min(Math.max(5000,OV.dmax||0),OV.dist*k));ovRender();return;}if(typeof T3==='undefined'||!T3.ready)return;T3.dist=Math.max(60,Math.min(Math.max(4000,T3.dmax||0),T3.dist*k));camUpdate();}
 /* pinch with two fingers to zoom the 3D case */
 function pinchSetup(){if(typeof T3==='undefined'||!T3.ready||T3._pinch)return;T3._pinch=true;const el=T3.r.domElement,pts=new Map();let d0=0,dist0=0;
   const dd=()=>{const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);};
   el.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){d0=dd();dist0=T3.dist;e.stopImmediatePropagation();}},{capture:true});
-  el.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size>=2){e.stopImmediatePropagation();const d=dd();if(d0>10&&d>10){T3.dist=Math.max(60,Math.min(4000,dist0*d0/d));camUpdate();}}},{capture:true});
+  el.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size>=2){e.stopImmediatePropagation();const d=dd();if(d0>10&&d>10){T3.dist=Math.max(60,Math.min(Math.max(4000,T3.dmax||0),dist0*d0/d));camUpdate();}}},{capture:true});
   const end=e=>{pts.delete(e.pointerId);if(pts.size<2)d0=0;};el.addEventListener('pointerup',end,{capture:true});el.addEventListener('pointercancel',end,{capture:true});}
 /* a case that does not fit: draw it from the top with the parts laid in it; what sticks out is red */
 const OV={r:null,scene:null,cam:null,az:-Math.PI/2,el:0.62,dist:700,t:null,cs:null};
-function ovRender(){if(!OV.r||!OV.scene)return;const c=Math.cos(OV.el);OV.cam.position.set(OV.t.x+OV.dist*c*Math.cos(OV.az),OV.t.y+OV.dist*c*Math.sin(OV.az),OV.t.z+OV.dist*Math.sin(OV.el));OV.cam.lookAt(OV.t);OV.r.render(OV.scene,OV.cam);}
+function ovRender(){if(!OV.r||!OV.scene)return;{const fr=Math.max(9000,OV.dist*4),nr=Math.max(1,OV.dist/400);if(OV.cam.far!==fr||OV.cam.near!==nr){OV.cam.far=fr;OV.cam.near=nr;OV.cam.updateProjectionMatrix();}}const c=Math.cos(OV.el);OV.cam.position.set(OV.t.x+OV.dist*c*Math.cos(OV.az),OV.t.y+OV.dist*c*Math.sin(OV.az),OV.t.z+OV.dist*Math.sin(OV.el));OV.cam.lookAt(OV.t);OV.r.render(OV.scene,OV.cam);}
 function ovInit(){if(OV.r)return true;if(typeof THREE==='undefined')return false;const cv=q('#nfOverCv');try{OV.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});}catch(e){return false;}
   OV.cam=new THREE.PerspectiveCamera(35,1,1,9000);OV.cam.up.set(0,0,1);OV.t=new THREE.Vector3();const pts=new Map();let last=null,d0=0,dist0=0;
   const dd=()=>{const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);};
   cv.style.touchAction='none';
   cv.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});try{cv.setPointerCapture(e.pointerId);}catch(x){}if(pts.size===2){d0=dd();dist0=OV.dist;}last={x:e.clientX,y:e.clientY};});
   cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(pts.size>=2){const d=dd();if(d0>10&&d>10){OV.dist=Math.max(80,Math.min(5000,dist0*d0/d));ovRender();}return;}
+    if(pts.size>=2){const d=dd();if(d0>10&&d>10){OV.dist=Math.max(80,Math.min(Math.max(5000,OV.dmax||0),dist0*d0/d));ovRender();}return;}
     if(!last)return;OV.az-=(e.clientX-last.x)*0.01;OV.el=Math.max(-0.2,Math.min(1.5,OV.el+(e.clientY-last.y)*0.01));last={x:e.clientX,y:e.clientY};ovRender();});
   const end=e=>{pts.delete(e.pointerId);if(pts.size<2)d0=0;last=null;};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
-  cv.addEventListener('wheel',e=>{e.preventDefault();OV.dist=Math.max(80,Math.min(5000,OV.dist*(e.deltaY>0?1.12:0.89)));ovRender();},{passive:false});return true;}
+  cv.addEventListener('wheel',e=>{e.preventDefault();OV.dist=Math.max(80,Math.min(Math.max(5000,OV.dmax||0),OV.dist*(e.deltaY>0?1.12:0.89)));ovRender();},{passive:false});return true;}
 /* lay the parts of one side in a case from the top: big ones first, row by row; the rest goes past the case */
 function ovPack(cs,list){const wall=(S.set&&S.set.wall)||8,gap=6;
   const items=list.map(p=>{let poly=(p.photo&&p.photo.outline)?p.photo.outline.map(a=>[a[0],a[1]]):null,e;try{e=getOriented(p,getR(p)).o.ext;}catch(x){e=[50,30,10];}
@@ -12952,7 +12952,7 @@ function ovPack(cs,list){const wall=(S.set&&S.set.wall)||8,gap=6;
     let bx0=Math.min(x0,...circ.map(c=>c[0]-c[2])),bx1=Math.max(x1,...circ.map(c=>c[0]+c[2])),by0=Math.min(y0,...circ.map(c=>c[1]-c[2])),by1=Math.max(y1,...circ.map(c=>c[1]+c[2]));
     if(by1-by0>bx1-bx0){poly=poly.map(a=>[a[1],-a[0]]);circ=circ.map(c=>[c[1],-c[0],c[2]]);[bx0,bx1,by0,by1]=[by0,by1,-bx1,-bx0];}
     return {p,poly:poly.map(a=>[a[0]-bx0,a[1]-by0]),circ:circ.map(c=>[c[0]-bx0,c[1]-by0,c[2]]),w:bx1-bx0,h:by1-by0,H:e[2]};}).sort((a,b)=>b.w*b.h-a.w*a.h);
-  let x=wall,y=wall,rowH=0;for(const it of items){if(x>wall&&x+it.w>cs.L-wall){x=wall;y+=rowH+gap;rowH=0;}it.x=x;it.y=y;x+=it.w+gap;rowH=Math.max(rowH,it.h);it.outXY=it.x+it.w>cs.L-wall+0.5||it.y+it.h>cs.W-wall+0.5;}
+  let x=wall,y=wall,rowH=0,ay=0;for(const it of items.filter(it=>it.w>cs.L-2*wall+0.5||it.h>cs.W-2*wall+0.5)){it.x=cs.L+40;it.y=ay;ay+=it.h+20;it.outXY=true;it.aside=true;}for(const it of items.filter(it=>!it.aside)){if(x>wall&&x+it.w>cs.L-wall){x=wall;y+=rowH+gap;rowH=0;}it.x=x;it.y=y;x+=it.w+gap;rowH=Math.max(rowH,it.h);it.outXY=it.x+it.w>cs.L-wall+0.5||it.y+it.h>cs.W-wall+0.5;}
   return items;}
 function ovShow(cs){const box=q('#nfOver');if(!box||!ovInit()){try{drawOver2D(cs);}catch(e){}return;}const W=box.clientWidth,H=box.clientHeight;if(!W||!H)return;
   OV.r.setPixelRatio(Math.min(2,devicePixelRatio||1));OV.r.setSize(W,H,false);OV.cam.aspect=W/H;OV.cam.updateProjectionMatrix();
@@ -12972,7 +12972,7 @@ function ovShow(cs){const box=q('#nfOver');if(!box||!ovInit()){try{drawOver2D(cs
       ext[0]=Math.min(ext[0],px);ext[1]=Math.max(ext[1],px+it.w);ext[2]=Math.min(ext[2],oy+py);ext[3]=Math.max(ext[3],oy+py+it.h);ext[4]=Math.max(ext[4],z0+it.H);}};
   tray(0,cs.base,floor,baseL,cs.base+cs.lid-floor,'Base');if(lidL.length)tray(cs.W+50,cs.lid,4,lidL,cs.lid,'Lid');
   const x0=Math.min(0,ext[0]),x1=Math.max(cs.L,ext[1]),y0=Math.min(0,ext[2]),y1=Math.max(lidL.length?2*cs.W+50:cs.W,ext[3]),z1=Math.max(cs.base+cs.lid,ext[4]);
-  OV.t.set((x0+x1)/2,(y0+y1)/2,z1/3);if(OV.cs!==cs.id){OV.cs=cs.id;OV.az=-Math.PI/2;OV.el=0.62;OV.dist=Math.max(x1-x0,y1-y0,z1)*2.6;}
+  OV.t.set((x0+x1)/2,(y0+y1)/2,z1/3);const fk=cs.id+'|'+W+'x'+H+'|'+Math.round(x1-x0)+'x'+Math.round(y1-y0);if(OV.cs!==fk){OV.cs=fk;OV.az=-Math.PI/2;OV.el=0.62;OV.dist=Math.max((x1-x0)*0.62/Math.tan(OV.cam.fov*Math.PI/360)/Math.max(0.3,OV.cam.aspect),Math.max(y1-y0,z1)*2.6);}OV.dmax=Math.max(x1-x0,y1-y0,z1)*6;
   const ck=q('#nfChk');if(ck)ck.innerHTML='<b>'+nm(cs.id)+'</b><span class="'+(badXY?'bad':'')+'">Length &amp; width '+(badXY?'✗':'✓')+'</span><span class="'+(badZ?'bad':'')+'">Depth '+(badZ?'✗':'✓')+'</span>'+(lidL.length?'<span style="background:#6b645d">Lid at the back</span>':'');
   ovRender();}
 function drawOver(cs){return ovShow(cs);}
@@ -13013,15 +13013,15 @@ function render(){
   q('#nfH').textContent=rec?'Best fit: '+nm(rec.id):'No case fits';
   q('#nfChips').innerHTML=ord.map(c=>{const s=stat(c.id),lab={no:'NO',yes:'YES',best:'BEST'}[s];return `<button class="nfchip ${s}${NF.sel===c.id?' sel':''}" data-id="${c.id}" aria-label="${nm(c.id)} ${lab}">${nm(c.id)}<span>${lab}</span>${NF.redSaved&&NF.redSaved[c.id]?'<i class="nfdot" title="You changed this case"></i>':''}</button>`;}).join('');{const ch=q('#nfChips');ch.classList.toggle('few',!NF.all&&!!rec);if(rec)ch.insertAdjacentHTML('beforeend','<button class="nfchip more" data-more="1">'+(NF.all?'Fewer ▴':'Other cases ▾')+'</button>');}
   const sel=CASES.find(c=>c.id===NF.sel),ss=stat(NF.sel),w=q('#nfWhy');let lines;
-  const lidOnly=ss==='no'&&/lid/i.test((FIT.res&&FIT.res.why[sel.id])||''),realRed=ss==='no'&&!lidOnly&&!!NF.shown;if(NF.redFor&&!realRed)nfRedClear();if(realRed)nfRedShow(sel);
+  const lidOnly=ss==='no'&&/lid/i.test((FIT.res&&FIT.res.why[sel.id])||''),realRed=ss==='no'&&!lidOnly&&(!!NF.shown||!rec);if(NF.redFor&&!realRed)nfRedClear();if(realRed)nfRedShow(sel);
   if(ss==='no')lines=(realRed&&NF.redInfo)?nfRedLines(sel):reasonFor(sel).map((x,i)=>i?x:'<b>'+nm(sel.id)+':</b> '+x);
   else if(ss==='best'){const smaller=ord.filter(c=>c.L*c.W<sel.L*sel.W&&stat(c.id)==='no'),nx=smaller[smaller.length-1];
     lines=nx?reasonFor(nx).slice(0,1).map(x=>'<b>'+nm(nx.id)+' is too small:</b> '+x):['<b>'+sel.name+'</b> is the smallest STA-300 case.'];}
   else lines=['<b>'+nm(sel.id)+'</b> fits too'+(rec?': a bigger case than '+nm(rec.id):'')+'.'];
   w.className=ss;w.innerHTML=lines.join('<br>');
-  document.body.classList.toggle('nfred',ss==='no'&&!realRed);document.body.classList.toggle('nfreal',!!realRed);if(ss==='no'&&!realRed)requestAnimationFrame(()=>drawOver(sel));
+  document.body.classList.toggle('nfred',ss==='no'&&!realRed);document.body.classList.toggle('nfreal',!!realRed);document.body.classList.toggle('nfhas',!!rec||!!realRed);q('#nfAl').style.display=rec?'':'none';if(!rec&&realRed)w.innerHTML+='<br><span style="color:#6b645d">No STA-300 case fits. Send to Shell-Case for a custom foam.</span>';if(ss==='no'&&!realRed)requestAnimationFrame(()=>drawOver(sel));
   const shown=NF.shown;{const e=shown&&S.ladder&&S.ladder.find(x=>x.c.id===shown),n=e&&e.options?Math.min(3,e.options.length):0,sg=q('#nfAl .nfseg');if(NF.align!=='auto'&&!(+NF.align<n))NF.align='auto';sg.innerHTML='<button data-al="auto">Auto</button>'+Array.from({length:n},(_,i)=>'<button data-al="'+i+'">'+(i+1)+'</button>').join('');sg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.al===String(NF.align));b.disabled=!shown||!!NF.redFor;});}
-  q('#nfLid').textContent=nfLidLab(S.lidAng||0);q('#nfTurn').disabled=!shown;
+  q('#nfLid').textContent=nfLidLab(S.lidAng||0);q('#nfTurn').disabled=!(shown||NF.redFor);
   requestAnimationFrame(nfLayout);}
 window.__startFit=function(){document.body.classList.add('fitmode');const sp=document.getElementById('fitSplash');if(sp)sp.remove();const nb=q('#btnNext');if(nb&&nb.parentElement)nb.parentElement.classList.add('fithide');
   S.parts.forEach(p=>{if(!p.fitSide)p.fitSide='auto';});
