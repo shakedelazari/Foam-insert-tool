@@ -222,12 +222,12 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 <section id="sSheet" class="scr">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
   <h2>Your sheet of paper</h2>
-  <p class="shSub">Put your product on a plain white sheet. The app uses the sheet to measure it.</p>
+  <p class="shSub">Place your product on a white paper and take a picture from above using the scan tool.</p>
   <div class="shEx" id="shEx" role="img"><span>Example</span><svg viewBox="0 0 300 340" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg></div>
   <div class="shLbl">Which paper do you have?</div>
   <div class="shCards"><button class="sheetc" data-sheet="a4"><b>A4</b><span>210 × 297 mm</span></button><button class="sheetc" data-sheet="letter"><b>Letter</b><span>8.5 × 11 in</span></button></div>
   <div class="seg2" id="unitSeg"><button data-u="mm">mm</button><button data-u="in">in</button></div>
-  <button class="pri" id="sheetGo">Continue</button>
+  <button class="pri" id="sheetGo">Scan the product</button>
 </section>
 
 <!-- 4 Take photo -->
@@ -378,13 +378,13 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <p style="font-size:14px">How deep the part sits in the foam: the height of the part as it lies in the case.</p>
   <button class="pri" id="depthOk">OK</button>
 </div></div>
-<div id="busy"><i></i><span id="busyT">Working…</span></div>
+<div id="busy"><i></i><span id="busyT">Working…</span><button type="button" id="busyBack" class="sec" style="display:none;height:46px;padding:0 22px">‹ Back</button></div>
 <div id="toast"></div>
 
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.18 · 25 Nov 2026';
+const APP_VERSION='A1.19 · 26 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -395,7 +395,7 @@ const NOTCH_R=20; // mm, half circle outside the edge
 const SHEETS={a4:{n:'A4',w:210,h:297,lab:'210 × 297 mm'},letter:{n:'Letter',w:215.9,h:279.4,lab:'8.5 × 11 in'}};
 const MAXC=1000;
 function toast(m,ms=2600){const t=$('#toast');t.innerHTML=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',ms);}
-function busy(on,t){$('#busy').style.display=on?'flex':'none';if(t)$('#busyT').textContent=t;}
+function busy(on,t){$('#busy').style.display=on?'flex':'none';if(t)$('#busyT').textContent=t;if(!on){const b=$('#busyBack');if(b)b.style.display='none';}}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const r1=v=>Math.round(v*10)/10;
 
@@ -482,7 +482,7 @@ function sheetEx(){const box=document.getElementById('shEx');if(!box)return;cons
     pliers('#a7adb3','#5d6368','#2f5d8a',0,0);
   box.setAttribute('aria-label','Example: pliers lying on a white '+S0.n+' sheet ('+S0.lab+')');}
 function paintSheet(){sheetEx();$$('[data-sheet]').forEach(b=>b.classList.toggle('on',b.dataset.sheet===P.sheet));$$('#unitSeg button').forEach(b=>b.classList.toggle('on',b.dataset.u===P.unit));}
-ENTER.sSheet=()=>{paintSheet();};
+ENTER.sSheet=()=>{paintSheet();$('#sheetGo').textContent=P&&P.parts&&P.parts.length?'Scan the product':'Scan the first product';};
 $$('[data-sheet]').forEach(b=>b.onclick=()=>{P.sheet=b.dataset.sheet;P.unit=P.sheet==='letter'?'in':'mm';saveAll();paintSheet();}); // Letter -> inches, A4 -> mm (can still be changed)
 $$('#unitSeg button').forEach(b=>b.onclick=()=>{P.unit=b.dataset.u;saveAll();paintSheet();});
 FWD.sSheet=()=>()=>afterSheet();$('#sheetGo').onclick=()=>afterSheet();
@@ -916,8 +916,8 @@ async function packLink(base,list,extra){const txt=new TextEncoder().encode(JSON
   if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(txt);w.close();body=new Uint8Array(await new Response(cs.readable).arrayBuffer());tag='z.';}
   return base+'#phone='+tag+b64u(body)+(extra||'');}
 async function goFit(){const list=LAY().filter(q=>q.inCheck!==false);if(!list.length){toast('Turn on <b>In check</b> for at least one part.');return;}
-  saveAll();busy(true,'Opening the fit check…');location.href=await packLink(new URL('./app-fit.html',location.href).href,list,'&fit=1&u='+P.unit);}
-addEventListener('pageshow',()=>busy(false));
+  saveAll();busy(true,'Opening the fit check… The first time can take a minute.');$('#busyBack').style.display='';location.href=await packLink(new URL('./app-fit.html',location.href).href,list,'&fit=1&u='+P.unit);}
+addEventListener('pageshow',()=>busy(false));$('#busyBack').onclick=()=>{try{window.stop();}catch(e){}busy(false);};
 
 /* ---------- Send to computer: scan the code on the computer (same Wi-Fi) or send a link ---------- */
 ENTER.sSend=()=>{const n=LAY().length;$('#sendCount').textContent=n+' part'+(n===1?'':'s')+' to send';};
