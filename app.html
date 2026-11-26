@@ -196,6 +196,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 .card.svc{display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px}.svb{width:54px;height:54px;border-radius:10px;background:#C6B68D;color:#292524;font:700 19px Antonio,sans-serif;display:grid;place-items:center;flex:none;text-align:center;line-height:1}
 .svt{flex:1;min-width:0}.svt b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.svt span{font-size:12px;color:var(--muted)}
 .svc .nb{flex:none}
+.szLift{display:none!important}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 </head>
@@ -208,7 +209,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <p style="font-size:16px">Scan your product. Get the best case fit.</p>
   <div class="grow homeVis"><img src="case-family.webp" alt="Shell-Case cases"></div>
   <button class="pri" id="homeScan" style="background:var(--fl);border-color:var(--fl);color:#fff">Scan object</button>
-  <button class="sec" id="homeOpen">Open library</button>
+  <button class="sec" id="homeOpen">Scanned products</button>
     <button class="sec" id="homeSaved" style="display:none">Saved layouts</button>
   <div class="hint" style="text-align:center" id="verTxt"></div>
 </section>
@@ -216,7 +217,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 <!-- Library: every part ever scanned. Tick the parts for the layout. -->
 <section id="sProj" class="scr">
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
-  <h2>Library</h2>
+  <h2>Scanned products</h2>
   <div class="hint" id="libHint">Tick the parts you want in the case.</div>
   <div class="lay" id="projList"></div>
   <button class="sec" id="libScan">+ Scan new object</button>
@@ -229,7 +230,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <h2>Saved layouts</h2>
   <div class="hint" id="svHint">Your cases with the parts in place. Tap Open to keep working on one.</div>
   <div class="lay" id="svList"></div>
-  <button class="sec" id="svLib">Open library</button>
+  <button class="sec" id="svLib">Scanned products</button>
 </section>
 
 <!-- 2 Allow level -->
@@ -311,7 +312,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   <div class="nav"><button class="nb" data-nav="back">‹ Back</button><button class="nb" data-nav="fwd">Forward ›</button></div>
   <h2>Layout</h2>
   <div class="lay" id="layList"></div>
-  <div class="row"><button class="sec" id="layScan" style="flex:1">+ Scan part</button><button class="sec" id="layLib" style="flex:1">+ From library</button></div>
+  <div class="row"><button class="sec" id="layScan" style="flex:1">+ Scan part</button><button class="sec" id="layLib" style="flex:1">+ Scanned products</button></div>
   <button class="pri" id="layGo">Find my STA-300 case</button>
 </section>
 
@@ -368,7 +369,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
   </div>
  </div>
 </div>
-<div class="modal" id="mAdded"><div class="card" style="width:100%;max-width:380px;padding:20px;gap:12px"><h2 style="font-size:30px">Part added</h2><p style="font-size:15px">Part added to the library.<br>Would you like to scan another object?</p><button class="pri" id="addMore">Scan another object</button><button class="sec" id="addDone">No, go to layout</button></div></div>
+<div class="modal" id="mAdded"><div class="card" style="width:100%;max-width:380px;padding:20px;gap:12px"><h2 style="font-size:30px">Part added</h2><p style="font-size:15px">Part added to Scanned products.<br>Would you like to scan another object?</p><button class="pri" id="addMore">Scan another object</button><button class="sec" id="addDone">No, go to layout</button></div></div>
 <div class="modal" id="mHowSend"><div class="card" style="width:100%;max-width:400px;padding:18px;gap:10px;max-height:92vh;overflow:auto;border-top:6px solid #F05325">
   <h2 style="font-size:28px">Transfer to computer</h2>
   <div class="row" style="align-items:flex-start;gap:10px"><b class="stepn">1</b><div style="flex:1;min-width:0;font-size:14px">On the computer, open the design page:<div class="row" style="margin-top:6px"><span id="hsUrl" style="font-size:12px;color:var(--muted);word-break:break-all;flex:1"></span><button class="sm" id="hsCopy" style="height:30px;padding:0 10px;border:2px solid var(--ink);border-radius:10px;background:#fff;font:600 12px Poppins,sans-serif">Copy</button></div></div></div>
@@ -384,7 +385,7 @@ html[data-theme=dark] .cf{color:#F5C518}html[data-theme=dark] #sSize input.rv{ba
 </div></div>
 <div id="menu"><div class="mp" role="menu">
   <button class="mi" data-mi="home">Home</button>
-  <button class="mi" data-mi="lib">Library</button>
+  <button class="mi" data-mi="lib">Scanned products</button>
   <button class="mi" data-mi="lay">Layout</button>
     <button class="mi" data-mi="saved">Saved layouts</button>
     <hr>
@@ -514,9 +515,9 @@ const G=[
   s+=`<rect x="16" y="370" width="311" height="46" rx="12" fill="${on[2]?'#292524':'#cfc8bb'}"/>${T(171,399,16,{c:'#F1EEE5'})}${on[2]?'Add part':'Check all 3'}</text>`;
   if(tg>=0)s+=finger(268,217+tg*58,true);else if(p>.8&&p<.94)s+=finger(171,393,p>.86);
   return s+tick(298,38,C(.92,.99,p),20)}},
- {t:'Add to library',s:'Saved in your library',d:p=>{const k=E(C(.15,.5,p)),nw=k>=1;
+ {t:'Scanned products',s:'Saved with your scans',d:p=>{const k=E(C(.15,.5,p)),nw=k>=1;
   const rows=[{n:'Battery',it:LIB[0],c:'#9b6fd6',d:'120 × 80 × 60 mm'},{n:'Charger',it:LIB[1],c:'#4fae6a',d:'150 × 100 × 55 mm'},{n:'Bits',it:LIB[2],c:'#d6a85a',d:'160 × 40 × 25 mm'},{n:'Drill',it:LIB[3],c:'#5b8fd6',d:'260 × 180 × 80 mm',nw:1}];
-  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/><text x="14" y="34" font-family="Antonio" font-weight="700" font-size="28" fill="#292524">LIBRARY</text>
+  let s=`<rect width="${W}" height="${H}" fill="#F1EEE5"/><text x="14" y="34" font-family="Antonio" font-weight="700" font-size="28" fill="#292524">SCANNED PRODUCTS</text>
    <text x="14" y="56" font-family="Poppins" font-size="12" fill="#6b645d">Tick the parts you want in the case.</text>`;
   rows.forEach((r,i)=>{const y0=68+i*64,y=r.nw?L(y0+50,y0,k):y0,on=!!r.nw;
    s+=`<g opacity="${r.nw?k:1}"><rect x="12" y="${y}" width="319" height="56" rx="12" fill="#fff" stroke="${on?'#F05325':'#fff'}" stroke-width="2"/>
@@ -615,7 +616,8 @@ return {open,seen,isOpen:()=>!!cur};
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='A1.20 · 26 Nov 2026';
+let LIFT_BACK=false; // Easy to lift opened from Best fit: Done/Cancel go back to a new fit check
+const APP_VERSION='A1.21 · 26 Nov 2026';
 /* ---------- switch: show screen 9 'Best fit' (true) or go straight to Send to computer (false). ?fit=0 / ?fit=1 in the link changes it on this phone. ---------- */
 const SHOW_FIT_DEFAULT=true;
 let SHOW_FIT=SHOW_FIT_DEFAULT;try{const f=new URLSearchParams(location.search).get('fit');if(f==='0'||f==='1')localStorage.setItem('fa_showfit',f);const v=localStorage.getItem('fa_showfit');if(v==='0'||v==='1')SHOW_FIT=v==='1';}catch(e){}
@@ -644,7 +646,7 @@ let P=null; // the library: every part. q.use = in the layout now
   P={id:'lib',lib:1,at:Date.now(),sheet:old?old.sheet||'a4':'a4',unit:old?old.unit||'mm':'mm',parts};PROJS=[P];})();
 const LAY=()=>P?P.parts.filter(q=>q.use):[];
 function newProject(){P.parts.forEach(q=>{q.use=false;});P.at=Date.now();saveAll();} // a new layout: the library stays
-function saveAll(){PROJS=[P];try{const lite=PROJS.map(p=>({...p,parts:p.parts.map(q=>{const o={...q};delete o.ph;delete o._cut;return o;})}));localStorage.setItem('fa_projects',JSON.stringify(lite));if(P)localStorage.setItem('fa_cur',P.id);}catch(e){toast('The phone storage is full. Delete old parts in the library.');}
+function saveAll(){PROJS=[P];try{const lite=PROJS.map(p=>({...p,parts:p.parts.map(q=>{const o={...q};delete o.ph;delete o._cut;return o;})}));localStorage.setItem('fa_projects',JSON.stringify(lite));if(P)localStorage.setItem('fa_cur',P.id);}catch(e){toast('The phone storage is full. Delete old parts in Scanned products.');}
   if(P)for(const q of P.parts){if(q.ph&&q._phSaved!==q.ph.j){const j=q.ph.j;PHDB.put('ph:'+q.id,q.ph).then(()=>{q._phSaved=j;}).catch(()=>{});}}}
 async function loadPhotos(p){for(const q of p.parts){if(!q.ph&&q.hasPh){try{const v=await PHDB.get('ph:'+q.id);if(v&&v.j){q.ph=v;q._phSaved=v.j;}}catch(e){}}}}
 function projName(p){if(!p.parts.length)return 'Empty project';const n=p.parts[0].name;return p.parts.length>1?n+' + '+(p.parts.length-1):n;}
@@ -668,7 +670,7 @@ function setTheme(d){if(d)document.documentElement.setAttribute('data-theme','da
 document.addEventListener('click',e=>{if(e.target.closest('[data-menu]')){$('#darkSw').setAttribute('aria-checked',String(isDark()));$('#menu').classList.add('on');return;}
   const mi=e.target.closest('[data-mi]');if(e.target.id==='menu'){$('#menu').classList.remove('on');return;}if(!mi)return;const k=mi.dataset.mi;
   if(k==='dark'){setTheme(!isDark());return;}$('#menu').classList.remove('on');
-  if(k==='g0'||k==='g1'){GUIDE.open(+k[1],{});return;}if(k==='saved'){show('sSaved');return;}if(k==='home'){HIST.length=0;CURS=null;show('sHome',false);}else if(k==='lib')show('sProj');else if(k==='lay'){if(LAY().length)show('sLayout');else{toast('The layout is empty. Tick parts in the library.');show('sProj');}}});
+  if(k==='g0'||k==='g1'){GUIDE.open(+k[1],{});return;}if(k==='saved'){show('sSaved');return;}if(k==='home'){HIST.length=0;CURS=null;show('sHome',false);}else if(k==='lib')show('sProj');else if(k==='lay'){if(LAY().length)show('sLayout');else{toast('The layout is empty. Tick parts in Scanned products.');show('sProj');}}});
 
 /* ---------- Saved layouts (saved in Best fit, key fa_saved) ---------- */
 function svAll(){try{const a=JSON.parse(localStorage.getItem('fa_saved')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
@@ -705,13 +707,13 @@ function afterSheet(){let seen=false;try{seen=localStorage.getItem('fa_lvl_seen'
 $('#homeOpen').onclick=()=>show('sProj');
 const szTxt=q=>{const f=v=>P.unit==='in'?(v/25.4).toFixed(1):Math.round(v);return f(q.L)+' × '+f(q.W)+' × '+f(q.D)+' '+P.unit;};
 ENTER.sProj=()=>{const l=$('#projList'),list=P.parts.slice().reverse(),n=LAY().length;
-  l.innerHTML=list.length?list.map(q=>`<div class="lb${q.use?' on':''}" data-lb="${q.id}"><button class="ck" data-a="use" role="checkbox" aria-checked="${!!q.use}" aria-label="Use ${esc(q.name)}">${q.use?'✓':''}</button><img class="th" src="${q.thumb||''}" alt=""><div style="flex:1;min-width:0" data-a="use"><b>${esc(q.name)}</b><span>${szTxt(q)}</span></div><button class="ed" data-a="edit" aria-label="Edit ${esc(q.name)}">Edit</button><button class="dl" data-a="del" aria-label="Delete ${esc(q.name)}">🗑</button></div>`).join(''):'<p class="hint" style="text-align:center;padding:30px 0">The library is empty. Scan an object first.</p>';
+  l.innerHTML=list.length?list.map(q=>`<div class="lb${q.use?' on':''}" data-lb="${q.id}"><button class="ck" data-a="use" role="checkbox" aria-checked="${!!q.use}" aria-label="Use ${esc(q.name)}">${q.use?'✓':''}</button><img class="th" src="${q.thumb||''}" alt=""><div style="flex:1;min-width:0" data-a="use"><b>${esc(q.name)}</b><span>${szTxt(q)}</span></div><button class="ed" data-a="edit" aria-label="Edit ${esc(q.name)}">Edit</button><button class="dl" data-a="del" aria-label="Delete ${esc(q.name)}">🗑</button></div>`).join(''):'<p class="hint" style="text-align:center;padding:30px 0">No scanned products yet. Scan an object first.</p>';
   $('#libGo').textContent=n?'Go to layout ('+n+')':'Go to layout';$('#libGo').disabled=!n;$('#libHint').style.display=list.length?'block':'none';updNav();};
 FWD.sProj=()=>LAY().length?()=>show('sLayout'):null;
 $('#projList').onclick=e=>{const b=e.target.closest('[data-a]'),r=e.target.closest('[data-lb]');if(!b||!r)return;const q=P.parts.find(x=>x.id===r.dataset.lb);if(!q)return;
   if(b.dataset.a==='use'){q.use=!q.use;saveAll();ENTER.sProj();return;}
   if(b.dataset.a==='edit'){editPart(q.id);return;}
-  if(b.dataset.a==='del'){if(!confirm('Delete "'+q.name+'" from the library? This cannot be undone.'))return;PHDB.del('ph:'+q.id).catch(()=>{});P.parts=P.parts.filter(x=>x!==q);saveAll();ENTER.sProj();}};
+  if(b.dataset.a==='del'){if(!confirm('Delete "'+q.name+'" from Scanned products? This cannot be undone.'))return;PHDB.del('ph:'+q.id).catch(()=>{});P.parts=P.parts.filter(x=>x!==q);saveAll();ENTER.sProj();}};
 $('#libGo').onclick=()=>{if(LAY().length){CUR=null;show('sLayout');}};
 $('#libScan').onclick=()=>{CUR=null;show('sSheet');};
 
@@ -1047,7 +1049,7 @@ FWD.sSize=()=>$('#sizeGo').disabled?null:()=>savePart();
 $('#szLift').onclick=()=>{SZ.lift=!SZ.lift;sizeUpd();};
 $('#szLiftTxt').onclick=e=>{if(e.target.id==='szLiftEd'&&CUR&&CUR.editId)openLift(CUR.editId,false);};
 $('#sizeGo').onclick=()=>savePart();
-$('#sizeDel').onclick=()=>{const id=CUR&&CUR.editId;if(!id||!confirm('Delete this part from the library?'))return;P.parts=P.parts.filter(q=>q.id!==id);PHDB.del('ph:'+id).catch(()=>{});saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);};
+$('#sizeDel').onclick=()=>{const id=CUR&&CUR.editId;if(!id||!confirm('Delete this part from Scanned products?'))return;P.parts=P.parts.filter(q=>q.id!==id);PHDB.del('ph:'+id).catch(()=>{});saveAll();CUR=null;HIST.length=0;HIST.push('sHome');CURS=null;show('sLayout',false);};
 function partThumb(cut){const t=document.createElement('canvas'),k=Math.min(120/cut.w,120/cut.h);t.width=Math.max(8,Math.round(cut.w*k));t.height=Math.max(8,Math.round(cut.h*k));const g=t.getContext('2d'),s=document.createElement('canvas');s.width=cut.w;s.height=cut.h;s.getContext('2d').putImageData(cut.img,0,0);g.fillStyle='#fff';g.fillRect(0,0,t.width,t.height);g.drawImage(s,0,0,t.width,t.height);return t.toDataURL('image/jpeg',0.8);}
 function ringThumb(ring){const xs=ring.map(p=>p[0]),ys=ring.map(p=>p[1]),w=Math.max(...xs),h=Math.max(...ys),k=100/Math.max(w,h,1),t=document.createElement('canvas');t.width=t.height=120;const g=t.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,120,120);g.fillStyle='#C6B68D';g.beginPath();ring.forEach((p,i)=>{const x=60+(p[0]-w/2)*k,y=60-(p[1]-h/2)*k;i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();return t.toDataURL('image/png');}
 function savePart(){const d=dims(),B=SZ.base,name=$('#inName').value.trim();if(!name||!(d.L>0&&d.W>0&&d.D>0))return;
@@ -1068,7 +1070,7 @@ $('#addDone').onclick=()=>{$('#mAdded').classList.remove('on');guidePlaceMaybe()
 /* ---------- 7 Layout: copies, Base or Lid, Easy to lift, In check ---------- */
 ENTER.sLayout=()=>{guidePlaceMaybe();$('#layGo').textContent=SHOW_FIT?'Find my STA-300 case':'Send to computer';renderLayout();};
 FWD.sLayout=()=>LAY().length?()=>layNext():null;
-function renderLayout(){const l=$('#layList');if(!LAY().length){l.innerHTML='<p class="hint" style="text-align:center;padding:30px 0">No parts yet. Scan a part, or add parts from the library.</p>';return;}
+function renderLayout(){const l=$('#layList');if(!LAY().length){l.innerHTML='<p class="hint" style="text-align:center;padding:30px 0">No parts yet. Scan a part, or add parts from Scanned products.</p>';return;}
   l.innerHTML=LAY().map(q=>`<div class="card pc${q.inCheck===false?' out':''}" data-id="${q.id}">
   <div class="row" style="gap:12px"><img class="th" src="${q.thumb||''}" alt=""><div class="nm">${esc(q.name)}</div><button class="sm" data-a="out" aria-label="Take out of the layout">✕</button></div>
   <div class="ln"><span>Copies</span><div class="row" style="gap:10px"><button class="qb" data-a="minus" aria-label="Remove one">-</button><span>${q.qty||1}</span><button class="qb add" data-a="plus" aria-label="Add one">+</button></div></div>
@@ -1077,7 +1079,7 @@ function renderLayout(){const l=$('#layList');if(!LAY().length){l.innerHTML='<p 
   <div class="ln"><span>In check</span><button class="sw" role="switch" aria-checked="${q.inCheck!==false}" aria-label="In check" data-a="check"></button></div></div>`).join('');}
 $('#layList').onclick=e=>{const b=e.target.closest('[data-a]'),c=e.target.closest('[data-id]');if(!b||!c)return;const q=P.parts.find(x=>x.id===c.dataset.id);if(!q)return;const a=b.dataset.a;
   if(a==='edit'){editPart(q.id);return;}
-  if(a==='out'){q.use=false;saveAll();renderLayout();updNav();toast('Taken out of the layout. It stays in the library.');return;}
+  if(a==='out'){q.use=false;saveAll();renderLayout();updNav();toast('Taken out of the layout. It stays in Scanned products.');return;}
   if(a==='minus')q.qty=Math.max(1,(q.qty||1)-1);else if(a==='plus')q.qty=Math.min(20,(q.qty||1)+1);
   else if(a==='base'||a==='lid'){const b=q.side!=='lid',l=q.side==='lid'||q.side==='both',nb=a==='base'?!b:b,nl=a==='lid'?!l:l;if(!nb&&!nl){toast('Choose Base, Lid or both.');return;}q.side=nb&&nl?'both':nl?'lid':'base';}
   else if(a==='check')q.inCheck=q.inCheck===false;
@@ -1113,9 +1115,9 @@ ENTER.sLift=()=>{requestAnimationFrame(drawLift);if(LF.hint&&LF.sel>=0)lfHint();
 function lfHint(){const t0=performance.now();const step=now=>{if(!LF.hint||CURS!=='sLift'||LF.sel<0||LF.drag>=0){LF.demo=null;drawLift();return;}
   const ph=(now-t0)/1000;LF.demo=0.035*Math.sin(ph*2.4)*Math.min(1,ph*1.5);drawLift();requestAnimationFrame(step);};requestAnimationFrame(step);}
 FWD.sLift=()=>()=>liftDone();
-function liftDone(){const q=P.parts.find(x=>x.id===LF.id);if(!q)return back();LF.hint=false;q.notches=LF.slots.map((s,k)=>s.open?(s.w>SLOT_MIN+0.5?{slot:k,t:+s.t.toFixed(4),w:Math.round(s.w)}:{slot:k,t:+s.t.toFixed(4)}):null).filter(Boolean);q.lift=q.notches.length>0;saveAll();back();}
+function liftDone(){const q=P.parts.find(x=>x.id===LF.id);if(!q)return back();LF.hint=false;q.notches=LF.slots.map((s,k)=>s.open?(s.w>SLOT_MIN+0.5?{slot:k,t:+s.t.toFixed(4),w:Math.round(s.w)}:{slot:k,t:+s.t.toFixed(4)}):null).filter(Boolean);q.lift=q.notches.length>0;saveAll();if(LIFT_BACK){LIFT_BACK=false;goFit();return;}back();}
 $('#lfDone').onclick=liftDone;
-$('#lfAdd').onclick=()=>{const q=P.parts.find(x=>x.id===LF.id);if(!q)return;const o=lfOrder(q),k=o.find(i=>!LF.slots[i].open);if(k==null){toast('Up to 4 notches.');return;}const s=LF.slots[k],t0=LF.slots[o[0]].home,near=t=>LF.slots.some(z=>z.open&&Math.min(Math.abs(z.t-t),1-Math.abs(z.t-t))<0.03);let t=t0,n=0;while(near(t)&&n<12){n++;t=(t0+0.06*n)%1;}s.open=true;s.t=t;s.w=SLOT_MIN;LF.sel=k;LF.hint=false;drawLift();};$('#lfCancel').onclick=()=>{LF.hint=false;back();};
+$('#lfAdd').onclick=()=>{const q=P.parts.find(x=>x.id===LF.id);if(!q)return;const o=lfOrder(q),k=o.find(i=>!LF.slots[i].open);if(k==null){toast('Up to 4 notches.');return;}const s=LF.slots[k],t0=LF.slots[o[0]].home,near=t=>LF.slots.some(z=>z.open&&Math.min(Math.abs(z.t-t),1-Math.abs(z.t-t))<0.03);let t=t0,n=0;while(near(t)&&n<12){n++;t=(t0+0.06*n)%1;}s.open=true;s.t=t;s.w=SLOT_MIN;LF.sel=k;LF.hint=false;drawLift();};$('#lfCancel').onclick=()=>{LF.hint=false;if(LIFT_BACK){LIFT_BACK=false;goFit();return;}back();};
 $('#lfShape').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;if(b.dataset.sh==='round')s.w=SLOT_MIN;else if(s.w<=SLOT_MIN+0.5)s.w=Math.min(SLOT_MAX,SLOT_MIN+30);drawLift();};
 $('#lfLen').onclick=e=>{const b=e.target.closest('button'),s=LF.slots[LF.sel];if(!b||!s||!s.open)return;s.w=Math.max(SLOT_MIN+10,Math.min(SLOT_MAX,s.w+(+b.dataset.d)));drawLift();};
 function drawLift(){const q=P.parts.find(x=>x.id===LF.id),box=$('#lfBox'),cv=$('#lfCv');if(!q)return;const r=q.ring,dpr=devicePixelRatio||1,W=box.clientWidth,H=box.clientHeight;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
@@ -1175,7 +1177,7 @@ async function packLink(base,list,extra){const txt=new TextEncoder().encode(JSON
   if(window.CompressionStream){const cs=new CompressionStream('deflate-raw'),w=cs.writable.getWriter();w.write(txt);w.close();body=new Uint8Array(await new Response(cs.readable).arrayBuffer());tag='z.';}
   return base+'#phone='+tag+b64u(body)+(extra||'');}
 async function goFit(){const list=LAY().filter(q=>q.inCheck!==false);if(!list.length){toast('Turn on <b>In check</b> for at least one part.');return;}
-  saveAll();busy(true,'Opening the fit check… The first time can take a minute.');$('#busyBack').style.display='';location.href=await packLink(new URL('./app-fit.html',location.href).href,list,'&fit=1&u='+P.unit);}
+  saveAll();busy(true,'Opening the fit check… The first time can take a minute.');$('#busyBack').style.display='';location.href=await packRaw(new URL('./app-fit.html',location.href).href,list.map(q=>{const o=itemOf(q);delete o.xy;delete o.zr;return o;}),'&fit=1&u='+P.unit);}
 addEventListener('pageshow',()=>busy(false));$('#busyBack').onclick=()=>{try{window.stop();}catch(e){}busy(false);};
 
 /* ---------- Send to computer: scan the code on the computer (same Wi-Fi) or send a link ---------- */
@@ -1283,6 +1285,7 @@ $('#scanQrClose').onclick=closeQrScanner;
 /* ---------- start ---------- */
 (async function(){saveAll();await loadPhotos(P);
   const h=location.hash.replace('#','');if(h)history.replaceState(null,'',location.pathname+location.search);
+  if(h.indexOf('lift=')===0){const id=decodeURIComponent(h.slice(5));if(P.parts.some(q=>q.id===id)){HIST.push('sHome');HIST.push('sLayout');CURS=null;LIFT_BACK=true;openLift(id,false);return;}}
   if(h==='library'){HIST.push('sHome');CURS=null;show('sProj',false);}
   else if(LAY().length&&(h==='layout'||h==='send')){HIST.push('sHome');if(h==='send'){HIST.push('sLayout');}CURS=null;show(h==='send'?'sSend':'sLayout',false);}
   else{show('sHome',false);if(!P.parts.length&&!GUIDE.seen(0))setTimeout(()=>{if(CURS==='sHome')GUIDE.open(0,{end:'Start scanning ▶',onEnd:()=>$('#homeScan').click()});},500);}})();
